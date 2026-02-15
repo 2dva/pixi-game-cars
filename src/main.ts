@@ -1,10 +1,10 @@
-import { Application, Assets, Ticker, type TickerCallback } from 'pixi.js'
+import { Application, Assets, Ticker } from 'pixi.js'
 import { addBackground } from './background'
 import { addCars, animateCars, preloadCarAssets } from './cars'
-import { addHero, moveHero, preloadHeroAsset } from './hero'
 import { Controller } from './controller'
-import { addRoadMark, moveRoad as animateRoad } from './road'
+import { addHero, moveHero, preloadHeroAsset } from './hero'
 import { addHUD, updateHUD } from './hud'
+import { addRoadMark, moveRoad as animateRoad } from './road'
 
 const app = new Application()
 

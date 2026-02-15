@@ -1,19 +1,17 @@
 import {
   Application,
-  Assets,
   Container,
-  Filter,
   Graphics,
-  Point,
-  Rectangle,
-  Sprite,
   Text,
-  TextStyle,
-  type Texture,
+  TextStyle
 } from 'pixi.js'
 
-let hudObj = {
-  speed: null,
+type HUDObject = {
+  speed: Text
+}
+
+const hudObj: HUDObject = {
+  speed: new Text(),
 }
 
 export function addHUD(app: Application, startSpeed: number) {
@@ -35,6 +33,7 @@ export function addHUD(app: Application, startSpeed: number) {
     fontSize: 36,
     fill: '#ffffff', // белый цвет
     stroke: '#000000', // обводка
+    // @ts-expect-error strokeThickness is valid but not in types
     strokeThickness: 2,
     dropShadow: true,
     dropShadowColor: '#000000',
@@ -57,5 +56,5 @@ export function addHUD(app: Application, startSpeed: number) {
 }
 
 export function updateHUD(speed: number) {
-  hudObj.speed!.text = `${speed} kmh`
+  hudObj.speed.text = `${speed} kmh`
 }

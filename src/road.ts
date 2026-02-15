@@ -1,5 +1,4 @@
 import { Application, Container, Graphics, GraphicsContext } from 'pixi.js'
-// import { DashLine } from "pixi-dashed-line";
 
 const lineDash = 20
 const lineGap = 24
@@ -33,9 +32,6 @@ export function addRoadMark(app: Application) {
   }
 
   const lines = new Graphics(dashed)
-
-  // const cont = new Container();
-  // cont.addChild(shape);
 
   // Add the car container to the stage.
   container.addChild(lines)
