@@ -1,10 +1,4 @@
-import {
-  Application,
-  Container,
-  Graphics,
-  Text,
-  TextStyle
-} from 'pixi.js'
+import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js'
 
 type HUDObject = {
   speed: Text
@@ -21,7 +15,7 @@ export function addHUD(app: Application, startSpeed: number) {
   const background = new Graphics()
   background.roundRect(0, 0, 180, 100, 10).fill({
     color: 0x000000,
-    alpha: 0.4, // 50% opacity
+    alpha: 0.4,
   })
 
   // This ensures other children are drawn on top of it

@@ -1,4 +1,9 @@
 import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js'
+import { ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
+
+// Cars configuration
+const CAR_COUNT = 5
+
 
 type CarAlias = 'car01' | 'car02' | 'car03'
 
@@ -13,7 +18,7 @@ type CarConfig = {
 }
 
 // Create an array of asset data to load.
-const carConfig = {
+const carConfig: CarConfig = {
   car01: { alias: 'car01', src: 'cars/car01.png', speed: 2 + Math.random() * 2 },
   car02: { alias: 'car02', src: 'cars/car02.png', speed: 2 + Math.random() * 2 },
   car03: { alias: 'car03', src: 'cars/car03.png', speed: 2 + Math.random() * 2 },
@@ -25,6 +30,7 @@ type Car = {
 }
 
 const cars: Car[] = []
+const carAssets: CarAlias[] = ['car01', 'car02', 'car03']
 
 export async function preloadCarAssets() {
   // Load the assets defined above.
@@ -38,11 +44,9 @@ export function addCars(app: Application) {
   // Add the car container to the stage.
   app.stage.addChild(carContainer)
 
-  const carCount = 5
-  const carAssets: CarAlias[] = ['car01', 'car02', 'car03']
 
   // Create a car sprite for each car.
-  for (let i = 0; i < carCount; i++) {
+  for (let i = 0; i < CAR_COUNT; i++) {
     // Cycle through the car assets for each sprite.
     const carAsset = carAssets[i % carAssets.length]
     // const carAsset = CarConfig[i % CarConfig.length].alias
@@ -57,8 +61,8 @@ export function addCars(app: Application) {
     // car.speed = 2 + Math.random() * 2
 
     // Randomly position the car sprite around the stage.
-    car.x = 100 + 100 * i
-    car.y = Math.random() * 100 + 200
+    car.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * i
+    car.y = Math.random() * 200 + 200
 
     // Randomly scale the car sprite to create some variety.
     car.scale.set(0.6)
