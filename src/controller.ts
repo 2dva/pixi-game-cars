@@ -1,5 +1,21 @@
+// Action keys type
+type ActionKey = "up" | "left" | "down" | "right" | "space";
+
+// Key state interface
+interface KeyState {
+  pressed: boolean;
+  doubleTap: boolean;
+  timestamp: number;
+}
+
+// Controller keys type
+type ControllerKeys = Record<ActionKey, KeyState>;
+
+// Key map type
+type KeyMap = Record<string, ActionKey>;
+
 // Map keyboard key codes to controller's state keys
-const keyMap = {
+const keyMap: KeyMap = {
   Space: "space",
   KeyW: "up",
   ArrowUp: "up",
@@ -13,9 +29,7 @@ const keyMap = {
 
 // Class for handling keyboard inputs.
 export class Controller {
-  constructor() {
-    // The controller's state.
-    this.keys = {
+    keys: ControllerKeys = {
       up: { pressed: false, doubleTap: false, timestamp: 0 },
       left: { pressed: false, doubleTap: false, timestamp: 0 },
       down: { pressed: false, doubleTap: false, timestamp: 0 },
@@ -23,13 +37,17 @@ export class Controller {
       space: { pressed: false, doubleTap: false, timestamp: 0 },
     };
 
+    constructor() {
+    // The controller's state.
+
     // Register event listeners for keydown and keyup events.
     window.addEventListener("keydown", (event) => this.keydownHandler(event));
     window.addEventListener("keyup", (event) => this.keyupHandler(event));
   }
 
-  keydownHandler(event) {
-    const key = keyMap[event.code];
+  keydownHandler(event: KeyboardEvent) {
+    const keyCode = event.code
+    const key = keyMap[keyCode];
 
     if (!key) return;
 
@@ -43,7 +61,7 @@ export class Controller {
     this.keys[key].pressed = true;
   }
 
-  keyupHandler(event) {
+  keyupHandler(event: KeyboardEvent) {
     const key = keyMap[event.code];
 
     if (!key) return;

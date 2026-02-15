@@ -52,7 +52,7 @@ export function addCars(app: Application) {
   }
 }
 
-export function animateCars(app: Application, time: Ticker) {
+export function animateCars(app: Application, speed: number, time: Ticker) {
   // Extract the delta time from the Ticker object.
   // const delta = time.deltaTime;
 
@@ -66,7 +66,8 @@ export function animateCars(app: Application, time: Ticker) {
     // Animate the car movement direction according to the turn speed.
 
     // Animate the car position according to the direction and speed.
-    car.y -= car.speed;
+    let deltaSpeed = - car.speed + speed * 0.1;
+    car.y += deltaSpeed;
 
     // Wrap the car position when it goes out of bounds.
     if (car.x < -stagePadding) {

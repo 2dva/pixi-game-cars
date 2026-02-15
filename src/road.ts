@@ -1,17 +1,21 @@
 import { Application, Container, Graphics, GraphicsContext } from "pixi.js";
+// import { DashLine } from "pixi-dashed-line";
 
-export function drawDashedLine(
+const lineDash = 20
+const lineGap = 24
+
+
+function drawDashedLine(
   ctx: GraphicsContext,
   cx: number,
-  cy: number,
-  dash: number,
-  gap: number
+  cy: number
 ) {
-  const segmentCount = Math.floor(600 / (dash + gap));
+
+  const segmentCount = Math.floor(650 / (lineDash + lineGap));
 
   for (let i = 0; i < segmentCount; i++) {
-    const start = i * (dash + gap);
-    const end = start + dash
+    const start = i * (lineDash + lineGap);
+    const end = start + lineDash;
     const x = cx, y1 = cy + start, y2 = cy + end
     ctx.moveTo(x, y1);
     ctx.lineTo(x, y2);
@@ -20,18 +24,33 @@ export function drawDashedLine(
   ctx.stroke();
 }
 
+let road: Container | null = null
+let roadDelta = 0
+
 export function addRoadMark(app: Application) {
+  const container = new Container();
+
   const dashed = new GraphicsContext();
 
   for (let i = 0; i < 7; i++) {
-    drawDashedLine(dashed, 120 + i * 100, 0, 20, 10);
+    drawDashedLine(dashed, 120 + i * 100, 0);
   }
 
-    const shape = new Graphics(dashed);
+  const lines = new Graphics(dashed);
 
   // const cont = new Container();
   // cont.addChild(shape);
 
   // Add the car container to the stage.
-  app.stage.addChild(shape);
+  container.addChild(lines)
+  app.stage.addChild(container);
+  road = container
+}
+
+export function moveRoad(speed: number) {
+  if (!road) return
+  roadDelta += speed * 0.1
+  roadDelta = roadDelta % (lineGap + lineDash)
+  
+  road.position.set(0, roadDelta - 20); 
 }
