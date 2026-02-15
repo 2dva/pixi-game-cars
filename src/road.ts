@@ -38,6 +38,12 @@ function drawSolidLine(ctx: GraphicsContext, cx: number) {
 
 // Draw single line
 function drawSidewalkLine(ctx: GraphicsContext, cx: number) {
+
+  ctx.moveTo(cx-3, -LINE_REPEAT)
+  ctx.lineTo(cx-3, APP_HEIGHT + LINE_REPEAT)
+  ctx.setStrokeStyle({ width: LINE_WIDTH + 4, color: 0x242424, alpha: 0.5 })
+  ctx.stroke()
+
   const segmentCount = Math.floor((APP_HEIGHT + 2 * LINE_REPEAT) / LINE_REPEAT)
   for (let i = 0; i < segmentCount; i++) {
     const start = i * LINE_REPEAT + 3

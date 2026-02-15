@@ -24,8 +24,14 @@ export function addHero(app: Application) {
   carContainer.addChild(car)
   hero = carContainer
   addSmoke(carContainer)
+  
 }
 
+let extraBrake = true
+let extraBrakeStage = 0
+const extraBrakeRotation = [
+  0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
+]
 
 export function moveHero(app: Application, speed: number, deltaSpeed: number, delta: number, time: Ticker) {
   const car = hero!
@@ -34,6 +40,15 @@ export function moveHero(app: Application, speed: number, deltaSpeed: number, de
   newX = Math.max(MOVE_LIMITS[0], newX)
   car.x = newX
   car.rotation = delta * 0.02
+  if (deltaSpeed < -3) {
+    if (!extraBrake) {
+      extraBrake = true
+      extraBrakeStage = 0
+    }
+    car.rotation = extraBrakeRotation[extraBrakeStage]
+    extraBrakeStage++
+    if (extraBrakeStage === extraBrakeRotation.length ) extraBrakeStage = 0
+  }
   animateSmoke(speed, deltaSpeed, time)
 }
 

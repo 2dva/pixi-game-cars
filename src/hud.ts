@@ -2,10 +2,12 @@ import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js'
 
 type HUDObject = {
   speed: Text
+  odo: Text
 }
 
 const hudObj: HUDObject = {
   speed: new Text(),
+  odo: new Text(),
 }
 
 export function addHUD(app: Application, startSpeed: number) {
@@ -22,8 +24,7 @@ export function addHUD(app: Application, startSpeed: number) {
   cont.addChild(background)
 
   const style = new TextStyle({
-    fontFamily: 'alarm clock, Arial',
-    // fontFamily: "Segment7Standard, Arial",
+    fontFamily: 'alarm clock, Arial', //"Segment7Standard",
     fontSize: 36,
     fill: '#ffffff', // белый цвет
     stroke: '#000000', // обводка
@@ -34,21 +35,40 @@ export function addHUD(app: Application, startSpeed: number) {
     dropShadowBlur: 4,
   })
 
-  const text = new Text({
+  const textSpeed = new Text({
     text: '',
     style,
     x: 6,
     y: 10,
   })
+  const textOdo = new Text({
+    text: '',
+    style: new TextStyle({
+      fontFamily: 'alarm clock, Arial',
+      fontSize: 16,
+      fill: '#ffffff', // белый цвет
+      stroke: '#000000', // обводка
+      dropShadow: true,
+    }),
+    x: 6,
+    y: 70,
+  })
 
-  hudObj.speed = text
-  updateHUD(startSpeed)
+  hudObj.speed = textSpeed
+  hudObj.odo = textOdo
+  updateHUD(startSpeed, 0)
 
-  cont.addChild(text)
+  cont.addChild(textSpeed)
+  cont.addChild(textOdo)
 
   app.stage.addChild(cont)
 }
 
-export function updateHUD(speed: number) {
-  hudObj.speed.text = `${speed} kmh`
+export function updateHUD(speed: number, distance: number) {
+  hudObj.speed.text = `${Math.floor(speed)} kmh`
+  hudObj.odo.text = `${(Math.floor(distance/100)/100).toFixed(2)} km`
+}
+
+export function calcDistance(speed: number) {
+  return speed * 0.1
 }
