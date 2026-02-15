@@ -85,7 +85,7 @@ export function animateCars(app: Application, speed: number, time: Ticker) {
     // Animate the car movement direction according to the turn speed.
 
     // Animate the car position according to the direction and speed.
-    let deltaSpeed = -carConfig[alias].speed + speed * 0.1
+    const deltaSpeed = -carConfig[alias].speed + speed * 0.1
     sprite.y += deltaSpeed
 
     // Wrap the car position when it goes out of bounds.
