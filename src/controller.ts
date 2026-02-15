@@ -1,79 +1,78 @@
 // Action keys type
-type ActionKey = "up" | "left" | "down" | "right" | "space";
+type ActionKey = 'up' | 'left' | 'down' | 'right' | 'space'
 
 // Key state interface
 interface KeyState {
-  pressed: boolean;
-  doubleTap: boolean;
-  timestamp: number;
+  pressed: boolean
+  doubleTap: boolean
+  timestamp: number
 }
 
 // Controller keys type
-type ControllerKeys = Record<ActionKey, KeyState>;
+type ControllerKeys = Record<ActionKey, KeyState>
 
 // Key map type
-type KeyMap = Record<string, ActionKey>;
+type KeyMap = Record<string, ActionKey>
 
 // Map keyboard key codes to controller's state keys
 const keyMap: KeyMap = {
-  Space: "space",
-  KeyW: "up",
-  ArrowUp: "up",
-  KeyA: "left",
-  ArrowLeft: "left",
-  KeyS: "down",
-  ArrowDown: "down",
-  KeyD: "right",
-  ArrowRight: "right",
-};
+  Space: 'space',
+  KeyW: 'up',
+  ArrowUp: 'up',
+  KeyA: 'left',
+  ArrowLeft: 'left',
+  KeyS: 'down',
+  ArrowDown: 'down',
+  KeyD: 'right',
+  ArrowRight: 'right',
+}
 
 // Class for handling keyboard inputs.
 export class Controller {
-    keys: ControllerKeys = {
-      up: { pressed: false, doubleTap: false, timestamp: 0 },
-      left: { pressed: false, doubleTap: false, timestamp: 0 },
-      down: { pressed: false, doubleTap: false, timestamp: 0 },
-      right: { pressed: false, doubleTap: false, timestamp: 0 },
-      space: { pressed: false, doubleTap: false, timestamp: 0 },
-    };
+  keys: ControllerKeys = {
+    up: { pressed: false, doubleTap: false, timestamp: 0 },
+    left: { pressed: false, doubleTap: false, timestamp: 0 },
+    down: { pressed: false, doubleTap: false, timestamp: 0 },
+    right: { pressed: false, doubleTap: false, timestamp: 0 },
+    space: { pressed: false, doubleTap: false, timestamp: 0 },
+  }
 
-    constructor() {
+  constructor() {
     // The controller's state.
 
     // Register event listeners for keydown and keyup events.
-    window.addEventListener("keydown", (event) => this.keydownHandler(event));
-    window.addEventListener("keyup", (event) => this.keyupHandler(event));
+    window.addEventListener('keydown', (event) => this.keydownHandler(event))
+    window.addEventListener('keyup', (event) => this.keyupHandler(event))
   }
 
   keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
-    const key = keyMap[keyCode];
+    const key = keyMap[keyCode]
 
-    if (!key) return;
+    if (!key) return
 
-    const now = Date.now();
+    const now = Date.now()
 
     // If not already in the double-tap state, toggle the double tap state if the key was pressed twice within 300ms.
-    this.keys[key].doubleTap =
-      this.keys[key].doubleTap || now - this.keys[key].timestamp < 300;
+    this.keys[key].doubleTap = this.keys[key].doubleTap || now - this.keys[key].timestamp < 300
 
     // Toggle on the key pressed state.
-    this.keys[key].pressed = true;
+    this.keys[key].pressed = true
   }
 
   keyupHandler(event: KeyboardEvent) {
-    const key = keyMap[event.code];
+    const key = keyMap[event.code]
 
-    if (!key) return;
+    if (!key) return
 
-    const now = Date.now();
+    const now = Date.now()
 
     // Reset the key pressed state.
-    this.keys[key].pressed = false;
+    this.keys[key].pressed = false
 
     // Reset double tap only if the key is in the double-tap state.
-    if (this.keys[key].doubleTap) this.keys[key].doubleTap = false;
+    if (this.keys[key].doubleTap) this.keys[key].doubleTap = false
     // Otherwise, update the timestamp to track the time difference till the next potential key down.
-    else this.keys[key].timestamp = now;
+    else this.keys[key].timestamp = now
   }
 }

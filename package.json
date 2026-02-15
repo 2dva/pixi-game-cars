@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "types": "tsc --noEmit --project ./tsconfig.json",
+    "prettify": "prettier --loglevel warn --cache --write '{src/**/*,*}.{js,ts,json,yml,css}' '!**/{node_modules,dist}/**/*'"
   },
   "devDependencies": {
+    "prettier": "^3.8.1",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
   },
