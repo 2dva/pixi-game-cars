@@ -1,5 +1,5 @@
 import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js'
-import { ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
+import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 
 // Cars configuration
 const CAR_COUNT = 5
@@ -75,14 +75,14 @@ export function addCars(app: Application) {
   }
 }
 
-export function animateCars(app: Application, speed: number, time: Ticker) {
+export function animateCars(speed: number, time: Ticker) {
   // Extract the delta time from the Ticker object.
   // const delta = time.deltaTime;
 
   // Define the padding around the stage where cares are considered out of sight.
   const stagePadding = 100
-  const boundWidth = app.screen.width + stagePadding * 2
-  const boundHeight = app.screen.height + stagePadding * 2
+  const boundWidth = APP_WIDTH + stagePadding * 2
+  const boundHeight = APP_HEIGHT + stagePadding * 2
 
   // Iterate through each car sprite.
   cars.forEach(({ sprite, alias }) => {
@@ -96,13 +96,13 @@ export function animateCars(app: Application, speed: number, time: Ticker) {
     if (sprite.x < -stagePadding) {
       sprite.x += boundWidth
     }
-    if (sprite.x > app.screen.width + stagePadding) {
+    if (sprite.x > APP_WIDTH + stagePadding) {
       sprite.x -= boundWidth
     }
     if (sprite.y < -stagePadding) {
       sprite.y += boundHeight
     }
-    if (sprite.y > app.screen.height + stagePadding) {
+    if (sprite.y > APP_HEIGHT + stagePadding) {
       sprite.y -= boundHeight
     }
   })

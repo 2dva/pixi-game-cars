@@ -33,13 +33,13 @@ const extraBrakeRotation = [
   0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
 ]
 
-export function moveHero(app: Application, speed: number, deltaSpeed: number, delta: number, time: Ticker) {
+export function moveHero(speed: number, deltaSpeed: number, delta: number, time: Ticker) {
   const car = hero!
-  let newX = car.x + delta
+  let newX = car.x + delta * (speed*12/(speed*10  + 200))
   newX = Math.min(MOVE_LIMITS[1], newX)
   newX = Math.max(MOVE_LIMITS[0], newX)
   car.x = newX
-  car.rotation = delta * 0.02
+  car.rotation = delta * speed * 0.0003
   if (deltaSpeed < -3) {
     if (!extraBrake) {
       extraBrake = true
@@ -55,13 +55,13 @@ export function moveHero(app: Application, speed: number, deltaSpeed: number, de
 const groups: Graphics[] = []
 const baseX = 10
 const baseY = 60
+const smokePos: number[] = []
 
 function addSmoke(container: Container) {
-
   const groupCount = 3
   const particleCount = 4
 
-  for (let index = 0; index < groupCount; index++) {
+  for (let i = 0; i < groupCount; i++) {
     const smokeGroup = new Graphics()
 
     for (let i = 0; i < particleCount; i++) {
@@ -76,7 +76,7 @@ function addSmoke(container: Container) {
 
     smokeGroup.x = baseX
     smokeGroup.y = baseY
-    smokeGroup.tick = index * (1 / groupCount)
+    smokePos[i] = i * (1 / groupCount)
     groups.push(smokeGroup)
     container.addChild(smokeGroup)
   }
@@ -86,12 +86,12 @@ function animateSmoke(speed: number, deltaSpeed: number, time: Ticker) {
   const dt = time.deltaTime * 0.02
   const visible = deltaSpeed > 0
 
-  groups.forEach((group) => {
+  groups.forEach((group, i) => {
     group.visible = speed > 0
     group.alpha = visible ? 0.5 : 0.06
-    group.tick = (group.tick + dt) % 1
-    group.x = baseX - Math.pow(group.tick, 2) * 4
-    group.y = baseY + group.tick * 80
-    group.scale.set(Math.pow(group.tick, 0.75))
+    smokePos[i] = (smokePos[i] + dt) % 1
+    group.x = baseX - Math.pow(smokePos[i], 2) * 4
+    group.y = baseY + smokePos[i] * 80
+    group.scale.set(Math.pow(smokePos[i], 0.75))
   })
 }

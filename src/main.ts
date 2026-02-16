@@ -1,11 +1,11 @@
 import { Application, Assets, Sprite, Ticker } from 'pixi.js'
 import { addBackground } from './background'
 import { addCars, animateCars, preloadCarAssets } from './cars'
+import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
 import { addHero, moveHero, preloadHeroAsset } from './hero'
 import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud'
 import { addRoadMark, moveRoad as animateRoad } from './road'
-import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 
 const app = new Application()
 
@@ -68,9 +68,9 @@ async function preload() {
     if (speed > TOP_SPEED) speed = TOP_SPEED
     distance += calcDistance(speed)
     updateHUD(speed, distance)
-    updateScore(Math.floor(distance/10000)*100)
-    moveHero(app, speed, deltaSpeed, delta, time)
-    animateCars(app, speed, time)
+    updateScore(Math.floor(distance / 10000) * 100)
+    moveHero(speed, deltaSpeed, delta, time)
+    animateCars(speed, time)
     animateRoad(speed)
   })
 })()
