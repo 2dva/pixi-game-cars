@@ -3,7 +3,7 @@ import { addBackground } from './background'
 import { addCars, animateCars, preloadCarAssets } from './cars'
 import { Controller } from './controller'
 import { addHero, moveHero, preloadHeroAsset } from './hero'
-import { addHUD, calcDistance, updateHUD } from './hud'
+import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud'
 import { addRoadMark, moveRoad as animateRoad } from './road'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 
@@ -37,6 +37,7 @@ async function preload() {
   addRoadMark(app)
   addCars(app)
   addHero(app)
+  addScore(app)
   addHUD(app, 0)
 
   const logo = Sprite.from('logo.png')
@@ -67,6 +68,7 @@ async function preload() {
     if (speed > TOP_SPEED) speed = TOP_SPEED
     distance += calcDistance(speed)
     updateHUD(speed, distance)
+    updateScore(Math.floor(distance/10000)*100)
     moveHero(app, speed, deltaSpeed, delta, time)
     animateCars(app, speed, time)
     animateRoad(speed)
