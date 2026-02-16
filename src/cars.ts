@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js'
+import { Application, Assets, Container, Sprite } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 
 // Cars configuration
@@ -75,10 +75,7 @@ export function addCars(app: Application) {
   }
 }
 
-export function animateCars(speed: number, time: Ticker) {
-  // Extract the delta time from the Ticker object.
-  // const delta = time.deltaTime;
-
+export function animateCars(speed: number) {
   // Define the padding around the stage where cares are considered out of sight.
   const stagePadding = 100
   const boundWidth = APP_WIDTH + stagePadding * 2

@@ -1,7 +1,6 @@
 import { Application, Assets, Sprite, Ticker } from 'pixi.js'
-import { addBackground } from './background'
 import { addCars, animateCars, preloadCarAssets } from './cars'
-import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
+import { APP_BACKGROUND, APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
 import { addHero, moveHero, preloadHeroAsset } from './hero'
 import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud'
@@ -14,7 +13,7 @@ let distance = 0
 
 async function setup() {
   // Intialize the application.
-  await app.init({ width: APP_WIDTH, height: APP_HEIGHT, backgroundColor: 0x545457 })
+  await app.init({ width: APP_WIDTH, height: APP_HEIGHT, backgroundColor: APP_BACKGROUND })
 
   // Then adding the application's canvas to the DOM body.
   document.body.appendChild(app.canvas)
@@ -33,7 +32,6 @@ async function preload() {
   await setup()
   await preload()
 
-  addBackground(app)
   addRoadMark(app)
   addCars(app)
   addHero(app)
@@ -70,7 +68,7 @@ async function preload() {
     updateHUD(speed, distance)
     updateScore(Math.floor(distance / 10000) * 100)
     moveHero(speed, deltaSpeed, delta, time)
-    animateCars(speed, time)
+    animateCars(speed)
     animateRoad(speed)
   })
 })()
