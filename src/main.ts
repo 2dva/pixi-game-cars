@@ -1,10 +1,10 @@
 import { Application, Assets, Sprite, Ticker } from 'pixi.js'
-import { addCars, animateCars, preloadCarAssets } from './cars'
+import { addCars, animateCars, checkCollisionCars, preloadCarAssets } from './cars'
 import { APP_BACKGROUND, APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
-import { addHero, moveHero, preloadHeroAsset } from './hero'
-import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud'
-import { addRoadMark, moveRoad as animateRoad } from './road'
+import { addHero, heroGetBounds, heroSetCollision, moveHero, preloadHeroAsset } from './hero'
+import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud/hud'
+import { addRoadMark, moveRoad as animateRoad } from './terrain/road'
 
 const app = new Application()
 
@@ -70,5 +70,8 @@ async function preload() {
     moveHero(speed, deltaSpeed, delta, time)
     animateCars(speed)
     animateRoad(speed)
+
+    const crash = checkCollisionCars(heroGetBounds())
+    heroSetCollision(crash)
   })
 })()

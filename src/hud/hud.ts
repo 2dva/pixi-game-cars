@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js'
-import { APP_WIDTH, TOP_SPEED } from './configuration'
+import { APP_WIDTH, TOP_SPEED } from '../configuration'
 
 // HUD Configuration
 const gears = [0, 25, 50, 85, 120, TOP_SPEED]

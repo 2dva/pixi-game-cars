@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, GraphicsContext } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
+import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 
 // Road configuration
 const LINE_WIDTH = 5

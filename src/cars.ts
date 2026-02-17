@@ -1,9 +1,8 @@
-import { Application, Assets, Container, Sprite } from 'pixi.js'
+import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 
 // Cars configuration
 const CAR_COUNT = 5
-
 
 type CarAlias = 'car01' | 'car02' | 'car03'
 
@@ -43,7 +42,6 @@ export function addCars(app: Application) {
 
   // Add the car container to the stage.
   app.stage.addChild(carContainer)
-
 
   // Create a car sprite for each car.
   for (let i = 0; i < CAR_COUNT; i++) {
@@ -104,3 +102,27 @@ export function animateCars(speed: number) {
     }
   })
 }
+
+function checkCollisionOneCar(a: Bounds, b: Bounds) {
+    const rightmostLeft = a.left < b.left ? b.left : a.left
+    const leftmostRight = a.right > b.right ? b.right : a.right
+
+    if (leftmostRight <= rightmostLeft) {
+      return false
+    }
+
+    const bottommostTop = a.top < b.top ? b.top : a.top
+    const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
+
+    return topmostBottom > bottommostTop
+}
+
+export function checkCollisionCars(heroBounds: Bounds) {
+    for (const { sprite } of cars) {
+      const carBounds = sprite.getBounds()
+      if (checkCollisionOneCar(heroBounds, carBounds)) return true
+
+    }
+    return false
+}
+

@@ -1,5 +1,6 @@
 import { Application, Assets, Container, Graphics, Sprite, Ticker } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
+import { ColorOverlayFilter } from 'pixi-filters'
 
 // Hero configuration
 const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH
@@ -24,7 +25,6 @@ export function addHero(app: Application) {
   carContainer.addChild(car)
   hero = carContainer
   addSmoke(carContainer)
-  
 }
 
 let extraBrake = true
@@ -35,7 +35,7 @@ const extraBrakeRotation = [
 
 export function moveHero(speed: number, deltaSpeed: number, delta: number, time: Ticker) {
   const car = hero!
-  let newX = car.x + delta * (speed*12/(speed*10  + 200))
+  let newX = car.x + delta * ((speed * 12) / (speed * 10 + 200))
   newX = Math.min(MOVE_LIMITS[1], newX)
   newX = Math.max(MOVE_LIMITS[0], newX)
   car.x = newX
@@ -47,15 +47,15 @@ export function moveHero(speed: number, deltaSpeed: number, delta: number, time:
     }
     car.rotation = extraBrakeRotation[extraBrakeStage]
     extraBrakeStage++
-    if (extraBrakeStage === extraBrakeRotation.length ) extraBrakeStage = 0
+    if (extraBrakeStage === extraBrakeRotation.length) extraBrakeStage = 0
   }
   animateSmoke(speed, deltaSpeed, time)
 }
 
 const groups: Graphics[] = []
+const smokePos: number[] = []
 const baseX = 10
 const baseY = 60
-const smokePos: number[] = []
 
 function addSmoke(container: Container) {
   const groupCount = 3
@@ -94,4 +94,15 @@ function animateSmoke(speed: number, deltaSpeed: number, time: Ticker) {
     group.y = baseY + smokePos[i] * 80
     group.scale.set(Math.pow(smokePos[i], 0.75))
   })
+}
+
+export function heroGetBounds() {
+  return hero!.getBounds()
+}
+
+const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.2 })
+
+export function heroSetCollision(crash: boolean) {
+  // hero!.children[0].tint = crash ? 0xff0000 : 0xffffff
+  hero!.children[0].filters = crash ? [crashFilter] : []
 }
