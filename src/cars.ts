@@ -1,4 +1,4 @@
-import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
+import { Application, Assets, Bounds, Container, Graphics, Sprite } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 
 // Cars configuration
@@ -36,6 +36,32 @@ export async function preloadCarAssets() {
   await Assets.load(Object.values(carConfig))
 }
 
+function createCar(n: number) {
+  const carContainer = new Container()
+  // Cycle through the car assets for each sprite.
+  const carAsset = carAssets[n % carAssets.length]
+  // const carAsset = CarConfig[i % CarConfig.length].alias
+
+  // Create a car sprite.
+  const car = Sprite.from(carAsset)
+
+  // Randomly position the car sprite around the stage.
+  car.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
+  car.y = Math.random() * 200 + 200
+  car.anchor.set(0.5)
+
+  // Randomly scale the car sprite to create some variety.
+  car.scale.set(0.6)
+
+  // Create border graphics for debugging
+  const borderGraphics = new Graphics()
+  borderGraphics.zIndex = -1 // Place behind the car sprite
+  carContainer.addChild(borderGraphics)
+  carContainer.addChild(car)
+  cars.push({ alias: carAsset, sprite: car })
+  return car
+}
+
 export function addCars(app: Application) {
   // Create a container to hold all the car sprites.
   const carContainer = new Container()
@@ -45,31 +71,8 @@ export function addCars(app: Application) {
 
   // Create a car sprite for each car.
   for (let i = 0; i < CAR_COUNT; i++) {
-    // Cycle through the car assets for each sprite.
-    const carAsset = carAssets[i % carAssets.length]
-    // const carAsset = CarConfig[i % CarConfig.length].alias
-
-    // Create a car sprite.
-    const car = Sprite.from(carAsset)
-
-    // Center the sprite anchor.
-    car.anchor.set(0.5)
-
-    // Assign additional properties for the animation.
-    // car.speed = 2 + Math.random() * 2
-
-    // Randomly position the car sprite around the stage.
-    car.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * i
-    car.y = Math.random() * 200 + 200
-
-    // Randomly scale the car sprite to create some variety.
-    car.scale.set(0.6)
-
-    // Add the car sprite to the car container.
+    const car = createCar(i)
     carContainer.addChild(car)
-
-    // Add the car sprite to the car array.
-    cars.push({ alias: carAsset, sprite: car })
   }
 }
 
@@ -120,9 +123,28 @@ function checkCollisionOneCar(a: Bounds, b: Bounds) {
 export function checkCollisionCars(heroBounds: Bounds) {
     for (const { sprite } of cars) {
       const carBounds = sprite.getBounds()
-      if (checkCollisionOneCar(heroBounds, carBounds)) return true
-
+      if (checkCollisionOneCar(heroBounds, carBounds)){
+        return true
+      }
     }
     return false
 }
 
+export function checkObstacleAhead(heroBounds: Bounds): boolean {
+  // Проверяем, есть ли препятствие впереди (справа от героя)
+  const heroLeft = heroBounds.left
+  const heroRight = heroBounds.right
+  const heroTop = heroBounds.top
+  
+  for (const { sprite } of cars) {
+    const carBounds = sprite.getBounds()
+    // Проверяем, находится ли машина впереди (справа) и на той же высоте
+    if (carBounds.right >= heroLeft && 
+        carBounds.left <= heroRight && 
+        carBounds.bottom >= heroTop && 
+        carBounds.top < heroTop) {
+      return true
+    }
+  }
+  return false
+}

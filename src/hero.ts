@@ -1,13 +1,22 @@
-import { Application, Assets, Container, Graphics, Sprite, Ticker } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
 import { ColorOverlayFilter } from 'pixi-filters'
+import { Application, Assets, Container, Graphics, Sprite, Ticker } from 'pixi.js'
+import { checkCollisionCars } from './cars'
+import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
 
 // Hero configuration
-const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH
-const HERO_HALF_WIDTH = 40
-const MOVE_LIMITS = [ROAD_LEFT_GAP + HERO_HALF_WIDTH, APP_WIDTH - SIDEWALK_WIDTH - HERO_HALF_WIDTH]
+const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH - 100
+const HERO_HALF_WIDTH = 30
+const MOVE_LIMITS = [ROAD_LEFT_GAP + HERO_HALF_WIDTH, APP_WIDTH - SIDEWALK_WIDTH - HERO_HALF_WIDTH - 5]
 
-let hero: Container | null = null
+type Hero = {
+  container: Container | null
+  sprite: Sprite | null
+}
+
+const hero: Hero = {
+  container: null,
+  sprite: null,
+}
 
 export async function preloadHeroAsset() {
   const heroAsset = { alias: 'hero', src: 'cars/car00.png' }
@@ -15,16 +24,19 @@ export async function preloadHeroAsset() {
 }
 
 export function addHero(app: Application) {
-  const carContainer = new Container()
-  carContainer.x = START_POSITION
-  carContainer.y = APP_HEIGHT - 100
-  app.stage.addChild(carContainer)
-  const car = Sprite.from('hero')
-  car.anchor.set(0.5)
-  car.scale.set(0.6)
-  carContainer.addChild(car)
-  hero = carContainer
-  addSmoke(carContainer)
+  const heroContainer = new Container({
+    x: START_POSITION,
+    y: APP_HEIGHT - 150,
+  })
+  app.stage.addChild(heroContainer)
+
+  const sprite = Sprite.from('hero')
+  sprite.scale.set(0.6)
+  heroContainer.addChild(sprite)
+
+  hero.container = heroContainer
+  hero.sprite = sprite
+  addSmoke(heroContainer)
 }
 
 let extraBrake = true
@@ -34,11 +46,24 @@ const extraBrakeRotation = [
 ]
 
 export function moveHero(speed: number, deltaSpeed: number, delta: number, time: Ticker) {
-  const car = hero!
+  const car = hero.container!
+  const oldX = car.x
   let newX = car.x + delta * ((speed * 12) / (speed * 10 + 200))
   newX = Math.min(MOVE_LIMITS[1], newX)
   newX = Math.max(MOVE_LIMITS[0], newX)
+  
+  
+  // Проверяем коллизию перед применением новой позиции
   car.x = newX
+  const heroBounds = heroGetBounds()
+  // if (delta < 0) console.log(Math.floor(heroBounds.top), Math.floor(heroBounds.bottom))
+  const hasCollision = checkCollisionCars(heroBounds)
+  
+  // Если есть коллизия, возвращаемся к старой позиции
+  if (hasCollision) {
+    car.x = oldX
+  }
+  
   car.rotation = delta * speed * 0.0003
   if (deltaSpeed < -3) {
     if (!extraBrake) {
@@ -54,8 +79,8 @@ export function moveHero(speed: number, deltaSpeed: number, delta: number, time:
 
 const groups: Graphics[] = []
 const smokePos: number[] = []
-const baseX = 10
-const baseY = 60
+const baseX = 40
+const baseY = 120
 
 function addSmoke(container: Container) {
   const groupCount = 3
@@ -97,12 +122,11 @@ function animateSmoke(speed: number, deltaSpeed: number, time: Ticker) {
 }
 
 export function heroGetBounds() {
-  return hero!.getBounds()
+  return hero.sprite!.getBounds()
 }
 
 const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.2 })
 
 export function heroSetCollision(crash: boolean) {
-  // hero!.children[0].tint = crash ? 0xff0000 : 0xffffff
-  hero!.children[0].filters = crash ? [crashFilter] : []
+  hero.sprite!.filters = crash ? [crashFilter] : []
 }
