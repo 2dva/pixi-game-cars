@@ -1,15 +1,23 @@
-import { Application, Container, Graphics, GraphicsContext } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
+import { Application, Assets, Container, Graphics, GraphicsContext, Sprite } from 'pixi.js'
+import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
+import { rollBoolDice } from '../utils'
 
 // Road configuration
 const LINE_WIDTH = 5
 const LINE_DASH = 30
 const LINE_GAP = 44
-const LANE_COUNT = 5
 const LINE_REPEAT = LINE_DASH + LINE_GAP
 const LINE_COLOR = 0xe5e5e5
 const LINE_YELLOW_COLOR = 0xa99f2f
 const SIDEWALK_BORDER_COLOR = 0x717475
+const STAGE_PADDING = 120
+
+const terrainObjects: Set<Sprite> = new Set()
+const terrainContainer = new Container()
+
+export async function preloadTerrainAssets() {
+    await Assets.load({ alias: 'tree01', src: 'terrain/tree01.png' })
+}
 
 // Draw single line
 function drawDashedLine(ctx: GraphicsContext, cx: number) {
@@ -58,28 +66,65 @@ let road: Container | null = null
 let roadDelta = 0
 
 export function addRoadMark(app: Application) {
-  const container = new Container()
+  road = new Container()
+
   const lineCtx = new GraphicsContext()
 
   drawSolidLine(lineCtx, ROAD_LEFT_GAP - LINE_WIDTH)
   drawSolidLine(lineCtx, ROAD_LEFT_GAP + LINE_WIDTH)
   drawSidewalkLine(lineCtx, APP_WIDTH - SIDEWALK_WIDTH)
 
-  for (let i = 1; i <= LANE_COUNT; i++) {
+  for (let i = 1; i <= ROAD_LANE_COUNT; i++) {
     drawDashedLine(lineCtx, ROAD_LEFT_GAP + i * ROAD_LANE_WIDTH)
   }
 
   const lines = new Graphics(lineCtx)
 
   // Add the car container to the stage.
-  container.addChild(lines)
-  app.stage.addChild(container)
-  road = container
+  road.addChild(lines)
+  app.stage.addChild(road)
+  app.stage.addChild(terrainContainer)
 }
 
-export function moveRoad(speed: number) {
+function addTerrainObject(x: number) {
+  const sprite = Sprite.from('tree01')
+  sprite.anchor.set(0.5)
+  sprite.scale.set(0.6)
+  sprite.x = x
+  sprite.y = -50
+  terrainObjects.add(sprite)
+  terrainContainer.addChild(sprite)
+}
+
+function removeTerrainObject(sprite: Sprite) {
+  terrainObjects.delete(sprite)
+  terrainContainer.removeChild(sprite)
+  sprite.destroy()
+}
+
+function animateRoad(speed: number) {
   if (!road) return
   roadDelta += speed * 0.1
   roadDelta = roadDelta % (LINE_GAP + LINE_DASH)
   road.position.set(0, roadDelta - LINE_REPEAT)
+}
+
+export function animateTerrain(speed: number) {
+  animateRoad(speed)
+
+  terrainObjects.forEach((sprite) => {
+    sprite.y += speed * 0.1
+    // объект остался за экраном - убираем со сцены
+    if (sprite.y < -STAGE_PADDING || sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      removeTerrainObject(sprite)
+    }
+  })
+}
+
+export function checkReleaseTerrain(speed: number) {
+  if (speed < 1) return
+  // бросаем кубик, и если ок, то рисуем объект
+  if (rollBoolDice(3)) {
+    addTerrainObject(APP_WIDTH - 15)
+  }
 }

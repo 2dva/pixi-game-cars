@@ -1,16 +1,16 @@
-import { Application, Assets, Container, Sprite } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
+import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
+import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
+import { rollBoolDice, rollDice } from './utils'
 
 // Cars configuration
-const CAR_COUNT = 5
-
+const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release / per 1 sec
+const STAGE_PADDING = 120
 
 type CarAlias = 'car01' | 'car02' | 'car03'
 
 type CarData = {
   alias: CarAlias
   src: string
-  speed: number
 }
 
 type CarConfig = {
@@ -19,88 +19,122 @@ type CarConfig = {
 
 // Create an array of asset data to load.
 const carConfig: CarConfig = {
-  car01: { alias: 'car01', src: 'cars/car01.png', speed: 2 + Math.random() * 2 },
-  car02: { alias: 'car02', src: 'cars/car02.png', speed: 2 + Math.random() * 2 },
-  car03: { alias: 'car03', src: 'cars/car03.png', speed: 2 + Math.random() * 2 },
+  car01: { alias: 'car01', src: 'cars/car01.png' },
+  car02: { alias: 'car02', src: 'cars/car02.png' },
+  car03: { alias: 'car03', src: 'cars/car03.png' },
 }
 
 type Car = {
-  alias: CarAlias
   sprite: Sprite
+  lane: number
+  speed: number
 }
 
-const cars: Car[] = []
-const carAssets: CarAlias[] = ['car01', 'car02', 'car03']
+let carContainer: Container | null = null
+const cars: Set<Car> = new Set()
+const occupiedLanes: Record<string, boolean> = {}
 
 export async function preloadCarAssets() {
-  // Load the assets defined above.
   await Assets.load(Object.values(carConfig))
+}
+
+function createRandomCarSprite() {
+  const carAsset = Object.keys(carConfig)[rollDice(3)]
+  const sprite = Sprite.from(carAsset)
+  sprite.anchor.set(0.5)
+  sprite.scale.set(0.6)
+  return sprite
+}
+
+function addCarToLane(n: number, globalSpeed: number) {
+  const speed = Math.floor(25 + rollDice(30))
+  const carSprite = createRandomCarSprite()
+  carSprite.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
+  carSprite.y = speed > globalSpeed ? APP_HEIGHT + STAGE_PADDING : -STAGE_PADDING
+  cars.add({ sprite: carSprite, lane: n, speed })
+  carContainer!.addChild(carSprite)
+}
+
+function removeCar(car: Car) {
+  cars.delete(car)
+  occupiedLanes[car.lane] = false
+  carContainer!.removeChild(car.sprite)
+  car.sprite.destroy()
 }
 
 export function addCars(app: Application) {
   // Create a container to hold all the car sprites.
-  const carContainer = new Container()
-
+  carContainer = new Container()
   // Add the car container to the stage.
   app.stage.addChild(carContainer)
-
-
-  // Create a car sprite for each car.
-  for (let i = 0; i < CAR_COUNT; i++) {
-    // Cycle through the car assets for each sprite.
-    const carAsset = carAssets[i % carAssets.length]
-    // const carAsset = CarConfig[i % CarConfig.length].alias
-
-    // Create a car sprite.
-    const car = Sprite.from(carAsset)
-
-    // Center the sprite anchor.
-    car.anchor.set(0.5)
-
-    // Assign additional properties for the animation.
-    // car.speed = 2 + Math.random() * 2
-
-    // Randomly position the car sprite around the stage.
-    car.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * i
-    car.y = Math.random() * 200 + 200
-
-    // Randomly scale the car sprite to create some variety.
-    car.scale.set(0.6)
-
-    // Add the car sprite to the car container.
-    carContainer.addChild(car)
-
-    // Add the car sprite to the car array.
-    cars.push({ alias: carAsset, sprite: car })
-  }
 }
 
 export function animateCars(speed: number) {
-  // Define the padding around the stage where cares are considered out of sight.
-  const stagePadding = 100
-  const boundWidth = APP_WIDTH + stagePadding * 2
-  const boundHeight = APP_HEIGHT + stagePadding * 2
-
-  // Iterate through each car sprite.
-  cars.forEach(({ sprite, alias }) => {
-    // Animate the car movement direction according to the turn speed.
-
-    // Animate the car position according to the direction and speed.
-    const deltaSpeed = -carConfig[alias].speed + speed * 0.1
-    sprite.y += deltaSpeed
-
-    // Wrap the car position when it goes out of bounds.
-    if (sprite.x < -stagePadding) {
-      sprite.x += boundWidth
-    }
-    if (sprite.x > APP_WIDTH + stagePadding) {
-      sprite.x -= boundWidth
-    }
-    if (sprite.y < -stagePadding) {
-      sprite.y += boundHeight
-    }
-    if (sprite.y > APP_HEIGHT + stagePadding) {
-      sprite.y -= boundHeight
+  cars.forEach((car) => {
+    const deltaSpeed = speed - car.speed
+    car.sprite.y += deltaSpeed * 0.1
+    // машинка уехала - убираем со сцены
+    if (car.sprite.y < -STAGE_PADDING || car.sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      removeCar(car)
     }
   })
+}
+
+export function checkReleaseCar(speed: number) {
+  // в цикле проверяем свободные полосы
+  for (let i = 0; i < ROAD_LANE_COUNT; i++) {
+    // если есть свободная полоса
+    if (!occupiedLanes[i]) {
+      // бросаем кубик, и если ок, то выпускаем машину
+      if (rollBoolDice(CHANCE_TO_RELEASE_CAR)) {
+        addCarToLane(i, speed)
+        occupiedLanes[i] = true
+      }
+    }
+  }
+}
+
+function checkCollisionOneCar(a: Bounds, b: Bounds) {
+  const rightmostLeft = a.left < b.left ? b.left : a.left
+  const leftmostRight = a.right > b.right ? b.right : a.right
+
+  if (leftmostRight <= rightmostLeft) {
+    return false
+  }
+
+  const bottommostTop = a.top < b.top ? b.top : a.top
+  const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
+
+  return topmostBottom > bottommostTop
+}
+
+export function checkCollisionCars(heroBounds: Bounds) {
+  for (const { sprite } of cars) {
+    const carBounds = sprite.getBounds()
+    if (checkCollisionOneCar(heroBounds, carBounds)) {
+      return true
+    }
+  }
+  return false
+}
+
+export function checkObstacleAhead(heroBounds: Bounds): boolean {
+  // Проверяем, есть ли препятствие впереди (справа от героя)
+  const heroLeft = heroBounds.left
+  const heroRight = heroBounds.right
+  const heroTop = heroBounds.top
+
+  for (const { sprite } of cars) {
+    const carBounds = sprite.getBounds()
+    // Проверяем, находится ли машина впереди (справа) и на той же высоте
+    if (
+      carBounds.right >= heroLeft &&
+      carBounds.left <= heroRight &&
+      carBounds.bottom >= heroTop &&
+      carBounds.top < heroTop
+    ) {
+      return true
+    }
+  }
+  return false
 }

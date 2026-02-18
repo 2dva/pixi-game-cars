@@ -1,12 +1,18 @@
-import { Application, Assets, Sprite, Ticker } from 'pixi.js'
-import { addCars, animateCars, preloadCarAssets } from './cars'
+import { Application, Assets, Ticker } from 'pixi.js'
+import { addCars, animateCars, checkCollisionCars, checkObstacleAhead, checkReleaseCar, preloadCarAssets } from './cars'
 import { APP_BACKGROUND, APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
-import { addHero, moveHero, preloadHeroAsset } from './hero'
-import { addHUD, addScore, calcDistance, updateHUD, updateScore } from './hud'
-import { addRoadMark, moveRoad as animateRoad } from './road'
+import { addHero, heroGetBounds, heroSetCollision, moveHero, preloadHeroAsset } from './hero'
+import { addHUD, preloadHudAssets, updateHUD } from './hud/hud'
+import { addRoadMark, animateTerrain, checkReleaseTerrain, preloadTerrainAssets } from './terrain/road'
+import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
 
 const app = new Application()
+
+// @ts-expect-error this is for debug
+globalThis.__PIXI_APP__ = app
+// @ts-expect-error this is for debug
+window.__PIXI_DEVTOOLS__ = { app }
 
 let speed = 0
 let distance = 0
@@ -21,11 +27,10 @@ async function setup() {
 
 async function preload() {
   Assets.init({ basePath: 'assets/' })
-  await Assets.load('fonts/Segment7Standard.otf')
-  await Assets.load('fonts/alarm_clock.ttf')
-  await Assets.load('logo.png')
+  await preloadHudAssets()
   await preloadCarAssets()
   await preloadHeroAsset()
+  await preloadTerrainAssets()
 }
 
 ;(async () => {
@@ -35,40 +40,68 @@ async function preload() {
   addRoadMark(app)
   addCars(app)
   addHero(app)
-  addScore(app)
   addHUD(app, 0)
-
-  const logo = Sprite.from('logo.png')
-  logo.x = 12
-  logo.y = APP_HEIGHT - 50
-  logo.width = 200
-  logo.scale.y = logo.scale.x
-  logo.alpha = 0.55
-  app.stage.addChild(logo)
 
   const controller = new Controller()
 
   app.ticker.add((time: Ticker) => {
+    const { speed, deltaSpeed, distance, deltaDistance, deltaX, score } = calculateState(controller)
+
+    updateHUD(speed, distance, score)
+    moveHero(speed, deltaSpeed, deltaX, time)
+    animateCars(speed)
+    animateTerrain(speed)
+
+    runEverySecond(time, () => {
+      checkReleaseCar(speed)
+    })
+
+    runEveryHundredMeters(deltaDistance, () => {
+      checkReleaseTerrain(speed)
+    })
+  })
+})()
+
+function calculateState(controller: Controller) {
     const upPressed = controller.keys.up.pressed
     const downPressed = controller.keys.down.pressed
     const rightPressed = controller.keys.right.pressed
     const leftPressed = controller.keys.left.pressed
     const spacePressed = controller.keys.space.pressed
-    let delta = 0
-    if (rightPressed) delta = 3
-    if (leftPressed) delta = -3
+
+    // Проверяем препятствие впереди перед изменением скорости
+    const heroBounds = heroGetBounds()
+    const obstacleAhead = checkObstacleAhead(heroBounds)
+    const crash = checkCollisionCars(heroBounds)
+
+    heroSetCollision(crash)
+
+    let deltaX = 0
+    if (rightPressed) deltaX = 3
+    if (leftPressed) deltaX = -3
+
+    // Если препятствие впереди, не позволяем увеличивать скорость
     let deltaSpeed = 0
-    if (upPressed) deltaSpeed = 1
-    if (downPressed) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-    if (spacePressed) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-    speed += deltaSpeed
-    if (speed < 0) speed = 0
-    if (speed > TOP_SPEED) speed = TOP_SPEED
-    distance += calcDistance(speed)
-    updateHUD(speed, distance)
-    updateScore(Math.floor(distance / 10000) * 100)
-    moveHero(speed, deltaSpeed, delta, time)
-    animateCars(speed)
-    animateRoad(speed)
-  })
-})()
+    if (!obstacleAhead) {
+      if (upPressed) deltaSpeed = 1
+      if (downPressed) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
+      if (spacePressed) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
+    }
+    speed += Math.floor(deltaSpeed)
+
+    // Если препятствие впереди, полностью останавливаемся
+    if (obstacleAhead) {
+      speed = 0
+    }
+
+    // Проверка чтобы не выйти за границу скорости
+    speed = Math.min(Math.max(speed, 0), TOP_SPEED)
+
+    const deltaDistance = calculateDistance(speed)
+    distance += deltaDistance
+
+    // Пока очки считаем просто по дистанции
+    const score = Math.floor(distance / 1000) * 100
+
+    return { speed, deltaSpeed, distance, deltaDistance, deltaX, score }
+}
