@@ -7,6 +7,7 @@ const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release / per 1 sec
 const STAGE_PADDING = 120
 
 type CarAlias = 'car01' | 'car02' | 'car03'
+type CollisionDirection = 'head' | 'back' | 'left' | 'right'
 
 type CarData = {
   alias: CarAlias
@@ -94,24 +95,57 @@ export function checkReleaseCar(speed: number) {
   }
 }
 
-function checkCollisionOneCar(a: Bounds, b: Bounds) {
+function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
   const rightmostLeft = a.left < b.left ? b.left : a.left
   const leftmostRight = a.right > b.right ? b.right : a.right
 
-  if (leftmostRight <= rightmostLeft) {
-    return false
+  if (leftmostRight < rightmostLeft) {
+    return null
   }
 
   const bottommostTop = a.top < b.top ? b.top : a.top
   const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
 
-  return topmostBottom > bottommostTop
+  if (topmostBottom < bottommostTop) {
+    return null
+  }
+
+  // we have collision here
+  const collisionX: CollisionDirection = a.left > b.left ? 'left' : 'right'
+  const collisionY: CollisionDirection = a.top > b.top ? 'head' : 'back'
+
+  const collisionDirection: CollisionDirection =
+    Math.abs(a.left - b.left) * 2 < Math.abs(a.top - b.top) ? collisionY : collisionX
+
+  return collisionDirection
 }
 
 export function checkCollisionCars(heroBounds: Bounds) {
-  for (const { sprite } of cars) {
+  for (const car of cars) {
+    const { sprite } = car
     const carBounds = sprite.getBounds()
-    if (checkCollisionOneCar(heroBounds, carBounds)) {
+    const collision = checkCollisionOneCar(heroBounds, carBounds)
+    if (collision !== null) {
+      const recoil = 4
+      switch (collision) {
+        case 'head':
+          car.speed += 2
+          sprite.y -= recoil
+          break
+        case 'back':
+          car.speed -= 8
+          sprite.y += recoil
+          break
+        case 'left':
+          car.speed -= 3
+          sprite.x -= recoil
+          break
+        case 'right':
+          car.speed -= 3
+          sprite.x += recoil
+          break
+      }
+      car.speed = Math.max(car.speed, 0)
       return true
     }
   }

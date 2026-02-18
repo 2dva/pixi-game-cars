@@ -5,7 +5,7 @@ import { Controller } from './controller'
 import { addHero, heroGetBounds, heroSetCollision, moveHero, preloadHeroAsset } from './hero'
 import { addHUD, preloadHudAssets, updateHUD } from './hud/hud'
 import { addRoadMark, animateTerrain, checkReleaseTerrain, preloadTerrainAssets } from './terrain/road'
-import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
+import { calculateDistance, runEveryHundredMeters, runEverySecond, throttle } from './utils'
 
 const app = new Application()
 
@@ -44,10 +44,13 @@ async function preload() {
 
   const controller = new Controller()
 
+  const updateHUDThrottled = throttle(updateHUD, 200)
+
+
   app.ticker.add((time: Ticker) => {
     const { speed, deltaSpeed, distance, deltaDistance, deltaX, score } = calculateState(controller)
 
-    updateHUD(speed, distance, score)
+    updateHUDThrottled(speed, distance, score)
     moveHero(speed, deltaSpeed, deltaX, time)
     animateCars(speed)
     animateTerrain(speed)
@@ -91,7 +94,7 @@ function calculateState(controller: Controller) {
 
     // Если препятствие впереди, полностью останавливаемся
     if (obstacleAhead) {
-      speed = 0
+      speed -= 15
     }
 
     // Проверка чтобы не выйти за границу скорости
