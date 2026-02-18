@@ -1,6 +1,7 @@
 import { Application, Assets, Container, Graphics, GraphicsContext, Sprite } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import { rollBoolDice } from '../utils'
+import { GifSource, GifSprite } from 'pixi.js/gif'
 
 // Road configuration
 const LINE_WIDTH = 5
@@ -12,11 +13,26 @@ const LINE_YELLOW_COLOR = 0xa99f2f
 const SIDEWALK_BORDER_COLOR = 0x717475
 const STAGE_PADDING = 120
 
-const terrainObjects: Set<Sprite> = new Set()
+const terrainObjects: Set<Sprite | GifSprite> = new Set()
 const terrainContainer = new Container()
 
+const terrainAssets = [
+  {
+    alias: 'tree01',
+    src: 'terrain/tree01.png',
+  },
+  {
+    alias: 'coin',
+    src: 'terrain/coin.png',
+  },
+]
+const coinAsset = 'terrain/coin.gif'
+
+let coinSource: GifSource
+
 export async function preloadTerrainAssets() {
-    await Assets.load({ alias: 'tree01', src: 'terrain/tree01.png' })
+  await Assets.load(terrainAssets)
+  coinSource = await Assets.load(coinAsset)
 }
 
 // Draw single line
@@ -86,8 +102,18 @@ export function addRoadMark(app: Application) {
   app.stage.addChild(terrainContainer)
 }
 
-function addTerrainObject(x: number) {
-  const sprite = Sprite.from('tree01')
+function addCoin(x: number) {
+  const sprite = new GifSprite({ source: coinSource })
+  sprite.anchor.set(0.5)
+  sprite.scale.set(0.3)
+  sprite.x = x
+  sprite.y = -50
+  terrainObjects.add(sprite)
+  terrainContainer.addChild(sprite)
+}
+
+function addTerrainObject(assetName: string, x: number) {
+  const sprite = Sprite.from(assetName)
   sprite.anchor.set(0.5)
   sprite.scale.set(0.6)
   sprite.x = x
@@ -96,7 +122,7 @@ function addTerrainObject(x: number) {
   terrainContainer.addChild(sprite)
 }
 
-function removeTerrainObject(sprite: Sprite) {
+function removeTerrainObject(sprite: Sprite | GifSprite) {
   terrainObjects.delete(sprite)
   terrainContainer.removeChild(sprite)
   sprite.destroy()
@@ -122,9 +148,9 @@ export function animateTerrain(speed: number) {
 }
 
 export function checkReleaseTerrain(speed: number) {
-  if (speed < 1) return
   // бросаем кубик, и если ок, то рисуем объект
+    addCoin(100)
   if (rollBoolDice(3)) {
-    addTerrainObject(APP_WIDTH - 15)
+    addTerrainObject('tree01', APP_WIDTH - 15)
   }
 }
