@@ -49,13 +49,11 @@ export function moveHero(speed: number, deltaSpeed: number, delta: number, time:
   const car = hero.container!
   const oldX = car.x
   let newX = car.x + delta * ((speed * 12) / (speed * 10 + 200))
-  newX = Math.min(MOVE_LIMITS[1], newX)
-  newX = Math.max(MOVE_LIMITS[0], newX)
+  newX = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
 
-  // Проверяем коллизию перед применением новой позиции
+  // Проверяем коллизию
   car.x = newX
   const heroBounds = heroGetBounds()
-  // if (delta < 0) console.log(Math.floor(heroBounds.top), Math.floor(heroBounds.bottom))
   const hasCollision = checkCollisionCars(heroBounds)
 
   // Если есть коллизия, возвращаемся к старой позиции
@@ -63,8 +61,8 @@ export function moveHero(speed: number, deltaSpeed: number, delta: number, time:
     car.x = oldX
   }
 
-  // при повороте руля влево/вправо
-  car.rotation = delta * speed * 0.0003
+  // при повороте руля влево/вправо не делаем rotation если не было перемещения
+  car.rotation = (car.x - oldX) * speed * 0.0003
   if (deltaSpeed < -3) {
     if (!extraBrake) {
       extraBrake = true

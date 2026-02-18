@@ -1,19 +1,19 @@
-import { Application, Assets, Container, Graphics, Text, TextStyle } from 'pixi.js'
+import { Application, Assets, BitmapText, Container, Graphics } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
 import { calculateGear } from '../utils'
 import { addLogo, preloadLogoAssets } from './logo'
 import { addScore, updateScore } from './score'
 
 type HUDObject = {
-  speed: Text
-  gear: Text
-  odo: Text
+  speed: BitmapText
+  gear: BitmapText
+  odo: BitmapText
 }
 
 const hudObj: HUDObject = {
-  speed: new Text(),
-  gear: new Text(),
-  odo: new Text(),
+  speed: new BitmapText(),
+  gear: new BitmapText(),
+  odo: new BitmapText(),
 }
 
 const FONT_STYLE = {
@@ -63,29 +63,32 @@ export function addHUD(app: Application, startSpeed: number) {
   })
   cont.addChild(background)
 
-  const textSpeedBG = new Text({
+  const textSpeedBG = new BitmapText({
     text: '888 kmh',
-    style: new TextStyle(FONT_STYLE.speedBg),
+    style: FONT_STYLE.speedBg,
     x: 170,
     y: 10,
   })
   textSpeedBG.anchor.set(1, 0)
-  const textSpeed = new Text({
+
+  const textSpeed = new BitmapText({
     text: '',
-    style: new TextStyle(FONT_STYLE.speed),
+    style: FONT_STYLE.speed,
     x: 170,
     y: 10,
   })
   textSpeed.anchor.set(1, 0)
-  const textOdo = new Text({
+
+  const textOdo = new BitmapText({
     text: '',
-    style: new TextStyle(FONT_STYLE.odo),
+    style: FONT_STYLE.odo,
     x: 22,
     y: 72,
   })
-  const textGear = new Text({
+
+  const textGear = new BitmapText({
     text: 'P',
-    style: new TextStyle(FONT_STYLE.gear),
+    style: FONT_STYLE.gear,
     x: 145,
     y: 55,
   })

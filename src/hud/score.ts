@@ -1,11 +1,11 @@
-import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js'
+import { Application, BitmapText, Container, Graphics } from 'pixi.js'
 
 type ScoreObject = {
-  score: Text
+  score: BitmapText
 }
 
 const scoreObj: ScoreObject = {
-  score: new Text(),
+  score: new BitmapText(),
 }
 
 const FONT_STYLE = {
@@ -25,9 +25,9 @@ export function addScore(app: Application) {
     color: 0x000000,
     alpha: 0.4,
   })
-  const textScore = new Text({
+  const textScore = new BitmapText({
     text: '0',
-    style: new TextStyle(FONT_STYLE.score),
+    style: FONT_STYLE.score,
     x: 170,
     y: 4,
   })
