@@ -1,6 +1,7 @@
 import { ColorOverlayFilter } from 'pixi-filters'
 import { Application, Assets, Container, Graphics, Sprite, Ticker } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
+import type { State } from './state'
 
 // Hero configuration
 const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH - 100
@@ -46,12 +47,12 @@ const extraBrakeRotation = [
   0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
 ]
 
-export function moveHero(speed: number, deltaSpeed: number, delta: number, crash: boolean, claim: boolean, time: Ticker) {
+export function moveHero({ speed, deltaSpeed, deltaX, crash, claim }: State, time: Ticker) {
   const car = hero.container!
   const oldX = car.x
   if (!crash) {
     // Если не происходит коллизия - перемещаем машинку
-    const newX = car.x + calculateHeroOffset(delta, speed)
+    const newX = car.x + calculateHeroOffset(deltaX, speed)
     car.x = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
   }
 

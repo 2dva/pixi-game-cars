@@ -1,6 +1,7 @@
 import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 import { rollBoolDice, rollDice } from './utils'
+import type { State } from './state'
 
 // Cars configuration
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release / per 1 sec
@@ -75,7 +76,7 @@ export function addCars(app: Application) {
   app.stage.addChild(carContainer)
 }
 
-export function animateCars(speed: number) {
+export function animateCars({ speed }: State) {
   cars.forEach((car) => {
     const deltaSpeed = speed - car.speed
     car.sprite.y += deltaSpeed * 0.1
@@ -86,7 +87,7 @@ export function animateCars(speed: number) {
   })
 }
 
-export function checkReleaseCar(speed: number) {
+export function checkReleaseCar({ speed }: State) {
   // в цикле проверяем свободные полосы
   for (let i = 0; i < ROAD_LANE_COUNT; i++) {
     // если есть свободная полоса

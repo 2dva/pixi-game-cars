@@ -3,7 +3,7 @@
 
 Управление: w,a,s,d,space
 ## Демо
-https://pixi-game-cars-deploy.vercel.app/
+https://pixi-game-cars.vercel.app/
 
 
 ## Запуск

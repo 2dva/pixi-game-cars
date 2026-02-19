@@ -2,6 +2,7 @@ import { Application, Assets, Bounds, Container, Graphics, GraphicsContext, Spri
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import { rollBoolDice } from '../utils'
 import { GifSource, GifSprite } from 'pixi.js/gif'
+import type { State } from '../state'
 
 // Road configuration
 const LINE_WIDTH = 5
@@ -137,7 +138,7 @@ function animateRoad(speed: number) {
   road.position.set(0, roadDelta - LINE_REPEAT)
 }
 
-export function animateTerrain(speed: number) {
+export function animateTerrain({ speed }: State) {
   animateRoad(speed)
 
   terrainObjects.forEach((sprite) => {

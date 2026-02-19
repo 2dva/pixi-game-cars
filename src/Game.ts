@@ -12,30 +12,21 @@ import {
   preloadTerrainAssets,
 } from './terrain/road'
 import { calculateDistance, runEveryHundredMeters, runEverySecond, throttle } from './utils'
-
-type State = {
-  score: number
-  speed: number
-  distance: number
-  condition: number
-}
+import { defaultState, type State } from './state'
 
 export class Game {
   app: Application
   state!: State
+  controller: Controller
 
   constructor(app: Application) {
     this.app = app
     this.initState()
+    this.controller = new Controller()
   }
 
   initState() {
-    this.state = {
-      score: 0,
-      speed: 0,
-      distance: 0,
-      condition: 100,
-    }
+    this.state = defaultState
   }
 
   async preloadAssets() {
@@ -60,50 +51,46 @@ export class Game {
       y: APP_HEIGHT / 2,
     })
     textLoading.anchor.set(0.5, 0.5)
+
     app.stage.addChild(textLoading)
-
     await preloadAssets()
-
     app.stage.removeChild(textLoading)
 
     addRoadMark(app)
     addCars(app)
     addHero(app)
-    addHUD(app, 0)
+    addHUD(app)
   }
 
   launch() {
-    const controller = new Controller()
-
     const updateHUDThrottled = throttle(updateHUD, 200)
 
     this.app.ticker.add((time: Ticker) => {
-      const { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim } =
-        this.calculateState(controller)
+      this.updateState()
 
-      updateHUDThrottled(speed, distance, score, condition)
-      moveHero(speed, deltaSpeed, deltaX, crash, !!claim, time)
-      animateCars(speed)
-      animateTerrain(speed)
+      updateHUDThrottled(this.state)
+      moveHero(this.state, time)
+      animateCars(this.state)
+      animateTerrain(this.state)
 
       runEverySecond(time, () => {
-        checkReleaseCar(speed)
+        checkReleaseCar(this.state)
       })
 
-      runEveryHundredMeters(deltaDistance, () => {
+      runEveryHundredMeters(this.state.deltaDistance, () => {
         checkReleaseTerrain()
       })
     })
   }
 
-  calculateState(controller: Controller) {
+  updateState() {
     let { speed, distance, score, condition } = this.state
 
-    const upPressed = controller.keys.up.pressed
-    const downPressed = controller.keys.down.pressed
-    const rightPressed = controller.keys.right.pressed
-    const leftPressed = controller.keys.left.pressed
-    const spacePressed = controller.keys.space.pressed
+    const upPressed = this.controller.keys.up.pressed
+    const downPressed = this.controller.keys.down.pressed
+    const rightPressed = this.controller.keys.right.pressed
+    const leftPressed = this.controller.keys.left.pressed
+    const spacePressed = this.controller.keys.space.pressed
 
     // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = heroGetBounds()
@@ -149,8 +136,6 @@ export class Game {
     // Пока очки считаем просто по дистанции
     // score = Math.floor(distance / 1000) * 100
 
-    Object.assign(this.state, { speed, distance, score, condition })
-
-    return { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim }
+    Object.assign(this.state, { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim })
   }
 }
