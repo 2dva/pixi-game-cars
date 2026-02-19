@@ -2,7 +2,7 @@ import { Assets, Bounds, Text, Ticker, type Application } from 'pixi.js'
 import { addCars, animateCars, checkCollisionCars, checkObstacleAhead, checkReleaseCar, preloadCarAssets } from './cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
-import { addHero, calculateHeroOffset, heroGetBounds, moveHero, preloadHeroAsset } from './hero'
+import { Hero } from './hero/Hero'
 import { HUD } from './hud/HUD'
 import { defaultState, type State } from './state'
 import {
@@ -18,6 +18,7 @@ export class Game {
   private app: Application
   private state!: State
   private controller: Controller
+  private hero: Hero
   private hud: HUD
 
   constructor(app: Application) {
@@ -25,6 +26,7 @@ export class Game {
     this.initState()
     this.controller = new Controller()
     this.hud = new HUD()
+    this.hero = new Hero()
   }
 
   initState() {
@@ -49,7 +51,7 @@ export class Game {
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
     await preloadCarAssets()
-    await preloadHeroAsset()
+    await this.hero.preloadAssets()
     await preloadTerrainAssets()
 
     this.app.stage.removeChild(textLoading)
@@ -62,7 +64,7 @@ export class Game {
 
     addRoadMark(app)
     addCars(app)
-    addHero(app)
+    this.hero.setup(app)
     this.hud.setup(app)
   }
 
@@ -71,7 +73,7 @@ export class Game {
       this.updateState()
 
       this.hud.draw(this.state)
-      moveHero(this.state, time)
+      this.hero.draw(this.state, time)
       animateCars(this.state)
       animateTerrain(this.state)
 
@@ -95,7 +97,7 @@ export class Game {
     const spacePressed = this.controller.keys.space.pressed
 
     // Проверяем препятствие впереди перед изменением скорости
-    const heroBounds = heroGetBounds()
+    const heroBounds = this.hero.heroGetBounds()
     const obstacleAhead = checkObstacleAhead(heroBounds)
 
     let deltaX = 0
@@ -117,7 +119,7 @@ export class Game {
     // Проверка чтобы не выйти за границу скорости
     speed = Math.min(Math.max(speed, 0), TOP_SPEED)
 
-    const offsetX = calculateHeroOffset(deltaX, speed)
+    const offsetX = this.hero.calculateHeroOffset(deltaX, speed)
     const heroBoundsWithShift = new Bounds(
       heroBounds.minX + offsetX,
       heroBounds.minY,
