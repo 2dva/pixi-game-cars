@@ -102,12 +102,13 @@ function calculateState(controller: Controller) {
     heroBounds.maxX + offsetX,
     heroBounds.maxY
   )
-  const crash = checkCollisionCars(heroBoundsWithShift)
-  if (crash) deltaX = deltaX * 0.6
+  const collision = checkCollisionCars(heroBoundsWithShift)
+  const crash = !!collision
+  if (collision) deltaX = deltaX * 0.6
   const deltaDistance = calculateDistance(speed)
   distance += deltaDistance
 
-  if (crash) condition -= 2
+  if (collision) condition -= collision.damage
   condition = Math.max(0, condition)
 
   // Пока очки считаем просто по дистанции

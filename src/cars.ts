@@ -8,6 +8,11 @@ const STAGE_PADDING = 120
 
 type CarAlias = 'car01' | 'car02' | 'car03'
 type CollisionDirection = 'head' | 'back' | 'left' | 'right'
+type CollisionObject = {
+  direction: CollisionDirection
+  force: number
+  damage: number
+}
 
 type CarData = {
   alias: CarAlias
@@ -95,7 +100,7 @@ export function checkReleaseCar(speed: number) {
   }
 }
 
-function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
+function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionObject | null {
   const amortization = 0.5
   const rightmostLeft = a.left < b.left ? b.left : a.left
   const leftmostRight = a.right > b.right ? b.right : a.right
@@ -104,12 +109,17 @@ function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
     return null
   }
 
+  let force = leftmostRight - rightmostLeft
+
   const bottommostTop = a.top < b.top ? b.top : a.top
   const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
 
   if (topmostBottom < bottommostTop + amortization) {
     return null
   }
+
+  force = Math.min(force, topmostBottom - bottommostTop)
+  const damage = Math.round(0.5 + force * 0.6)
 
   // we have collision here
   const collisionX: CollisionDirection = a.left > b.left ? 'left' : 'right'
@@ -118,17 +128,17 @@ function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
   const collisionDirection: CollisionDirection =
     Math.abs(a.left - b.left) * 2 < Math.abs(a.top - b.top) ? collisionY : collisionX
 
-  return collisionDirection
+  return { direction: collisionDirection, force, damage }
 }
 
-export function checkCollisionCars(heroBounds: Bounds): boolean {
+export function checkCollisionCars(heroBounds: Bounds): CollisionObject | null {
   for (const car of cars) {
     const { sprite } = car
     const carBounds = sprite.getBounds()
     const collision = checkCollisionOneCar(heroBounds, carBounds)
     if (collision !== null) {
       const recoil = 4
-      switch (collision) {
+      switch (collision.direction) {
         case 'head':
           car.speed += 2
           sprite.y -= recoil
@@ -147,10 +157,10 @@ export function checkCollisionCars(heroBounds: Bounds): boolean {
           break
       }
       car.speed = Math.max(car.speed, 0)
-      return true
+      return collision
     }
   }
-  return false
+  return null
 }
 
 export function checkObstacleAhead(heroBounds: Bounds): boolean {
