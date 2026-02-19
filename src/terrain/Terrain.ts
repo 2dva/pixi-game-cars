@@ -3,37 +3,37 @@ import { GifSprite, type GifSource } from 'pixi.js/gif'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from '../configuration'
 import type { State } from '../state'
 import { rollBoolDice } from '../utils'
-import { Road } from './road'
+import { Road } from './Road'
 
 const STAGE_PADDING = 120
 
+const coinAsset = 'terrain/coin.gif'
 const terrainAssets = [
   {
     alias: 'tree01',
     src: 'terrain/tree01.png',
   },
 ]
-const coinAsset = 'terrain/coin.gif'
 
-let coinSource: GifSource
 type claimableType = 'coin'
 
 export class Terrain {
-  road: Road
+  terrainContainer: Container
   terrainObjects: Set<Sprite | GifSprite>
   claimableObjects: Set<Sprite | GifSprite>
-  terrainContainer: Container
+  road: Road
+  coinSource!: GifSource
 
   constructor() {
+    this.terrainContainer = new Container()
     this.terrainObjects = new Set()
     this.claimableObjects = new Set()
-    this.terrainContainer = new Container()
     this.road = new Road()
   }
 
   async preloadAssets() {
     await Assets.load(terrainAssets)
-    coinSource = await Assets.load(coinAsset)
+    this.coinSource = await Assets.load(coinAsset)
   }
 
   setup(app: Application) {
@@ -48,13 +48,13 @@ export class Terrain {
       sprite.y += speed * 0.1
       // объект остался за экраном - убираем со сцены
       if (sprite.y > APP_HEIGHT + STAGE_PADDING) {
-        this.removeTerrainObject(sprite)
+        this.removeObject(sprite)
       }
     })
   }
 
   addCoin(x: number) {
-    const sprite = new GifSprite({ source: coinSource })
+    const sprite = new GifSprite({ source: this.coinSource })
     sprite.anchor.set(0.5)
     sprite.scale.set(0.3)
     sprite.x = x
@@ -65,7 +65,7 @@ export class Terrain {
     this.terrainContainer.addChild(sprite)
   }
 
-  addTerrainObject(assetName: string, x: number) {
+  private addObject(assetName: string, x: number) {
     const sprite = Sprite.from(assetName)
     sprite.anchor.set(0.5)
     sprite.scale.set(0.6)
@@ -75,24 +75,24 @@ export class Terrain {
     this.terrainContainer.addChild(sprite)
   }
 
-  removeTerrainObject(sprite: Sprite | GifSprite) {
+  private removeObject(sprite: Sprite | GifSprite) {
     this.terrainObjects.delete(sprite)
     this.claimableObjects.delete(sprite)
     this.terrainContainer.removeChild(sprite)
     sprite.destroy()
   }
 
-  checkReleaseTerrain() {
+  checkObjectRelease() {
     const laneNumber = 1 + Math.floor(Math.random() * ROAD_LANE_COUNT)
     this.addCoin(ROAD_LEFT_GAP + laneNumber * ROAD_LANE_WIDTH - ROAD_LANE_WIDTH / 2)
 
     // бросаем кубик, и если ок, то рисуем объект
     if (rollBoolDice(3)) {
-      this.addTerrainObject('tree01', APP_WIDTH - 15)
+      this.addObject('tree01', APP_WIDTH - 15)
     }
   }
 
-  checkCollisionObject(a: Bounds, b: Bounds): boolean {
+  private checkObjectCollision(a: Bounds, b: Bounds): boolean {
     const rightmostLeft = a.left < b.left ? b.left : a.left
     const leftmostRight = a.right > b.right ? b.right : a.right
     if (leftmostRight < rightmostLeft) return false
@@ -105,9 +105,9 @@ export class Terrain {
   checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {
     for (const sprite of this.claimableObjects) {
       const bounds = sprite.getBounds()
-      const claimed = this.checkCollisionObject(heroBounds, bounds)
+      const claimed = this.checkObjectCollision(heroBounds, bounds)
       if (claimed) {
-        this.removeTerrainObject(sprite)
+        this.removeObject(sprite)
         return 'coin'
       }
     }

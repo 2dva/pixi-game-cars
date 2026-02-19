@@ -53,7 +53,7 @@ export class Road {
   }
 
   // Draw single line
-  drawDashedLine(ctx: GraphicsContext, cx: number) {
+  private drawDashedLine(ctx: GraphicsContext, cx: number) {
     const segmentCount = Math.floor((APP_HEIGHT + 2 * LINE_REPEAT) / LINE_REPEAT)
 
     for (let i = 0; i < segmentCount; i++) {
@@ -70,7 +70,7 @@ export class Road {
   }
 
   // Draw yellow line
-  drawSolidLine(ctx: GraphicsContext, cx: number) {
+  private drawSolidLine(ctx: GraphicsContext, cx: number) {
     ctx.moveTo(cx, -LINE_REPEAT)
     ctx.lineTo(cx, APP_HEIGHT + LINE_REPEAT)
     ctx.setStrokeStyle({ width: LINE_WIDTH, color: LINE_YELLOW_COLOR })
@@ -78,7 +78,7 @@ export class Road {
   }
 
   // Draw single line
-  drawSidewalkLine(ctx: GraphicsContext, cx: number) {
+  private drawSidewalkLine(ctx: GraphicsContext, cx: number) {
     ctx.moveTo(cx - 3, -LINE_REPEAT)
     ctx.lineTo(cx - 3, APP_HEIGHT + LINE_REPEAT)
     ctx.setStrokeStyle({ width: LINE_WIDTH + 4, color: 0x242424, alpha: 0.5 })

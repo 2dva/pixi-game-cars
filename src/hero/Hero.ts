@@ -27,8 +27,7 @@ export class Hero {
   }
 
   async preloadAssets() {
-    const heroAsset = { alias: 'hero', src: 'cars/car00.png' }
-    await Assets.load(heroAsset)
+    await Assets.load({ alias: 'hero', src: 'cars/car00.png' })
   }
 
   setup(app: Application) {
@@ -52,11 +51,11 @@ export class Hero {
     const oldX = car.x
     if (!crash) {
       // Если не происходит коллизия - перемещаем машинку
-      const newX = car.x + this.calculateHeroOffset(deltaX, speed)
+      const newX = car.x + this.calculateOffset(deltaX, speed)
       car.x = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
     }
 
-    this.heroShowEffect({ crash, claim })
+    this.showEffect({ crash, claim })
 
     // при повороте руля влево/вправо не делаем rotation если не было перемещения
     car.rotation = (car.x - oldX) * speed * 0.0003
@@ -73,15 +72,15 @@ export class Hero {
     this.exhaust.draw(speed, deltaSpeed, time)
   }
 
-  heroGetBounds() {
+  getBounds() {
     return this.sprite!.getBounds()
   }
 
-  calculateHeroOffset(delta: number, speed: number) {
+  calculateOffset(delta: number, speed: number) {
     return delta * ((speed * 12) / (speed * 10 + 200))
   }
 
-  heroShowEffect(state: Record<string, boolean>) {
+  showEffect(state: Record<string, boolean>) {
     const filters: ColorOverlayFilter[] = []
     if (state.crash) filters.push(crashFilter)
     if (state.claim) filters.push(claimFilter)

@@ -1,12 +1,12 @@
 import { Assets, Bounds, Text, Ticker, type Application } from 'pixi.js'
 import { addCars, animateCars, checkCollisionCars, checkObstacleAhead, checkReleaseCar, preloadCarAssets } from './cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
-import { Controller } from './controller'
-import { Hero } from './hero/Hero'
-import { HUD } from './hud/HUD'
+import { Controller } from './Controller'
+import { Hero } from './Hero/Hero'
+import { HUD } from './HUD/HUD'
 import { defaultState, type State } from './state'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
-import { Terrain } from './terrain/Terrain'
+import { Terrain } from './Terrain/Terrain'
 
 export class Game {
   private app: Application
@@ -17,8 +17,8 @@ export class Game {
   private terrain: Terrain
 
   constructor(app: Application) {
-    this.app = app
     this.initState()
+    this.app = app
     this.controller = new Controller()
     this.terrain = new Terrain()
     this.hud = new HUD()
@@ -78,33 +78,28 @@ export class Game {
       })
 
       runEveryHundredMeters(this.state.deltaDistance, () => {
-        this.terrain.checkReleaseTerrain()
+        this.terrain.checkObjectRelease()
       })
     })
   }
 
   updateState() {
     let { speed, distance, score, condition } = this.state
-
-    const upPressed = this.controller.keys.up.pressed
-    const downPressed = this.controller.keys.down.pressed
-    const rightPressed = this.controller.keys.right.pressed
-    const leftPressed = this.controller.keys.left.pressed
-    const spacePressed = this.controller.keys.space.pressed
+    const { keyUp, keyDown, keyLeft, keyRight, keySpace } = this.controller.state
 
     // Проверяем препятствие впереди перед изменением скорости
-    const heroBounds = this.hero.heroGetBounds()
+    const heroBounds = this.hero.getBounds()
     const obstacleAhead = checkObstacleAhead(heroBounds)
 
     let deltaX = 0
-    if (rightPressed) deltaX = 3
-    if (leftPressed) deltaX = -3
+    if (keyRight) deltaX = 3
+    if (keyLeft) deltaX = -3
 
     // Если препятствие впереди, не позволяем увеличивать скорость
     let deltaSpeed = 0
-    if (!obstacleAhead && upPressed) deltaSpeed = 1
-    if (downPressed) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-    if (spacePressed) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
+    if (!obstacleAhead && keyUp) deltaSpeed = 1
+    if (keyDown) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
+    if (keySpace) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
     speed += Math.floor(deltaSpeed)
 
     // Если препятствие впереди, полностью останавливаемся
@@ -115,7 +110,7 @@ export class Game {
     // Проверка чтобы не выйти за границу скорости
     speed = Math.min(Math.max(speed, 0), TOP_SPEED)
 
-    const offsetX = this.hero.calculateHeroOffset(deltaX, speed)
+    const offsetX = this.hero.calculateOffset(deltaX, speed)
     const heroBoundsWithShift = new Bounds(
       heroBounds.minX + offsetX,
       heroBounds.minY,

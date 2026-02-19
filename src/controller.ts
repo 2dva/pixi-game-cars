@@ -45,7 +45,17 @@ export class Controller {
     window.addEventListener('keyup', (event) => this.keyupHandler(event))
   }
 
-  keydownHandler(event: KeyboardEvent) {
+  get state() {
+    return {
+      keyUp: this.keys.up.pressed,
+      keyDown: this.keys.down.pressed,
+      keyRight: this.keys.right.pressed,
+      keyLeft: this.keys.left.pressed,
+      keySpace: this.keys.space.pressed,
+    }
+  }
+
+  private keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
     const key = keyMap[keyCode]
 
@@ -60,7 +70,7 @@ export class Controller {
     this.keys[key].pressed = true
   }
 
-  keyupHandler(event: KeyboardEvent) {
+  private keyupHandler(event: KeyboardEvent) {
     const key = keyMap[event.code]
 
     if (!key) return
