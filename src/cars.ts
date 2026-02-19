@@ -96,17 +96,18 @@ export function checkReleaseCar(speed: number) {
 }
 
 function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
+  const amortization = 0.5
   const rightmostLeft = a.left < b.left ? b.left : a.left
   const leftmostRight = a.right > b.right ? b.right : a.right
 
-  if (leftmostRight < rightmostLeft) {
+  if (leftmostRight < rightmostLeft + amortization) {
     return null
   }
 
   const bottommostTop = a.top < b.top ? b.top : a.top
   const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
 
-  if (topmostBottom < bottommostTop) {
+  if (topmostBottom < bottommostTop + amortization) {
     return null
   }
 
@@ -120,7 +121,7 @@ function checkCollisionOneCar(a: Bounds, b: Bounds): CollisionDirection | null {
   return collisionDirection
 }
 
-export function checkCollisionCars(heroBounds: Bounds) {
+export function checkCollisionCars(heroBounds: Bounds): boolean {
   for (const car of cars) {
     const { sprite } = car
     const carBounds = sprite.getBounds()

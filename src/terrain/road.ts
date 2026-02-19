@@ -21,10 +21,6 @@ const terrainAssets = [
     alias: 'tree01',
     src: 'terrain/tree01.png',
   },
-  {
-    alias: 'coin',
-    src: 'terrain/coin.png',
-  },
 ]
 const coinAsset = 'terrain/coin.gif'
 
@@ -108,6 +104,7 @@ function addCoin(x: number) {
   sprite.scale.set(0.3)
   sprite.x = x
   sprite.y = -50
+  sprite.animationSpeed = 1.7
   terrainObjects.add(sprite)
   terrainContainer.addChild(sprite)
 }

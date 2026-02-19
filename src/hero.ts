@@ -1,12 +1,12 @@
 import { ColorOverlayFilter } from 'pixi-filters'
 import { Application, Assets, Container, Graphics, Sprite, Ticker } from 'pixi.js'
-import { checkCollisionCars } from './cars'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configuration'
 
 // Hero configuration
 const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH - 100
 const HERO_WIDTH = 60
 const MOVE_LIMITS = [ROAD_LEFT_GAP, APP_WIDTH - SIDEWALK_WIDTH - HERO_WIDTH - 5]
+const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.2 })
 
 type Hero = {
   container: Container | null
@@ -45,21 +45,16 @@ const extraBrakeRotation = [
   0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
 ]
 
-export function moveHero(speed: number, deltaSpeed: number, delta: number, time: Ticker) {
+export function moveHero(speed: number, deltaSpeed: number, delta: number, crash: boolean, time: Ticker) {
   const car = hero.container!
   const oldX = car.x
-  let newX = car.x + delta * ((speed * 12) / (speed * 10 + 200))
-  newX = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
-
-  // Проверяем коллизию
-  car.x = newX
-  const heroBounds = heroGetBounds()
-  const hasCollision = checkCollisionCars(heroBounds)
-
-  // Если есть коллизия, возвращаемся к старой позиции
-  if (hasCollision) {
-    car.x = oldX
+  if (!crash) {
+    // Если не происходит коллизия - перемещаем машинку
+    const newX = car.x + calculateHeroOffset(delta, speed)
+    car.x = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
   }
+
+  heroSetCollision(crash)
 
   // при повороте руля влево/вправо не делаем rotation если не было перемещения
   car.rotation = (car.x - oldX) * speed * 0.0003
@@ -124,7 +119,9 @@ export function heroGetBounds() {
   return hero.sprite!.getBounds()
 }
 
-const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.2 })
+export function calculateHeroOffset(delta: number, speed: number) {
+  return delta * ((speed * 12) / (speed * 10 + 200))
+}
 
 export function heroSetCollision(crash: boolean) {
   hero.sprite!.filters = crash ? [crashFilter] : []

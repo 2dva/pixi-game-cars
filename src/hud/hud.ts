@@ -3,6 +3,7 @@ import { APP_WIDTH } from '../configuration'
 import { calculateGear } from '../utils'
 import { addLogo, preloadLogoAssets } from './logo'
 import { addScore, updateScore } from './score'
+import { addCondition, updateCondition } from './condition'
 
 type HUDObject = {
   speed: BitmapText
@@ -101,15 +102,18 @@ export function addHUD(app: Application, startSpeed: number) {
   hudObj.speed = textSpeed
   hudObj.gear = textGear
   hudObj.odo = textOdo
-  updateHUD(startSpeed, 0, 0)
   app.stage.addChild(cont)
   addScore(app)
   addLogo(app)
+  addCondition(app)
+
+  updateHUD(startSpeed, 0, 0, 100)
 }
 
-export function updateHUD(speed: number, distance: number, score: number) {
+export function updateHUD(speed: number, distance: number, score: number, condition: number) {
   hudObj.speed.text = `${'' + Math.floor(speed)} kmh`
   hudObj.gear.text = calculateGear(speed)
   hudObj.odo.text = `${'' + (Math.floor(distance / 10) / 100).toFixed(1).padStart(7, '0')} km`
+  updateCondition(condition)
   updateScore(score)
 }
