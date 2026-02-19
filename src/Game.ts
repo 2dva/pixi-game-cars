@@ -5,14 +5,8 @@ import { Controller } from './controller'
 import { Hero } from './hero/Hero'
 import { HUD } from './hud/HUD'
 import { defaultState, type State } from './state'
-import {
-  addRoadMark,
-  animateTerrain,
-  checkObjectIsClaimed,
-  checkReleaseTerrain,
-  preloadTerrainAssets,
-} from './terrain/road'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
+import { Terrain } from './terrain/Terrain'
 
 export class Game {
   private app: Application
@@ -20,11 +14,13 @@ export class Game {
   private controller: Controller
   private hero: Hero
   private hud: HUD
+  private terrain: Terrain
 
   constructor(app: Application) {
     this.app = app
     this.initState()
     this.controller = new Controller()
+    this.terrain = new Terrain()
     this.hud = new HUD()
     this.hero = new Hero()
   }
@@ -51,8 +47,8 @@ export class Game {
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
     await preloadCarAssets()
+    await this.terrain.preloadAssets()
     await this.hero.preloadAssets()
-    await preloadTerrainAssets()
 
     this.app.stage.removeChild(textLoading)
   }
@@ -62,7 +58,7 @@ export class Game {
 
     await this.preloadAssets()
 
-    addRoadMark(app)
+    this.terrain.setup(app)
     addCars(app)
     this.hero.setup(app)
     this.hud.setup(app)
@@ -75,14 +71,14 @@ export class Game {
       this.hud.draw(this.state)
       this.hero.draw(this.state, time)
       animateCars(this.state)
-      animateTerrain(this.state)
+      this.terrain.draw(this.state)
 
       runEverySecond(time, () => {
         checkReleaseCar(this.state)
       })
 
       runEveryHundredMeters(this.state.deltaDistance, () => {
-        checkReleaseTerrain()
+        this.terrain.checkReleaseTerrain()
       })
     })
   }
@@ -135,7 +131,7 @@ export class Game {
     if (collision) condition -= collision.damage
     condition = Math.max(0, condition)
 
-    const claim = checkObjectIsClaimed(heroBounds)
+    const claim = this.terrain.checkObjectIsClaimed(heroBounds)
     if (claim) score += 100
     // Пока очки считаем просто по дистанции
     // score = Math.floor(distance / 1000) * 100
