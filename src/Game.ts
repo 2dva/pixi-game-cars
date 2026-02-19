@@ -3,7 +3,8 @@ import { addCars, animateCars, checkCollisionCars, checkObstacleAhead, checkRele
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './controller'
 import { addHero, calculateHeroOffset, heroGetBounds, moveHero, preloadHeroAsset } from './hero'
-import { addHUD, preloadHudAssets, updateHUD } from './hud/hud'
+import { HUD } from './hud/HUD'
+import { defaultState, type State } from './state'
 import {
   addRoadMark,
   animateTerrain,
@@ -11,18 +12,19 @@ import {
   checkReleaseTerrain,
   preloadTerrainAssets,
 } from './terrain/road'
-import { calculateDistance, runEveryHundredMeters, runEverySecond, throttle } from './utils'
-import { defaultState, type State } from './state'
+import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
 
 export class Game {
-  app: Application
-  state!: State
-  controller: Controller
+  private app: Application
+  private state!: State
+  private controller: Controller
+  private hud: HUD
 
   constructor(app: Application) {
     this.app = app
     this.initState()
     this.controller = new Controller()
+    this.hud = new HUD()
   }
 
   initState() {
@@ -30,16 +32,6 @@ export class Game {
   }
 
   async preloadAssets() {
-    Assets.init({ basePath: 'assets/' })
-    await preloadHudAssets()
-    await preloadCarAssets()
-    await preloadHeroAsset()
-    await preloadTerrainAssets()
-  }
-
-  async setup() {
-    const { app, preloadAssets } = this
-
     const textLoading = new Text({
       text: 'Loading...',
       style: {
@@ -52,23 +44,33 @@ export class Game {
     })
     textLoading.anchor.set(0.5, 0.5)
 
-    app.stage.addChild(textLoading)
-    await preloadAssets()
-    app.stage.removeChild(textLoading)
+    this.app.stage.addChild(textLoading)
+
+    Assets.init({ basePath: 'assets/' })
+    await this.hud.preloadAssets()
+    await preloadCarAssets()
+    await preloadHeroAsset()
+    await preloadTerrainAssets()
+
+    this.app.stage.removeChild(textLoading)
+  }
+
+  async setup() {
+    const { app } = this
+
+    await this.preloadAssets()
 
     addRoadMark(app)
     addCars(app)
     addHero(app)
-    addHUD(app)
+    this.hud.setup(app)
   }
 
   launch() {
-    const updateHUDThrottled = throttle(updateHUD, 200)
-
     this.app.ticker.add((time: Ticker) => {
       this.updateState()
 
-      updateHUDThrottled(this.state)
+      this.hud.draw(this.state)
       moveHero(this.state, time)
       animateCars(this.state)
       animateTerrain(this.state)

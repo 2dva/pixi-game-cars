@@ -1,4 +1,3 @@
-export const APP_NAME = 'Car Lines'
 export const APP_BACKGROUND = 0x545457
 export const APP_WIDTH = 740
 export const APP_HEIGHT = 600

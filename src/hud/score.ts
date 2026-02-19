@@ -1,13 +1,5 @@
 import { Application, BitmapText, Container, Graphics } from 'pixi.js'
 
-type ScoreObject = {
-  score: BitmapText
-}
-
-const scoreObj: ScoreObject = {
-  score: new BitmapText(),
-}
-
 const FONT_STYLE = {
   score: {
     fontFamily: 'alarm clock, Arial',
@@ -17,33 +9,40 @@ const FONT_STYLE = {
   },
 }
 
-export function addScore(app: Application) {
-  const cont = new Container()
-  cont.position.set(20, 20)
-  const background = new Graphics()
-  background.roundRect(0, 0, 180, 40, 10).fill({
-    color: 0x000000,
-    alpha: 0.4,
-  })
-  const textScore = new BitmapText({
-    text: '0',
-    style: FONT_STYLE.score,
-    x: 170,
-    y: 4,
-  })
-  textScore.anchor.set(1, 0)
-  cont.addChild(background)
-  cont.addChild(textScore)
+export class Score {
+  bitmap!: BitmapText
 
-  scoreObj.score = textScore
-  app.stage.addChild(cont)
-}
+  constructor() {}
 
-export function updateScore(score: number) {
-  if (String(score) != scoreObj.score.text) {
-    scoreObj.score.text = `${score}`
-    scoreObj.score.tint = 0xfff568
-    setTimeout(() => { scoreObj.score.tint = 0xffffff }, 100)
+  setup(app: Application) {
+    const cont = new Container()
+    cont.position.set(20, 20)
+    const background = new Graphics()
+    background.roundRect(0, 0, 180, 40, 10).fill({
+      color: 0x000000,
+      alpha: 0.4,
+    })
+    const textScore = new BitmapText({
+      text: '0',
+      style: FONT_STYLE.score,
+      x: 170,
+      y: 4,
+    })
+    textScore.anchor.set(1, 0)
+    cont.addChild(background)
+    cont.addChild(textScore)
+
+    this.bitmap = textScore
+    app.stage.addChild(cont)
   }
-  
+
+  draw(score: number) {
+    if (String(score) != this.bitmap.text) {
+      this.bitmap.text = `${score}`
+      this.bitmap.tint = 0xfff568
+      setTimeout(() => {
+        this.bitmap.tint = 0xffffff
+      }, 100)
+    }
+  }
 }
