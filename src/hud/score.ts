@@ -40,5 +40,10 @@ export function addScore(app: Application) {
 }
 
 export function updateScore(score: number) {
-  scoreObj.score.text = `${score}`
+  if (String(score) != scoreObj.score.text) {
+    scoreObj.score.text = `${score}`
+    scoreObj.score.tint = 0xfff568
+    setTimeout(() => { scoreObj.score.tint = 0xffffff }, 100)
+  }
+  
 }

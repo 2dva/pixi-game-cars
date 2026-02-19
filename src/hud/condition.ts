@@ -1,6 +1,6 @@
 import { Application, Container, Graphics } from 'pixi.js'
 
-const scaleHeight = 145
+const scaleHeight = 148
 let scale: Graphics
 
 export function addCondition(app: Application) {
@@ -22,7 +22,6 @@ export function addCondition(app: Application) {
 }
 
 export function updateCondition(condition: number) {
-  if (!scale) return
   scale.clear()
   scale.moveTo(15, 155)
   scale.lineTo(15, 155 - Math.round((scaleHeight / 100) * condition))

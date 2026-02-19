@@ -4,7 +4,7 @@ import { APP_BACKGROUND, APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuratio
 import { Controller } from './controller'
 import { addHero, calculateHeroOffset, heroGetBounds, moveHero, preloadHeroAsset } from './hero'
 import { addHUD, preloadHudAssets, updateHUD } from './hud/hud'
-import { addRoadMark, animateTerrain, checkReleaseTerrain, preloadTerrainAssets } from './terrain/road'
+import { addRoadMark, animateTerrain, checkObjectIsClaimed, checkReleaseTerrain, preloadTerrainAssets } from './terrain/road'
 import { calculateDistance, runEveryHundredMeters, runEverySecond, throttle } from './utils'
 
 const app = new Application()
@@ -14,6 +14,7 @@ globalThis.__PIXI_APP__ = app
 // @ts-expect-error this is for debug
 window.__PIXI_DEVTOOLS__ = { app }
 
+let score = 0
 let speed = 0
 let distance = 0
 let condition = 100
@@ -48,10 +49,10 @@ async function preload() {
   const updateHUDThrottled = throttle(updateHUD, 200)
 
   app.ticker.add((time: Ticker) => {
-    const { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash } = calculateState(controller)
+    const { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim } = calculateState(controller)
 
     updateHUDThrottled(speed, distance, score, condition)
-    moveHero(speed, deltaSpeed, deltaX, crash, time)
+    moveHero(speed, deltaSpeed, deltaX, crash, !!claim, time)
     animateCars(speed)
     animateTerrain(speed)
 
@@ -111,8 +112,10 @@ function calculateState(controller: Controller) {
   if (collision) condition -= collision.damage
   condition = Math.max(0, condition)
 
+  const claim = checkObjectIsClaimed(heroBounds)
+  if (claim) score += 100
   // Пока очки считаем просто по дистанции
-  const score = Math.floor(distance / 1000) * 100
+  // score = Math.floor(distance / 1000) * 100
 
-  return { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash }
+  return { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim }
 }

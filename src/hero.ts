@@ -6,7 +6,8 @@ import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from './configur
 const START_POSITION = APP_WIDTH - SIDEWALK_WIDTH - 100
 const HERO_WIDTH = 60
 const MOVE_LIMITS = [ROAD_LEFT_GAP, APP_WIDTH - SIDEWALK_WIDTH - HERO_WIDTH - 5]
-const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.2 })
+const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.3 })
+const claimFilter = new ColorOverlayFilter({ color: 'yellow', alpha: 0.5 })
 
 type Hero = {
   container: Container | null
@@ -45,7 +46,7 @@ const extraBrakeRotation = [
   0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
 ]
 
-export function moveHero(speed: number, deltaSpeed: number, delta: number, crash: boolean, time: Ticker) {
+export function moveHero(speed: number, deltaSpeed: number, delta: number, crash: boolean, claim: boolean, time: Ticker) {
   const car = hero.container!
   const oldX = car.x
   if (!crash) {
@@ -54,7 +55,7 @@ export function moveHero(speed: number, deltaSpeed: number, delta: number, crash
     car.x = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
   }
 
-  heroSetCollision(crash)
+  heroShowEffect({ crash, claim })
 
   // при повороте руля влево/вправо не делаем rotation если не было перемещения
   car.rotation = (car.x - oldX) * speed * 0.0003
@@ -123,6 +124,9 @@ export function calculateHeroOffset(delta: number, speed: number) {
   return delta * ((speed * 12) / (speed * 10 + 200))
 }
 
-export function heroSetCollision(crash: boolean) {
-  hero.sprite!.filters = crash ? [crashFilter] : []
+export function heroShowEffect(state: Record<string, boolean>) {
+  const filters: ColorOverlayFilter[] = []
+  if (state.crash) filters.push(crashFilter)
+  if (state.claim) filters.push(claimFilter)
+  hero.sprite!.filters = filters
 }

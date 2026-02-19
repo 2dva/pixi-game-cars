@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Graphics, GraphicsContext, Sprite } from 'pixi.js'
+import { Application, Assets, Bounds, Container, Graphics, GraphicsContext, Sprite } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import { rollBoolDice } from '../utils'
 import { GifSource, GifSprite } from 'pixi.js/gif'
@@ -15,6 +15,9 @@ const STAGE_PADDING = 120
 
 const terrainObjects: Set<Sprite | GifSprite> = new Set()
 const terrainContainer = new Container()
+
+const claimableObjects: Set<Sprite | GifSprite> = new Set()
+type claimableType = 'coin'
 
 const terrainAssets = [
   {
@@ -106,6 +109,7 @@ function addCoin(x: number) {
   sprite.y = -50
   sprite.animationSpeed = 1.7
   terrainObjects.add(sprite)
+  claimableObjects.add(sprite)
   terrainContainer.addChild(sprite)
 }
 
@@ -121,6 +125,7 @@ function addTerrainObject(assetName: string, x: number) {
 
 function removeTerrainObject(sprite: Sprite | GifSprite) {
   terrainObjects.delete(sprite)
+  claimableObjects.delete(sprite)
   terrainContainer.removeChild(sprite)
   sprite.destroy()
 }
@@ -138,16 +143,41 @@ export function animateTerrain(speed: number) {
   terrainObjects.forEach((sprite) => {
     sprite.y += speed * 0.1
     // объект остался за экраном - убираем со сцены
-    if (sprite.y < -STAGE_PADDING || sprite.y > APP_HEIGHT + STAGE_PADDING) {
+    if (sprite.y > APP_HEIGHT + STAGE_PADDING) {
       removeTerrainObject(sprite)
     }
   })
 }
 
 export function checkReleaseTerrain(speed: number) {
+  const laneNumber = 1 + Math.floor(Math.random() * ROAD_LANE_COUNT)
+  addCoin(ROAD_LEFT_GAP + laneNumber * ROAD_LANE_WIDTH - ROAD_LANE_WIDTH / 2)
+
   // бросаем кубик, и если ок, то рисуем объект
-    addCoin(100)
   if (rollBoolDice(3)) {
     addTerrainObject('tree01', APP_WIDTH - 15)
   }
+}
+
+function checkCollisionObject(a: Bounds, b: Bounds): boolean {
+  const rightmostLeft = a.left < b.left ? b.left : a.left
+  const leftmostRight = a.right > b.right ? b.right : a.right
+  if (leftmostRight < rightmostLeft) return false
+    console.log(`CheckCoin:`, rightmostLeft, leftmostRight)
+
+  const bottommostTop = a.top < b.top ? b.top : a.top
+  const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
+  return topmostBottom > bottommostTop
+}
+
+export function checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {
+  for (const sprite of claimableObjects) {
+    const bounds = sprite.getBounds()
+    const claimed = checkCollisionObject(heroBounds, bounds)
+    if (claimed) {
+      removeTerrainObject(sprite)
+      return 'coin'
+    }
+  }
+  return null
 }
