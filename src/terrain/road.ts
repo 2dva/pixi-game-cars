@@ -149,7 +149,7 @@ export function animateTerrain(speed: number) {
   })
 }
 
-export function checkReleaseTerrain(speed: number) {
+export function checkReleaseTerrain() {
   const laneNumber = 1 + Math.floor(Math.random() * ROAD_LANE_COUNT)
   addCoin(ROAD_LEFT_GAP + laneNumber * ROAD_LANE_WIDTH - ROAD_LANE_WIDTH / 2)
 
@@ -163,7 +163,6 @@ function checkCollisionObject(a: Bounds, b: Bounds): boolean {
   const rightmostLeft = a.left < b.left ? b.left : a.left
   const leftmostRight = a.right > b.right ? b.right : a.right
   if (leftmostRight < rightmostLeft) return false
-    console.log(`CheckCoin:`, rightmostLeft, leftmostRight)
 
   const bottommostTop = a.top < b.top ? b.top : a.top
   const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
