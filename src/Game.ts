@@ -1,5 +1,4 @@
 import { Assets, Bounds, Text, Ticker, type Application } from 'pixi.js'
-import { addCars, animateCars, checkCollisionCars, checkObstacleAhead, checkReleaseCar, preloadCarAssets } from './cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './Controller'
 import { Hero } from './Hero/Hero'
@@ -7,12 +6,14 @@ import { HUD } from './HUD/HUD'
 import { defaultState, type State } from './state'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
 import { Terrain } from './Terrain/Terrain'
+import { Cars } from './Cars'
 
 export class Game {
   private app: Application
   private state!: State
   private controller: Controller
   private hero: Hero
+  private cars: Cars
   private hud: HUD
   private terrain: Terrain
 
@@ -22,6 +23,7 @@ export class Game {
     this.controller = new Controller()
     this.terrain = new Terrain()
     this.hud = new HUD()
+    this.cars = new Cars()
     this.hero = new Hero()
   }
 
@@ -46,7 +48,7 @@ export class Game {
 
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
-    await preloadCarAssets()
+    await this.cars.preloadAssets()
     await this.terrain.preloadAssets()
     await this.hero.preloadAssets()
 
@@ -59,7 +61,7 @@ export class Game {
     await this.preloadAssets()
 
     this.terrain.setup(app)
-    addCars(app)
+    this.cars.setup(app)
     this.hero.setup(app)
     this.hud.setup(app)
   }
@@ -70,11 +72,11 @@ export class Game {
 
       this.hud.draw(this.state)
       this.hero.draw(this.state, time)
-      animateCars(this.state)
+      this.cars.draw(this.state)
       this.terrain.draw(this.state)
 
       runEverySecond(time, () => {
-        checkReleaseCar(this.state)
+        this.cars.checkReleaseCar(this.state)
       })
 
       runEveryHundredMeters(this.state.deltaDistance, () => {
@@ -89,7 +91,7 @@ export class Game {
 
     // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = this.hero.getBounds()
-    const obstacleAhead = checkObstacleAhead(heroBounds)
+    const obstacleAhead = this.cars.checkObstacleAhead(heroBounds)
 
     let deltaX = 0
     if (keyRight) deltaX = 3
@@ -117,7 +119,7 @@ export class Game {
       heroBounds.maxX + offsetX,
       heroBounds.maxY
     )
-    const collision = checkCollisionCars(heroBoundsWithShift)
+    const collision = this.cars.checkCollisionCars(heroBoundsWithShift)
     const crash = !!collision
     if (collision) deltaX = deltaX * 0.6
     const deltaDistance = calculateDistance(speed)
