@@ -9,6 +9,8 @@ const FONT_STYLE = {
   },
 }
 
+const DEFAULT_TINT = 0xf5f5f5
+
 export class Score {
   bitmap!: BitmapText
 
@@ -28,6 +30,9 @@ export class Score {
       x: 170,
       y: 4,
     })
+    textScore.style.letterSpacing = 0
+    textScore.style.fontWeight = 'normal'
+    textScore.tint = DEFAULT_TINT
     textScore.anchor.set(1, 0)
     cont.addChild(background)
     cont.addChild(textScore)
@@ -40,8 +45,12 @@ export class Score {
     if (String(score) != this.bitmap.text) {
       this.bitmap.text = `${score}`
       this.bitmap.tint = 0xfff568
+      this.bitmap.style.letterSpacing = 0.8
+      this.bitmap.style.fontWeight = 'bold'
       setTimeout(() => {
-        this.bitmap.tint = 0xffffff
+        this.bitmap.tint = DEFAULT_TINT
+        this.bitmap.style.letterSpacing = 0
+        this.bitmap.style.fontWeight = 'normal'
       }, 100)
     }
   }
