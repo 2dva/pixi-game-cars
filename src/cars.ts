@@ -1,19 +1,14 @@
-import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
+import { Application, Assets, Container, Sprite } from 'pixi.js'
+import { checkCollisionWithCar, checkObstacleAhead, type BoundsLike, type CollisionObject } from './collision'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
-import { rollBoolDice, rollDice } from './utils'
 import type { State } from './state'
+import { rollBoolDice, rollDice } from './utils'
 
 // Cars configuration
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
 const STAGE_PADDING = 120
 
 type CarAlias = 'car01' | 'car02' | 'car03'
-type CollisionDirection = 'head' | 'back' | 'left' | 'right'
-type CollisionObject = {
-  direction: CollisionDirection
-  force: number
-  damage: number
-}
 
 type CarData = {
   alias: CarAlias
@@ -106,42 +101,11 @@ export class Cars {
     }
   }
 
-  private checkCollisionOneCar(a: Bounds, b: Bounds): CollisionObject | null {
-    const amortization = 0.5
-    const rightmostLeft = a.left < b.left ? b.left : a.left
-    const leftmostRight = a.right > b.right ? b.right : a.right
-
-    if (leftmostRight < rightmostLeft + amortization) {
-      return null
-    }
-
-    let force = leftmostRight - rightmostLeft
-
-    const bottommostTop = a.top < b.top ? b.top : a.top
-    const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
-
-    if (topmostBottom < bottommostTop + amortization) {
-      return null
-    }
-
-    force = Math.min(force, topmostBottom - bottommostTop)
-    const damage = Math.round(0.5 + force * 0.6)
-
-    // we have collision here
-    const collisionX: CollisionDirection = a.left > b.left ? 'left' : 'right'
-    const collisionY: CollisionDirection = a.top > b.top ? 'head' : 'back'
-
-    const collisionDirection: CollisionDirection =
-      Math.abs(a.left - b.left) * 2 < Math.abs(a.top - b.top) ? collisionY : collisionX
-
-    return { direction: collisionDirection, force, damage }
-  }
-
-  checkCollisionCars(heroBounds: Bounds): CollisionObject | null {
+  checkCollisionCars(heroBounds: BoundsLike): CollisionObject | null {
     for (const car of this.cars) {
       const { sprite } = car
       const carBounds = sprite.getBounds()
-      const collision = this.checkCollisionOneCar(heroBounds, carBounds)
+      const collision = checkCollisionWithCar(heroBounds, carBounds)
       if (collision !== null) {
         const recoil = 4
         switch (collision.direction) {
@@ -169,23 +133,10 @@ export class Cars {
     return null
   }
 
-  checkObstacleAhead(heroBounds: Bounds): boolean {
-    // Проверяем, есть ли препятствие впереди (справа от героя)
-    const heroLeft = heroBounds.left
-    const heroRight = heroBounds.right
-    const heroTop = heroBounds.top
-
+  checkCarsAheadHero(heroBounds: BoundsLike): boolean {
+    // Проверяем, нет ли впереди машинки
     for (const { sprite } of this.cars) {
-      const carBounds = sprite.getBounds()
-      // Проверяем, находится ли машина впереди (справа) и на той же высоте
-      if (
-        carBounds.right >= heroLeft &&
-        carBounds.left <= heroRight &&
-        carBounds.bottom >= heroTop &&
-        carBounds.top < heroTop
-      ) {
-        return true
-      }
+      if (checkObstacleAhead(heroBounds, sprite.getBounds())) return true
     }
     return false
   }

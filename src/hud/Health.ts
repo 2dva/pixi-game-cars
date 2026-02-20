@@ -21,7 +21,7 @@ export class Health {
       colorStops: colorStops,
       textureSpace: 'local',
     })
-    this.gradientColorMap = this.createColorMap([0x00ff00, 0xff0000])
+    this.gradientColorMap = this.createColorMap([0x01c929, 0xff0000])
   }
 
   async preloadAssets() {}
@@ -50,7 +50,7 @@ export class Health {
       this.scale.clear()
       this.scale.moveTo(15, 155)
       this.scale.lineTo(15, 155 - Math.round((SCALE_HEIGHT / 100) * health))
-      this.scale.stroke({ width: 20, color: 0x00ff00, alpha: 0.7, fill: this.scaleGradient })
+      this.scale.stroke({ width: 20, alpha: .9, fill: this.scaleGradient })
       this.scale.tint = this.tint
     }
   }

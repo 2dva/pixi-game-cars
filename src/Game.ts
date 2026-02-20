@@ -1,12 +1,12 @@
-import { Assets, Bounds, Text, Ticker, type Application } from 'pixi.js'
+import { Assets, Text, Ticker, type Application } from 'pixi.js'
+import { Cars } from './Cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './Controller'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
 import { defaultState, type State } from './state'
-import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
 import { Terrain } from './Terrain/Terrain'
-import { Cars } from './Cars'
+import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
 
 export class Game {
   private app: Application
@@ -91,7 +91,7 @@ export class Game {
 
     // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = this.hero.getBounds()
-    const obstacleAhead = this.cars.checkObstacleAhead(heroBounds)
+    const obstacleAhead = this.cars.checkCarsAheadHero(heroBounds)
 
     let deltaX = 0
     if (keyRight) deltaX = 3
@@ -113,12 +113,13 @@ export class Game {
     speed = Math.min(Math.max(speed, 0), TOP_SPEED)
 
     const offsetX = this.hero.calculateOffset(deltaX, speed)
-    const heroBoundsWithShift = new Bounds(
-      heroBounds.minX + offsetX,
-      heroBounds.minY,
-      heroBounds.maxX + offsetX,
-      heroBounds.maxY
-    )
+
+    const heroBoundsWithShift = {
+      left: heroBounds.left + offsetX,
+      right: heroBounds.right + offsetX,
+      top: heroBounds.top,
+      bottom: heroBounds.bottom,
+    }
     const collision = this.cars.checkCollisionCars(heroBoundsWithShift)
     const crash = !!collision
     if (collision) deltaX = deltaX * 0.6

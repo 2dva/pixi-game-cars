@@ -1,6 +1,14 @@
 import { Application, Assets, Bounds, Container, Sprite, Text, Texture } from 'pixi.js'
 import { GifSprite, type GifSource } from 'pixi.js/gif'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
+import { checkCollisionWithObject } from '../collision'
+import {
+  APP_HEIGHT,
+  APP_WIDTH,
+  ROAD_LANE_COUNT,
+  ROAD_LANE_WIDTH,
+  ROAD_LEFT_GAP,
+  SIDEWALK_WIDTH,
+} from '../configuration'
 import type { State } from '../state'
 import { rollBoolDice } from '../utils'
 import { Road } from './Road'
@@ -106,20 +114,10 @@ export class Terrain {
     this.addObject(new Sprite(this.letterAtexture), APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
   }
 
-  private checkObjectCollision(a: Bounds, b: Bounds): boolean {
-    const rightmostLeft = a.left < b.left ? b.left : a.left
-    const leftmostRight = a.right > b.right ? b.right : a.right
-    if (leftmostRight < rightmostLeft) return false
-
-    const bottommostTop = a.top < b.top ? b.top : a.top
-    const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
-    return topmostBottom > bottommostTop
-  }
-
   checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {
     for (const sprite of this.claimableObjects) {
       const bounds = sprite.getBounds()
-      const claimed = this.checkObjectCollision(heroBounds, bounds)
+      const claimed = checkCollisionWithObject(heroBounds, bounds)
       if (claimed) {
         this.removeObject(sprite)
         return 'coin'
