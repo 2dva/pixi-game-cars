@@ -1,11 +1,19 @@
-import { Application, Assets, Bounds, Container, Sprite } from 'pixi.js'
+import { Application, Assets, Bounds, Container, Sprite, Text, Texture } from 'pixi.js'
 import { GifSprite, type GifSource } from 'pixi.js/gif'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from '../configuration'
+import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import type { State } from '../state'
 import { rollBoolDice } from '../utils'
 import { Road } from './Road'
 
 const STAGE_PADDING = 120
+
+const FONT_STYLE = {
+  letterA: {
+    fontFamily: 'Arial',
+    fontSize: 112,
+    fill: 0xe5e5e5,
+  },
+}
 
 const coinAsset = 'terrain/coin.gif'
 const terrainAssets = [
@@ -23,6 +31,7 @@ export class Terrain {
   claimableObjects: Set<Sprite | GifSprite>
   road: Road
   coinSource!: GifSource
+  letterAtexture!: Texture
 
   constructor() {
     this.terrainContainer = new Container()
@@ -37,6 +46,9 @@ export class Terrain {
   }
 
   setup(app: Application) {
+    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
+    this.letterAtexture = app.renderer.generateTexture(letterA)
+
     this.road.setup(app)
     app.stage.addChild(this.terrainContainer)
   }
@@ -65,8 +77,8 @@ export class Terrain {
     this.terrainContainer.addChild(sprite)
   }
 
-  private addObject(assetName: string, x: number) {
-    const sprite = Sprite.from(assetName)
+  private addObject(assetName: string | Sprite, x: number) {
+    const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
     sprite.anchor.set(0.5)
     sprite.scale.set(0.6)
     sprite.x = x
@@ -90,6 +102,8 @@ export class Terrain {
     if (rollBoolDice(3)) {
       this.addObject('tree01', APP_WIDTH - 15)
     }
+    // рисуем А-полосу
+    this.addObject(new Sprite(this.letterAtexture), APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
   }
 
   private checkObjectCollision(a: Bounds, b: Bounds): boolean {
