@@ -27,18 +27,22 @@ const keyMap: KeyMap = {
   ArrowRight: 'right',
 }
 
+const defaultState: ControllerKeys = {
+  up: { pressed: false, doubleTap: false, timestamp: 0 },
+  left: { pressed: false, doubleTap: false, timestamp: 0 },
+  down: { pressed: false, doubleTap: false, timestamp: 0 },
+  right: { pressed: false, doubleTap: false, timestamp: 0 },
+  space: { pressed: false, doubleTap: false, timestamp: 0 },
+}
+
 // Class for handling keyboard inputs.
 export class Controller {
-  keys: ControllerKeys = {
-    up: { pressed: false, doubleTap: false, timestamp: 0 },
-    left: { pressed: false, doubleTap: false, timestamp: 0 },
-    down: { pressed: false, doubleTap: false, timestamp: 0 },
-    right: { pressed: false, doubleTap: false, timestamp: 0 },
-    space: { pressed: false, doubleTap: false, timestamp: 0 },
-  }
+  private keys: ControllerKeys
+  disabled = false
 
   constructor() {
     // The controller's state.
+    this.keys = structuredClone(defaultState)
 
     // Register event listeners for keydown and keyup events.
     window.addEventListener('keydown', (event) => this.keydownHandler(event))
@@ -46,6 +50,15 @@ export class Controller {
   }
 
   get state() {
+    if (this.disabled) {
+      return {
+        keyUp: false,
+        keyDown: false,
+        keyRight: false,
+        keyLeft: false,
+        keySpace: false,
+      }
+    }
     return {
       keyUp: this.keys.up.pressed,
       keyDown: this.keys.down.pressed,

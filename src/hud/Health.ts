@@ -1,6 +1,6 @@
 import { Application, Color, Container, FillGradient, Graphics } from 'pixi.js'
 
-const SCALE_HEIGHT = 148
+const SCALE_HEIGHT = 149
 const colorStops = [
   { offset: 0, color: '#646464' },
   { offset: 0.5, color: '#ffffff' },

@@ -45,6 +45,10 @@ export class Road {
     app.stage.addChild(this.road)
   }
 
+  reset() {
+    this.roadDelta = 0
+  }
+
   draw(speed: number) {
     if (!this.road) return
     this.roadDelta += speed * 0.1

@@ -48,6 +48,12 @@ export class Terrain {
     app.stage.addChild(this.terrainContainer)
   }
 
+  reset() {
+    this.terrainObjects.forEach((s) => this.removeObject(s))
+    this.road.reset()
+    this.claimable.reset()
+  }
+
   draw({ speed }: State) {
     this.road.draw(speed)
     this.claimable.draw(speed)

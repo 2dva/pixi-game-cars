@@ -51,6 +51,12 @@ export class Cars {
     app.stage.addChild(this.carContainer)
   }
 
+  reset() {
+    this.cars.forEach((car) => {
+      this.removeCar(car)
+    })
+  }
+
   draw(state: State) {
     const { speed } = state
     this.cars.forEach((car) => {

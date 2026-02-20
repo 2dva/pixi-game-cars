@@ -7,6 +7,13 @@ import { HUD } from './HUD/HUD'
 import { defaultState, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
+import { InfoScreen, SCREEN_EVENT } from './InfoScreen'
+
+const GAME_MODES = {
+  DEMO: 0,
+  FREE_RIDE: 1,
+  CLASSIC: 2,
+}
 
 export class Game {
   private app: Application
@@ -28,7 +35,7 @@ export class Game {
   }
 
   initState() {
-    this.state = defaultState
+    this.state = Object.assign({}, defaultState)
   }
 
   async preloadAssets() {
@@ -67,6 +74,16 @@ export class Game {
   }
 
   launch() {
+    this.switchMode(GAME_MODES.DEMO)
+
+    const startScreen = new InfoScreen()
+    startScreen.setup(this.app)
+    startScreen.setVisible()
+    startScreen.on(SCREEN_EVENT, (e) => {
+      if (e.mode > 0) this.switchMode(e.mode)
+      startScreen.destroy()
+    })
+
     this.app.ticker.add((time: Ticker) => {
       this.updateState()
 
@@ -85,7 +102,27 @@ export class Game {
     })
   }
 
-  updateState() {
+  /**
+   * GAME_MODES.DEMO: hide hero, speed = 15, block controls
+   * GAME_MODES.FREE_RIDE: endless life
+   * GAME_MODES.CLASSIC: can die if health drops to zero
+   */
+  switchMode(mode: number) {
+    this.initState()
+    const isDemo = mode === GAME_MODES.DEMO
+
+    this.state.mode = mode
+    this.state.speed = isDemo ? 15 : 0
+    this.controller.disabled = isDemo
+
+    this.terrain.reset()
+    this.cars.reset()
+    this.hero.reset()
+
+    this.hero.setVisible(!isDemo)
+  }
+
+  private updateState() {
     let { speed, distance, score, condition } = this.state
     const { keyUp, keyDown, keyLeft, keyRight, keySpace } = this.controller.state
 

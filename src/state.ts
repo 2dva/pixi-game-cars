@@ -1,4 +1,5 @@
 export type State = {
+  mode: number,
   score: number
   speed: number
   deltaSpeed: number
@@ -11,6 +12,7 @@ export type State = {
 }
 
 export const defaultState: State = {
+  mode: 0,
   score: 0,
   speed: 0,
   deltaSpeed: 0,
