@@ -1,9 +1,25 @@
 import { Application, Container, Graphics, Text, type DestroyOptions } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH } from './configuration'
+import { APP_HEIGHT, APP_WIDTH, GAME_MODES, type GameMode } from './configuration'
 
-export const SCREEN_EVENT = 'screenEvent'
-const EVENTS = {
-  START_GAME: 0,
+export const SCREEN_MODE = {
+  START: 'mode_start',
+  PAUSE: 'mode_pause',
+  END: 'mode_end',
+} as const
+
+
+export const screenEventName = 'screenEvent'
+
+export const EVENT_TYPE = {
+  SELECT_GAME_MODE: 'selectGameMode',
+} as const
+
+export type ScreenMode = (typeof SCREEN_MODE)[keyof typeof SCREEN_MODE]
+export type EventType = (typeof EVENT_TYPE)[keyof typeof EVENT_TYPE]
+
+export type ScreenEvent = {
+  type: EventType
+  mode: GameMode
 }
 
 const fontTitle = {
@@ -28,7 +44,6 @@ const fontSecondary = {
 
 export class InfoScreen extends Container {
   keydownHandlerBound = this.keydownHandler.bind(this)
-  screenEvent = new CustomEvent('type')
 
   constructor() {
     super()
@@ -88,25 +103,35 @@ export class InfoScreen extends Container {
   keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
     if (keyCode === 'Digit1') {
-      // start FREE RIDE
-      this.emit(SCREEN_EVENT, { mode: 1, code: keyCode })
+      this.emitAndHide(GAME_MODES.FREE_RIDE) // start FREE_RIDE game
     } else if (keyCode === 'Digit2') {
-      // start CLASSIC
-      this.emit(SCREEN_EVENT, { mode: 2, code: keyCode })
+      this.emitAndHide(GAME_MODES.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
     }
   }
 
-  setVisible(show: boolean = true) {
-    this.visible = show
-    if (show) {
-      window.addEventListener('keydown', this.keydownHandlerBound)
-    } else {
-      window.removeEventListener('keydown', this.keydownHandlerBound)
+  show(mode: ScreenMode) {
+    if (mode === SCREEN_MODE.START) {
+      // пока только один режим
     }
+    this.visible = true
+    window.addEventListener('keydown', this.keydownHandlerBound)
+  }
+
+  private emitAndHide(mode: number) {
+    this.emit(screenEventName, {
+      type: EVENT_TYPE.SELECT_GAME_MODE,
+      mode,
+    })
+    this.hide()
+  }
+
+  private hide() {
+    window.removeEventListener('keydown', this.keydownHandlerBound)
+    this.visible = false
   }
 
   destroy(options?: DestroyOptions): void {
-    this.setVisible(false)
+    this.hide()
     this.removeChildren()
 
     super.destroy(options)

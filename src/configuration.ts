@@ -11,3 +11,12 @@ export const ROAD_LANE_WIDTH = 100
 export const SIDEWALK_WIDTH = 90
 
 export const TOP_SPEED = 150
+
+export const GAME_MODES = {
+  DEMO: 0,
+  FREE_RIDE: 1,
+  COLLECT_IN_TIME: 2,
+} as const
+
+export type GameMode = (typeof GAME_MODES)[keyof typeof GAME_MODES]
+

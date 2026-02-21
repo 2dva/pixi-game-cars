@@ -1,19 +1,13 @@
 import { Assets, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
-import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
+import { APP_HEIGHT, APP_WIDTH, GAME_MODES, TOP_SPEED, type GameMode } from './configuration'
 import { Controller } from './Controller'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
 import { defaultState, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
-import { InfoScreen, SCREEN_EVENT } from './InfoScreen'
-
-const GAME_MODES = {
-  DEMO: 0,
-  FREE_RIDE: 1,
-  CLASSIC: 2,
-}
+import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 
 export class Game {
   private app: Application
@@ -76,12 +70,11 @@ export class Game {
   launch() {
     this.switchMode(GAME_MODES.DEMO)
 
-    const startScreen = new InfoScreen()
-    startScreen.setup(this.app)
-    startScreen.setVisible()
-    startScreen.on(SCREEN_EVENT, (e) => {
-      if (e.mode > 0) this.switchMode(e.mode)
-      startScreen.destroy()
+    const infoScreen = new InfoScreen()
+    infoScreen.setup(this.app)
+    infoScreen.show(SCREEN_MODE.START)
+    infoScreen.on(screenEventName, (event: ScreenEvent) => {
+      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode)
     })
 
     this.app.ticker.add((time: Ticker) => {
@@ -107,7 +100,7 @@ export class Game {
    * GAME_MODES.FREE_RIDE: endless life
    * GAME_MODES.CLASSIC: can die if health drops to zero
    */
-  switchMode(mode: number) {
+  switchMode(mode: GameMode) {
     this.initState()
     const isDemo = mode === GAME_MODES.DEMO
 

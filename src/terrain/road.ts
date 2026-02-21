@@ -13,8 +13,8 @@ const LINE_WIDTH = 5
 const LINE_DASH = 30
 const LINE_GAP = 44
 const LINE_REPEAT = LINE_DASH + LINE_GAP
-const LINE_COLOR = 0xe5e5e5
-const LINE_YELLOW_COLOR = 0xa99f2f
+const LINE_COLOR_WHITE = 0xe5e5e5
+const LINE_COLOR_YELLOW = 0xa99f2f
 const SIDEWALK_BORDER_COLOR = 0x717475
 
 export class Road {
@@ -30,13 +30,14 @@ export class Road {
 
     const lineCtx = new GraphicsContext()
 
-    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP - LINE_WIDTH)
-    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP + LINE_WIDTH)
+    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP - LINE_WIDTH, LINE_COLOR_YELLOW)
+    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP + LINE_WIDTH, LINE_COLOR_YELLOW)
     this.drawSidewalkLine(lineCtx, APP_WIDTH - SIDEWALK_WIDTH)
 
-    for (let i = 1; i <= ROAD_LANE_COUNT; i++) {
+    for (let i = 1; i < ROAD_LANE_COUNT; i++) {
       this.drawDashedLine(lineCtx, ROAD_LEFT_GAP + i * ROAD_LANE_WIDTH)
     }
+    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP + ROAD_LANE_COUNT * ROAD_LANE_WIDTH, LINE_COLOR_WHITE)
 
     const lines = new Graphics(lineCtx)
 
@@ -69,15 +70,15 @@ export class Road {
       ctx.moveTo(x, y1)
       ctx.lineTo(x, y2)
     }
-    ctx.setStrokeStyle({ width: LINE_WIDTH, color: LINE_COLOR, alignment: 0 })
+    ctx.setStrokeStyle({ width: LINE_WIDTH, color: LINE_COLOR_WHITE, alignment: 0 })
     ctx.stroke()
   }
 
   // Draw yellow line
-  private drawSolidLine(ctx: GraphicsContext, cx: number) {
+  private drawSolidLine(ctx: GraphicsContext, cx: number, color: number) {
     ctx.moveTo(cx, -LINE_REPEAT)
     ctx.lineTo(cx, APP_HEIGHT + LINE_REPEAT)
-    ctx.setStrokeStyle({ width: LINE_WIDTH, color: LINE_YELLOW_COLOR })
+    ctx.setStrokeStyle({ width: LINE_WIDTH, color })
     ctx.stroke()
   }
 
