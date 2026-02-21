@@ -6,7 +6,7 @@ export type State = {
   distance: number
   deltaDistance: number
   deltaX: number
-  condition: number
+  health: number
   crash: boolean
   claim: boolean
 }
@@ -19,7 +19,7 @@ export const defaultState: State = {
   distance: 0,
   deltaDistance: 0,
   deltaX: 0,
-  condition: 100,
+  health: 100,
   crash: false,
   claim: false,
 }

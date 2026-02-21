@@ -1,12 +1,12 @@
 import { ColorOverlayFilter } from 'pixi-filters'
-import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js'
+import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import type { State } from '../state'
 import { Exhaust } from './Exhaust'
 
 // Hero configuration
-const START_POSITION_X = APP_WIDTH - SIDEWALK_WIDTH - 90
-const START_POSITION_Y = APP_HEIGHT - 150
+const START_POSITION_X = APP_WIDTH - SIDEWALK_WIDTH - 80
+const START_POSITION_Y = APP_HEIGHT - 160
 const HERO_WIDTH = 60
 const MOVE_LIMITS = [ROAD_LEFT_GAP, APP_WIDTH - SIDEWALK_WIDTH - HERO_WIDTH - 5]
 const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.3 })
@@ -31,9 +31,7 @@ export class Hero extends Container {
     await Assets.load({ alias: 'hero', src: 'cars/car00.png' })
   }
 
-  setup(app: Application) {
-    app.stage.addChild(this)
-
+  setup(stage: Container) {
     const sprite = Sprite.from('hero')
     sprite.scale.set(0.6)
     this.addChild(sprite)
@@ -41,6 +39,8 @@ export class Hero extends Container {
     this.sprite = sprite
     this.exhaust.setup(this)
     this.reset()
+
+    stage.addChild(this)
   }
 
   reset() {

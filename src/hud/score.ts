@@ -1,4 +1,7 @@
-import { Application, BitmapText, Container, Graphics } from 'pixi.js'
+import { BitmapText, Container, Graphics } from 'pixi.js'
+
+const POS_X = 15
+const POS_Y = 20
 
 const FONT_STYLE = {
   score: {
@@ -9,46 +12,51 @@ const FONT_STYLE = {
   },
 }
 
-const DEFAULT_TINT = 0xf5f5f5
+const TINT_DEFAULT = 0xf5f5f5
+const TINT_BRIGHT = 0xfff568
 
-export class Score {
+export class Score extends Container {
   bitmap!: BitmapText
 
-  constructor() {}
+  constructor() {
+    super()
+  }
 
-  setup(app: Application) {
-    const cont = new Container()
-    cont.position.set(20, 20)
+  setup(parent: Container) {
+    this.position.set(POS_X, POS_Y)
+
     const background = new Graphics()
     background.roundRect(0, 0, 180, 40, 10).fill({
       color: 0x000000,
       alpha: 0.4,
     })
+    
     const textScore = new BitmapText({
       text: '0',
       style: FONT_STYLE.score,
       x: 170,
       y: 4,
     })
+    
     textScore.style.letterSpacing = 0
     textScore.style.fontWeight = 'normal'
-    textScore.tint = DEFAULT_TINT
+    textScore.tint = TINT_DEFAULT
     textScore.anchor.set(1, 0)
-    cont.addChild(background)
-    cont.addChild(textScore)
-
     this.bitmap = textScore
-    app.stage.addChild(cont)
+    
+    this.addChild(background)
+    this.addChild(textScore)
+    parent.addChild(this)
   }
 
   draw(score: number) {
     if (String(score) != this.bitmap.text) {
       this.bitmap.text = `${score}`
-      this.bitmap.tint = 0xfff568
+      this.bitmap.tint = TINT_BRIGHT
       this.bitmap.style.letterSpacing = 0.8
       this.bitmap.style.fontWeight = 'bold'
       setTimeout(() => {
-        this.bitmap.tint = DEFAULT_TINT
+        this.bitmap.tint = TINT_DEFAULT
         this.bitmap.style.letterSpacing = 0
         this.bitmap.style.fontWeight = 'normal'
       }, 100)

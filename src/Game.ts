@@ -1,16 +1,18 @@
-import { Assets, Text, Ticker, type Application } from 'pixi.js'
+import { Assets, Container, Text, Ticker, type Application, type Renderer } from 'pixi.js'
 import { Cars } from './Cars'
 import { APP_HEIGHT, APP_WIDTH, GAME_MODES, TOP_SPEED, type GameMode } from './configuration'
 import { Controller } from './Controller'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
+import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { defaultState, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
-import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 
 export class Game {
-  private app: Application
+  private stage: Container
+  private ticker: Ticker
+  private renderer: Renderer
   private state!: State
   private controller: Controller
   private hero: Hero
@@ -20,7 +22,9 @@ export class Game {
 
   constructor(app: Application) {
     this.initState()
-    this.app = app
+    this.stage = app.stage
+    this.ticker = app.ticker
+    this.renderer = app.renderer
     this.controller = new Controller()
     this.terrain = new Terrain()
     this.hud = new HUD()
@@ -45,7 +49,7 @@ export class Game {
     })
     textLoading.anchor.set(0.5, 0.5)
 
-    this.app.stage.addChild(textLoading)
+    this.stage.addChild(textLoading)
 
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
@@ -53,31 +57,31 @@ export class Game {
     await this.terrain.preloadAssets()
     await this.hero.preloadAssets()
 
-    this.app.stage.removeChild(textLoading)
+    this.stage.removeChild(textLoading)
   }
 
   async setup() {
-    const { app } = this
+    const { stage, renderer } = this
 
     await this.preloadAssets()
 
-    this.terrain.setup(app)
-    this.cars.setup(app)
-    this.hero.setup(app)
-    this.hud.setup(app)
+    this.terrain.setup(stage, renderer)
+    this.cars.setup(stage)
+    this.hero.setup(stage)
+    this.hud.setup(stage)
   }
 
   launch() {
     this.switchMode(GAME_MODES.DEMO)
 
     const infoScreen = new InfoScreen()
-    infoScreen.setup(this.app)
+    infoScreen.setup(this.stage, this.ticker)
     infoScreen.show(SCREEN_MODE.START)
     infoScreen.on(screenEventName, (event: ScreenEvent) => {
       if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode)
     })
 
-    this.app.ticker.add((time: Ticker) => {
+    this.ticker.add((time: Ticker) => {
       this.updateState()
 
       this.hud.draw(this.state)
@@ -116,7 +120,7 @@ export class Game {
   }
 
   private updateState() {
-    let { speed, distance, score, condition } = this.state
+    let { speed, distance, score, health } = this.state
     const { keyUp, keyDown, keyLeft, keyRight, keySpace } = this.controller.state
 
     // Проверяем препятствие впереди перед изменением скорости
@@ -156,14 +160,16 @@ export class Game {
     const deltaDistance = calculateDistance(speed)
     distance += deltaDistance
 
-    if (collision) condition -= collision.damage
-    condition = Math.max(0, condition)
+    if (this.state.mode !== GAME_MODES.FREE_RIDE) {
+      if (collision) health -= collision.damage
+      health = Math.max(0, health)
+    }
 
     const claim = this.terrain.checkObjectIsClaimed(heroBounds)
     if (claim) score += 100
     // Пока очки считаем просто по дистанции
     // score = Math.floor(distance / 1000) * 100
 
-    Object.assign(this.state, { speed, deltaSpeed, distance, deltaDistance, deltaX, score, condition, crash, claim })
+    Object.assign(this.state, { speed, deltaSpeed, distance, deltaDistance, deltaX, score, health, crash, claim })
   }
 }

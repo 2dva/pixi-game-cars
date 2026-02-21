@@ -4,11 +4,11 @@ export const APP_HEIGHT = 600
 
 export const STAGE_PADDING = 120
 
-export const ROAD_LEFT_GAP = 50
+export const ROAD_LEFT_GAP = 60
 export const ROAD_LANE_COUNT = 5
 export const ROAD_LANE_WIDTH = 100
 
-export const SIDEWALK_WIDTH = 90
+export const SIDEWALK_WIDTH = 80
 
 export const TOP_SPEED = 150
 

@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Text, type DestroyOptions } from 'pixi.js'
+import { Container, Graphics, Text, Ticker, type DestroyOptions } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, GAME_MODES, type GameMode } from './configuration'
 
 export const SCREEN_MODE = {
@@ -6,7 +6,6 @@ export const SCREEN_MODE = {
   PAUSE: 'mode_pause',
   END: 'mode_end',
 } as const
-
 
 export const screenEventName = 'screenEvent'
 
@@ -51,7 +50,7 @@ export class InfoScreen extends Container {
 
   async preloadAssets() {}
 
-  setup(app: Application) {
+  setup(stage: Container, ticker: Ticker) {
     const background = new Graphics()
     background.rect(0, 0, APP_WIDTH, APP_HEIGHT).fill({
       color: 0x000000,
@@ -86,10 +85,10 @@ export class InfoScreen extends Container {
     text3.anchor.set(0.5, 0)
     this.addChild(text1, text2, text3)
     this.visible = false
-    app.stage.addChild(this)
+    stage.addChild(this)
 
     let elapsed = 0
-    app.ticker.add(({ deltaTime }) => {
+    ticker.add(({ deltaTime }) => {
       elapsed += deltaTime
       // Toggle visibility every 30 frames (approx 0.5 seconds at 60fps)
       if (Math.floor(elapsed / 60) % 2 === 0) {

@@ -1,4 +1,4 @@
-import { Application, Assets, Bounds, Container, Sprite, Text, Texture } from 'pixi.js'
+import { Assets, Bounds, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
 import type { State } from '../state'
@@ -21,18 +21,17 @@ const terrainAssets = [
   },
 ]
 
-export class Terrain {
-  terrainContainer: Container
+export class Terrain extends Container {
   terrainObjects: Set<Sprite | GifSprite>
   road: Road
   letterAtexture!: Texture
   claimable: ClaimableObjects
 
   constructor() {
-    this.terrainContainer = new Container()
+    super()
     this.terrainObjects = new Set()
     this.road = new Road()
-    this.claimable = new ClaimableObjects(this.terrainContainer)
+    this.claimable = new ClaimableObjects(this)
   }
 
   async preloadAssets() {
@@ -40,12 +39,12 @@ export class Terrain {
     await this.claimable.preloadAssets()
   }
 
-  setup(app: Application) {
+  setup(stage: Container, renderer: Renderer) {
     const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
-    this.letterAtexture = app.renderer.generateTexture(letterA)
+    this.letterAtexture = renderer.generateTexture(letterA)
 
-    this.road.setup(app)
-    app.stage.addChild(this.terrainContainer)
+    this.road.setup(stage)
+    stage.addChild(this)
   }
 
   reset() {
@@ -74,12 +73,12 @@ export class Terrain {
     sprite.x = x
     sprite.y = -50
     this.terrainObjects.add(sprite)
-    this.terrainContainer.addChild(sprite)
+    this.addChild(sprite)
   }
 
   private removeObject(sprite: Sprite | GifSprite) {
     this.terrainObjects.delete(sprite)
-    this.terrainContainer.removeChild(sprite)
+    this.removeChild(sprite)
     sprite.destroy()
   }
 

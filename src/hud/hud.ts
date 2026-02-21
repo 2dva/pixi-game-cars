@@ -1,4 +1,4 @@
-import { Application, Assets } from 'pixi.js'
+import { Assets, Container } from 'pixi.js'
 import type { State } from '../state'
 import { throttle } from '../utils'
 import { Gauges } from './Gauges'
@@ -25,17 +25,17 @@ export class HUD {
     await this.logo.preloadAssets()
   }
 
-  setup(app: Application) {
-    this.gauges.setup(app)
-    this.score.setup(app)
-    this.logo.setup(app)
-    this.health.setup(app)
+  setup(stage: Container) {
+    this.gauges.setup(stage)
+    this.score.setup(stage)
+    this.logo.setup(stage)
+    this.health.setup(stage)
   }
 
   private instantDraw(state: State) {
-    const { speed, distance, score, condition } = state
+    const { speed, distance, score, health } = state
     this.gauges.draw(speed, distance)
-    this.health.draw(condition)
+    this.health.draw(health)
     this.score.draw(score)
   }
 }

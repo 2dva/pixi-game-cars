@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite } from 'pixi.js'
+import { Assets, Container, Sprite } from 'pixi.js'
 import { checkCollisionWithCar, checkObstacleAhead, type BoundsLike, type CollisionObject } from './collision'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 import type { State } from './state'
@@ -32,23 +32,20 @@ type Car = {
   speed: number
 }
 
-export class Cars {
-  carContainer: Container
+export class Cars extends Container {
   cars: Set<Car> = new Set()
   occupiedLanes: Record<string, boolean> = {}
 
   constructor() {
-    // Create a container to hold all the car sprites.
-    this.carContainer = new Container()
+    super()
   }
 
   async preloadAssets() {
     await Assets.load(Object.values(carConfig))
   }
 
-  setup(app: Application) {
-    // Add the car container to the stage.
-    app.stage.addChild(this.carContainer)
+  setup(stage: Container) {
+    stage.addChild(this)
   }
 
   reset() {
@@ -83,13 +80,13 @@ export class Cars {
     carSprite.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
     carSprite.y = speed > globalSpeed ? APP_HEIGHT + STAGE_PADDING : -STAGE_PADDING
     this.cars.add({ sprite: carSprite, lane: n, speed })
-    this.carContainer!.addChild(carSprite)
+    this.addChild(carSprite)
   }
 
   private removeCar(car: Car) {
     this.cars.delete(car)
     this.occupiedLanes[car.lane] = false
-    this.carContainer!.removeChild(car.sprite)
+    this.removeChild(car.sprite)
     car.sprite.destroy()
   }
 

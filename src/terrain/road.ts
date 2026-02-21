@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, GraphicsContext } from 'pixi.js'
+import { Container, Graphics, GraphicsContext } from 'pixi.js'
 import {
   APP_HEIGHT,
   APP_WIDTH,
@@ -17,17 +17,16 @@ const LINE_COLOR_WHITE = 0xe5e5e5
 const LINE_COLOR_YELLOW = 0xa99f2f
 const SIDEWALK_BORDER_COLOR = 0x717475
 
-export class Road {
-  road!: Container
+export class Road extends Container {
   roadDelta = 0
 
-  constructor() {}
+  constructor() {
+    super()
+  }
 
   async preloadAssets() {}
 
-  setup(app: Application) {
-    this.road = new Container()
-
+  setup(stage: Container) {
     const lineCtx = new GraphicsContext()
 
     this.drawSolidLine(lineCtx, ROAD_LEFT_GAP - LINE_WIDTH, LINE_COLOR_YELLOW)
@@ -42,8 +41,8 @@ export class Road {
     const lines = new Graphics(lineCtx)
 
     // Add the car container to the stage.
-    this.road.addChild(lines)
-    app.stage.addChild(this.road)
+    this.addChild(lines)
+    stage.addChild(this)
   }
 
   reset() {
@@ -51,10 +50,9 @@ export class Road {
   }
 
   draw(speed: number) {
-    if (!this.road) return
     this.roadDelta += speed * 0.1
     this.roadDelta = this.roadDelta % (LINE_GAP + LINE_DASH)
-    this.road.position.set(0, this.roadDelta - LINE_REPEAT)
+    this.position.set(0, this.roadDelta - LINE_REPEAT)
   }
 
   // Draw single line
