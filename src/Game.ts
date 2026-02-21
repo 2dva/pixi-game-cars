@@ -185,8 +185,6 @@ export class Game {
 
     const claim = this.terrain.checkObjectIsClaimed(heroBounds)
     if (claim) score += 100
-    // Пока очки считаем просто по дистанции
-    // score = Math.floor(distance / 1000) * 100
 
     Object.assign(this.state, { speed, deltaSpeed, distance, deltaDistance, deltaX, score, health, crash, claim })
   }

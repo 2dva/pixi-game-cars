@@ -76,7 +76,6 @@ export class Cars extends Container {
     runEverySecond(time.elapsedMS, () => {
       this.checkReleaseCar(state)
     })
-
   }
 
   private createRandomCarSprite() {
@@ -88,10 +87,11 @@ export class Cars extends Container {
   }
 
   private addCarToLane(n: number, globalSpeed: number) {
-    const speed = Math.floor(25 + rollDice(30))
+    const speed = Math.floor(25 + rollDice(30)) * Math.sign(n + 0.1)
     const carSprite = this.createRandomCarSprite()
     carSprite.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
     carSprite.y = speed > globalSpeed ? APP_HEIGHT + STAGE_PADDING : -STAGE_PADDING
+    carSprite.rotation = n < 0 ? Math.PI : 0
     this.cars.add({ sprite: carSprite, lane: n, speed })
     this.addChild(carSprite)
   }
@@ -105,7 +105,7 @@ export class Cars extends Container {
 
   checkReleaseCar({ speed }: State) {
     // в цикле проверяем свободные полосы
-    for (let i = 0; i < ROAD_LANE_COUNT; i++) {
+    for (let i = -1; i < ROAD_LANE_COUNT; i++) {
       // если есть свободная полоса
       if (!this.occupiedLanes[i]) {
         // бросаем кубик, и если ок, то выпускаем машину
@@ -119,38 +119,17 @@ export class Cars extends Container {
 
   checkCollisionCars(heroBounds: BoundsLike): CollisionObject | null {
     for (const car of this.cars) {
-      const { sprite } = car
-      const carBounds = sprite.getBounds()
-      const collision = checkCollisionWithCar(heroBounds, carBounds)
-      if (collision !== null) {
-        const recoil = 4
-        switch (collision.direction) {
-          case 'head':
-            car.speed += 2
-            sprite.y -= recoil
-            break
-          case 'back':
-            car.speed -= 8
-            sprite.y += recoil
-            break
-          case 'left':
-            car.speed -= 3
-            sprite.x -= recoil
-            break
-          case 'right':
-            car.speed -= 3
-            sprite.x += recoil
-            break
-        }
-        car.speed = Math.max(car.speed, 0)
-        return collision
-      }
+      const collision = checkCollisionWithCar(heroBounds, car.sprite.getBounds())
+      if (collision === null) continue
+      car.speed = Math.max(car.speed - collision.speedLoss, 0)
+      car.sprite.x += collision.recoil[0]
+      car.sprite.y += collision.recoil[1]
+      return collision
     }
     return null
   }
 
   checkCarsAheadHero(heroBounds: BoundsLike): boolean {
-    // Проверяем, нет ли впереди машинки
     for (const { sprite } of this.cars) {
       if (checkObstacleAhead(heroBounds, sprite.getBounds())) return true
     }

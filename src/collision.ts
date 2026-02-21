@@ -6,6 +6,8 @@ export type CollisionObject = {
   direction: CollisionDirection
   force: number
   damage: number
+  speedLoss: number
+  recoil: [number, number]
 }
 
 export function checkCollisionWithObject(hero: BoundsLike, obj: BoundsLike): boolean {
@@ -43,10 +45,31 @@ export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike): Collis
   const collisionX: CollisionDirection = hero.left > car.left ? 'left' : 'right'
   const collisionY: CollisionDirection = hero.top > car.top ? 'head' : 'back'
 
-  const collisionDirection: CollisionDirection =
+  const direction: CollisionDirection =
     Math.abs(hero.left - car.left) * 2 < Math.abs(hero.top - car.top) ? collisionY : collisionX
 
-  return { direction: collisionDirection, force, damage }
+  let speedLoss = 0
+  let recoil: [number, number] = [0,0]
+  switch (direction) {
+    case 'head':
+      speedLoss = -2
+      recoil = [0, -4]
+      break
+    case 'back':
+      speedLoss = 8
+      recoil = [0, 4]
+      break
+    case 'left':
+      speedLoss = 3
+      recoil = [-4, 0]
+      break
+    case 'right':
+      speedLoss = 3
+      recoil = [4, 0]
+      break
+  }
+
+  return { direction: direction, force, damage, speedLoss, recoil }
 }
 
 export function checkObstacleAhead(hero: BoundsLike, car: BoundsLike): boolean {
