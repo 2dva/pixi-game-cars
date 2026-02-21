@@ -16,6 +16,7 @@ export const GAME_MODES = {
   DEMO: 0,
   FREE_RIDE: 1,
   COLLECT_IN_TIME: 2,
+  GAME_OVER: 999,
 } as const
 
 export type GameMode = (typeof GAME_MODES)[keyof typeof GAME_MODES]

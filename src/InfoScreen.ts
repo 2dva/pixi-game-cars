@@ -43,14 +43,30 @@ const fontSecondary = {
 
 export class InfoScreen extends Container {
   keydownHandlerBound = this.keydownHandler.bind(this)
+  ticker: Ticker
+  elapsedSeconds: number
+  blinkText: Text
+  screenMode: ScreenMode | null
 
   constructor() {
     super()
+    this.zIndex = 10
+    this.ticker = new Ticker()
+    this.elapsedSeconds = 0
+    this.blinkText = new Text()
+    this.screenMode = null
   }
 
   async preloadAssets() {}
 
-  setup(stage: Container, ticker: Ticker) {
+  setup(stage: Container) {
+    this.ticker.add(this.tickHandler, this)
+
+    this.visible = false
+    stage.addChild(this)
+  }
+
+  setupBackground() {
     const background = new Graphics()
     background.rect(0, 0, APP_WIDTH, APP_HEIGHT).fill({
       color: 0x000000,
@@ -62,6 +78,11 @@ export class InfoScreen extends Container {
       alpha: 0.5,
     })
     this.addChild(background)
+  }
+
+  setupStartScreen() {
+    this.removeChildren()
+    this.setupBackground()
 
     const text1 = new Text({
       text: 'Выбери тип игры:',
@@ -83,48 +104,89 @@ export class InfoScreen extends Container {
       y: 410,
     })
     text3.anchor.set(0.5, 0)
-    this.addChild(text1, text2, text3)
-    this.visible = false
-    stage.addChild(this)
+    this.blinkText = text3
 
-    let elapsed = 0
-    ticker.add(({ deltaTime }) => {
-      elapsed += deltaTime
-      // Toggle visibility every 30 frames (approx 0.5 seconds at 60fps)
-      if (Math.floor(elapsed / 60) % 2 === 0) {
-        text3.visible = true
-      } else {
-        text3.visible = false
-      }
+    this.addChild(text1, text2, text3)
+  }
+
+  setupEndScreen() {
+    this.removeChildren()
+    this.setupBackground()
+
+    const text1 = new Text({
+      text: 'Игра закончена',
+      style: fontTitle,
+      x: APP_WIDTH / 2,
+      y: 180,
     })
+    text1.anchor.set(0.5, 0)
+    const text2 = new Text({
+      text: 'Машина разбилась',
+      style: fontMain,
+      x: 240,
+      y: 260,
+    })
+    const text3 = new Text({
+      text: 'Нажми пробел чтобы продолжить',
+      style: fontSecondary,
+      x: APP_WIDTH / 2,
+      y: 410,
+    })
+    text3.anchor.set(0.5, 0)
+    this.blinkText = text3
+
+    this.addChild(text1, text2, text3)
+  }
+
+  tickHandler(time: Ticker) {
+    this.elapsedSeconds += time.elapsedMS
+    if (this.elapsedSeconds > 1000.0) {
+      this.elapsedSeconds -= 1000.0
+      this.blinkText.visible = !this.blinkText.visible
+    }
   }
 
   keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
-    if (keyCode === 'Digit1') {
-      this.emitAndHide(GAME_MODES.FREE_RIDE) // start FREE_RIDE game
-    } else if (keyCode === 'Digit2') {
-      this.emitAndHide(GAME_MODES.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
+    if (this.screenMode === SCREEN_MODE.START) {
+      if (keyCode === 'Digit1') {
+        this.emitAndHide(GAME_MODES.FREE_RIDE) // start FREE_RIDE game
+      } else if (keyCode === 'Digit2') {
+        this.emitAndHide(GAME_MODES.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
+      }
+    } else if (this.screenMode === SCREEN_MODE.END) {
+      if (keyCode === 'Space') {
+        this.emitAndHide(GAME_MODES.DEMO)
+      }
     }
   }
 
   show(mode: ScreenMode) {
+    if (this.visible) return
+    
+    this.screenMode = mode
+    this.ticker.start()
     if (mode === SCREEN_MODE.START) {
-      // пока только один режим
+      this.setupStartScreen()
+    } else if (mode === SCREEN_MODE.END) {
+      this.setupEndScreen()
     }
     this.visible = true
-    window.addEventListener('keydown', this.keydownHandlerBound)
+    setTimeout(() => {
+      window.addEventListener('keydown', this.keydownHandlerBound)
+    }, 500)
   }
 
   private emitAndHide(mode: number) {
+    this.hide()
     this.emit(screenEventName, {
       type: EVENT_TYPE.SELECT_GAME_MODE,
       mode,
     })
-    this.hide()
   }
 
   private hide() {
+    if (this.ticker.started) this.ticker.stop()
     window.removeEventListener('keydown', this.keydownHandlerBound)
     this.visible = false
   }

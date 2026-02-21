@@ -21,17 +21,28 @@ const terrainAssets = [
   },
 ]
 
+let elapsedDistance = 0.0
+function runEveryHundredMeters(deltaDistance: number, cb: () => void) {
+  elapsedDistance += deltaDistance
+  if (elapsedDistance < 100.0) return
+  elapsedDistance -= 100.0
+  cb()
+}
+
 export class Terrain extends Container {
   terrainObjects: Set<Sprite | GifSprite>
   road: Road
   letterAtexture!: Texture
   claimable: ClaimableObjects
 
-  constructor() {
+  constructor(renderer: Renderer) {
     super()
     this.terrainObjects = new Set()
     this.road = new Road()
     this.claimable = new ClaimableObjects(this)
+
+    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
+    this.letterAtexture = renderer.generateTexture(letterA)
   }
 
   async preloadAssets() {
@@ -39,10 +50,7 @@ export class Terrain extends Container {
     await this.claimable.preloadAssets()
   }
 
-  setup(stage: Container, renderer: Renderer) {
-    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
-    this.letterAtexture = renderer.generateTexture(letterA)
-
+  setup(stage: Container) {
     this.road.setup(stage)
     stage.addChild(this)
   }
@@ -53,9 +61,13 @@ export class Terrain extends Container {
     this.claimable.reset()
   }
 
-  draw({ speed }: State) {
+  draw({ speed, deltaDistance }: State) {
     this.road.draw(speed)
     this.claimable.draw(speed)
+
+    runEveryHundredMeters(deltaDistance, () => {
+      this.checkObjectRelease()
+    })
 
     this.terrainObjects.forEach((sprite) => {
       sprite.y += speed * 0.1

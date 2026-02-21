@@ -1,4 +1,4 @@
-import { Assets, Container, Text, Ticker, type Application, type Renderer } from 'pixi.js'
+import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
 import { APP_HEIGHT, APP_WIDTH, GAME_MODES, TOP_SPEED, type GameMode } from './configuration'
 import { Controller } from './Controller'
@@ -7,26 +7,26 @@ import { HUD } from './HUD/HUD'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { defaultState, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
-import { calculateDistance, runEveryHundredMeters, runEverySecond } from './utils'
+import { calculateDistance } from './utils'
 
 export class Game {
   private stage: Container
   private ticker: Ticker
-  private renderer: Renderer
   private state!: State
   private controller: Controller
   private hero: Hero
   private cars: Cars
   private hud: HUD
   private terrain: Terrain
+  private infoScreen: InfoScreen
 
   constructor(app: Application) {
     this.initState()
     this.stage = app.stage
     this.ticker = app.ticker
-    this.renderer = app.renderer
+    this.infoScreen = new InfoScreen()
     this.controller = new Controller()
-    this.terrain = new Terrain()
+    this.terrain = new Terrain(app.renderer)
     this.hud = new HUD()
     this.cars = new Cars()
     this.hero = new Hero()
@@ -61,41 +61,31 @@ export class Game {
   }
 
   async setup() {
-    const { stage, renderer } = this
+    const { stage } = this
 
     await this.preloadAssets()
 
-    this.terrain.setup(stage, renderer)
+    this.infoScreen.setup(stage)
+    this.terrain.setup(stage)
     this.cars.setup(stage)
     this.hero.setup(stage)
     this.hud.setup(stage)
+
+    this.infoScreen.on(screenEventName, (event: ScreenEvent) => {
+      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode)
+    })
   }
 
   launch() {
     this.switchMode(GAME_MODES.DEMO)
-
-    const infoScreen = new InfoScreen()
-    infoScreen.setup(this.stage, this.ticker)
-    infoScreen.show(SCREEN_MODE.START)
-    infoScreen.on(screenEventName, (event: ScreenEvent) => {
-      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode)
-    })
 
     this.ticker.add((time: Ticker) => {
       this.updateState()
 
       this.hud.draw(this.state)
       this.hero.draw(this.state, time)
-      this.cars.draw(this.state)
+      this.cars.draw(this.state, time)
       this.terrain.draw(this.state)
-
-      runEverySecond(time, () => {
-        this.cars.checkReleaseCar(this.state)
-      })
-
-      runEveryHundredMeters(this.state.deltaDistance, () => {
-        this.terrain.checkObjectRelease()
-      })
     })
   }
 
@@ -105,8 +95,21 @@ export class Game {
    * GAME_MODES.CLASSIC: can die if health drops to zero
    */
   switchMode(mode: GameMode) {
-    this.initState()
+    if (mode === GAME_MODES.GAME_OVER) {
+      this.state.mode = mode
+      this.infoScreen.show(SCREEN_MODE.END)
+      this.state.speed = 0
+      this.controller.disabled = true
+      return
+    }
+
+    if (mode === GAME_MODES.DEMO) {
+      this.infoScreen.show(SCREEN_MODE.START)
+    }
+
     const isDemo = mode === GAME_MODES.DEMO
+
+    this.initState()
 
     this.state.mode = mode
     this.state.speed = isDemo ? 15 : 0
@@ -121,7 +124,7 @@ export class Game {
 
   private updateState() {
     let { speed, distance, score, health } = this.state
-    const { keyUp, keyDown, keyLeft, keyRight, keySpace } = this.controller.state
+    const { keyUp, keyDown, keyLeft, keyRight, keySpace, m } = this.controller.state
 
     // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = this.hero.getBounds()
@@ -155,14 +158,29 @@ export class Game {
       bottom: heroBounds.bottom,
     }
     const collision = this.cars.checkCollisionCars(heroBoundsWithShift)
-    const crash = !!collision
+    let crash = !!collision
     if (collision) deltaX = deltaX * 0.6
     const deltaDistance = calculateDistance(speed)
     distance += deltaDistance
 
-    if (this.state.mode !== GAME_MODES.FREE_RIDE) {
+    if (this.state.mode === GAME_MODES.COLLECT_IN_TIME) {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
+      if (health === 0) {
+        this.switchMode(GAME_MODES.GAME_OVER)
+        return
+      }
+    }
+    
+    if (this.state.mode === GAME_MODES.GAME_OVER) {
+      crash = true
+      speed = 0
+      deltaSpeed = 0
+    }
+
+    if (m) {
+        this.switchMode(GAME_MODES.DEMO)
+        return
     }
 
     const claim = this.terrain.checkObjectIsClaimed(heroBounds)

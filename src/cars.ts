@@ -1,4 +1,4 @@
-import { Assets, Container, Sprite } from 'pixi.js'
+import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { checkCollisionWithCar, checkObstacleAhead, type BoundsLike, type CollisionObject } from './collision'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 import type { State } from './state'
@@ -32,6 +32,14 @@ type Car = {
   speed: number
 }
 
+let elapsedSeconds = 0.0
+export function runEverySecond(elapsedMS: number, cb: () => void) {
+  elapsedSeconds += elapsedMS
+  if (elapsedSeconds < 1000.0) return
+  elapsedSeconds -= 1000.0
+  cb()
+}
+
 export class Cars extends Container {
   cars: Set<Car> = new Set()
   occupiedLanes: Record<string, boolean> = {}
@@ -54,7 +62,7 @@ export class Cars extends Container {
     })
   }
 
-  draw(state: State) {
+  draw(state: State, time: Ticker) {
     const { speed } = state
     this.cars.forEach((car) => {
       const deltaSpeed = speed - car.speed
@@ -64,6 +72,11 @@ export class Cars extends Container {
         this.removeCar(car)
       }
     })
+
+    runEverySecond(time.elapsedMS, () => {
+      this.checkReleaseCar(state)
+    })
+
   }
 
   private createRandomCarSprite() {
