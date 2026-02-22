@@ -4,7 +4,7 @@ import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING }
 import type { State } from '../state'
 import { rollBoolDice } from '../utils'
 import { ClaimableObjects, type claimableType } from './ClaimableObjects'
-import { Road } from './_road'
+import { Road } from './Road'
 
 const FONT_STYLE = {
   letterA: {

@@ -1,12 +1,12 @@
 import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
-import { Cars } from './_cars'
+import { Cars } from './Cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
-import { Controller } from './_controller'
-import { Hero } from './_Hero/Hero'
-import { HUD } from './_HUD/_hud'
+import { Controller } from './Controller'
+import { Hero } from './Hero/Hero'
+import { HUD } from './HUD/HUD'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
-import { Terrain } from './_Terrain/_terrain'
+import { Terrain } from './Terrain/Terrain'
 import { calculateDistanceBySpeed } from './utils'
 
 export class Game {
@@ -32,7 +32,7 @@ export class Game {
     this.hero = new Hero()
   }
 
-  initState() {
+  private initState() {
     this.state = Object.assign({}, defaultState)
   }
 
@@ -79,21 +79,9 @@ export class Game {
   launch() {
     this.switchMode(GAME_MODE.DEMO)
 
-    this.ticker.add((time: Ticker) => {
-      this.updateState(time)
-
-      this.hud.draw(this.state)
-      this.hero.draw(this.state, time)
-      this.cars.draw(this.state, time)
-      this.terrain.draw(this.state)
-    })
+    this.ticker.add(this.updateOnTick, this)
   }
 
-  /**
-   * GAME_MODES.DEMO: hide hero, speed = 15, block controls
-   * GAME_MODES.FREE_RIDE: endless life
-   * GAME_MODES.CLASSIC: can die if health drops to zero
-   */
   switchMode(mode: GameMode, modeReason: GameModeReason = GAME_MODE_REASON.NO_REASON) {
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
@@ -104,11 +92,11 @@ export class Game {
       return
     }
 
-    if (mode === GAME_MODE.DEMO) {
+    const isDemo = mode === GAME_MODE.DEMO
+
+    if (isDemo) {
       this.infoScreen.show(SCREEN_MODE.START, this.state)
     }
-
-    const isDemo = mode === GAME_MODE.DEMO
 
     this.initState()
     this.state.mode = mode
@@ -123,9 +111,14 @@ export class Game {
     this.hero.setVisible(!isDemo)
   }
 
-  private updateState(time: Ticker) {
+  private updateOnTick(time: Ticker) {
     let { speed, distance, score, health, timeLeft } = this.state
     const { keyUp, keyDown, keyLeft, keyRight, keySpace, m } = this.controller.state
+
+    this.hud.draw(this.state)
+    this.hero.draw(this.state, time)
+    this.cars.draw(this.state, time)
+    this.terrain.draw(this.state)
 
     // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = this.hero.getBounds()
