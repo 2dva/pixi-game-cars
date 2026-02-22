@@ -1,11 +1,11 @@
 import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
-import { APP_HEIGHT, APP_WIDTH, GAME_MODES, TOP_SPEED, type GameMode } from './configuration'
+import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './Controller'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
-import { defaultState, type State } from './state'
+import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import { calculateDistance } from './utils'
 
@@ -77,10 +77,10 @@ export class Game {
   }
 
   launch() {
-    this.switchMode(GAME_MODES.DEMO)
+    this.switchMode(GAME_MODE.DEMO)
 
     this.ticker.add((time: Ticker) => {
-      this.updateState()
+      this.updateState(time)
 
       this.hud.draw(this.state)
       this.hero.draw(this.state, time)
@@ -94,23 +94,23 @@ export class Game {
    * GAME_MODES.FREE_RIDE: endless life
    * GAME_MODES.CLASSIC: can die if health drops to zero
    */
-  switchMode(mode: GameMode) {
-    if (mode === GAME_MODES.GAME_OVER) {
+  switchMode(mode: GameMode, modeReason: GameModeReason = GAME_MODE_REASON.NO_REASON) {
+    if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
-      this.infoScreen.show(SCREEN_MODE.END)
+      this.state.modeReason = modeReason
+      this.infoScreen.show(SCREEN_MODE.END, this.state)
       this.state.speed = 0
       this.controller.disabled = true
       return
     }
 
-    if (mode === GAME_MODES.DEMO) {
-      this.infoScreen.show(SCREEN_MODE.START)
+    if (mode === GAME_MODE.DEMO) {
+      this.infoScreen.show(SCREEN_MODE.START, this.state)
     }
 
-    const isDemo = mode === GAME_MODES.DEMO
+    const isDemo = mode === GAME_MODE.DEMO
 
     this.initState()
-
     this.state.mode = mode
     this.state.speed = isDemo ? 15 : 0
     this.controller.disabled = isDemo
@@ -118,12 +118,13 @@ export class Game {
     this.terrain.reset()
     this.cars.reset()
     this.hero.reset()
+    this.hud.reset()
 
     this.hero.setVisible(!isDemo)
   }
 
-  private updateState() {
-    let { speed, distance, score, health } = this.state
+  private updateState(time: Ticker) {
+    let { speed, distance, score, health, timeLeft } = this.state
     const { keyUp, keyDown, keyLeft, keyRight, keySpace, m } = this.controller.state
 
     // Проверяем препятствие впереди перед изменением скорости
@@ -163,29 +164,43 @@ export class Game {
     const deltaDistance = calculateDistance(speed)
     distance += deltaDistance
 
-    if (this.state.mode === GAME_MODES.COLLECT_IN_TIME) {
-      if (collision) health -= collision.damage
-      health = Math.max(0, health)
-      if (health === 0) {
-        this.switchMode(GAME_MODES.GAME_OVER)
-        return
-      }
-    }
-    
-    if (this.state.mode === GAME_MODES.GAME_OVER) {
-      crash = true
+    if (this.state.mode === GAME_MODE.GAME_OVER) {
+      crash = health === 0
       speed = 0
       deltaSpeed = 0
     }
 
+    if (this.state.mode === GAME_MODE.COLLECT_IN_TIME) {
+      if (collision) health -= collision.damage
+      health = Math.max(0, health)
+      timeLeft -= time.elapsedMS / 1000
+
+      if (timeLeft <= 0.0) {
+        this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_TIME_IS_UP)
+      } else if (health === 0) {
+        this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_CRASHED)
+      }
+    }
+
     if (m) {
-        this.switchMode(GAME_MODES.DEMO)
-        return
+      this.switchMode(GAME_MODE.DEMO, GAME_MODE_REASON.END_MANUAL)
+      return
     }
 
     const claim = this.terrain.checkObjectIsClaimed(heroBounds)
     if (claim) score += 100
 
-    Object.assign(this.state, { speed, deltaSpeed, distance, deltaDistance, deltaX, score, health, crash, claim })
+    Object.assign(this.state, {
+      speed,
+      deltaSpeed,
+      distance,
+      deltaDistance,
+      deltaX,
+      score,
+      health,
+      timeLeft,
+      crash,
+      claim,
+    })
   }
 }

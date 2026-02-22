@@ -1,4 +1,4 @@
-import { BitmapText, Container, Graphics } from 'pixi.js'
+import { Container, Graphics, Text } from 'pixi.js'
 
 const POS_X = 15
 const POS_Y = 20
@@ -16,7 +16,7 @@ const TINT_DEFAULT = 0xf5f5f5
 const TINT_BRIGHT = 0xfff568
 
 export class Score extends Container {
-  bitmap!: BitmapText
+  private textObj!: Text
 
   constructor() {
     super()
@@ -31,18 +31,17 @@ export class Score extends Container {
       alpha: 0.4,
     })
     
-    const textScore = new BitmapText({
+    const textScore = new Text({
       text: '0',
       style: FONT_STYLE.score,
       x: 170,
       y: 4,
     })
-    
     textScore.style.letterSpacing = 0
     textScore.style.fontWeight = 'normal'
     textScore.tint = TINT_DEFAULT
     textScore.anchor.set(1, 0)
-    this.bitmap = textScore
+    this.textObj = textScore
     
     this.addChild(background)
     this.addChild(textScore)
@@ -50,15 +49,15 @@ export class Score extends Container {
   }
 
   draw(score: number) {
-    if (String(score) != this.bitmap.text) {
-      this.bitmap.text = `${score}`
-      this.bitmap.tint = TINT_BRIGHT
-      this.bitmap.style.letterSpacing = 0.8
-      this.bitmap.style.fontWeight = 'bold'
+    if (String(score) != this.textObj.text) {
+      this.textObj.text = `${score}`
+      this.textObj.tint = TINT_BRIGHT
+      this.textObj.style.letterSpacing = 0.8
+      this.textObj.style.fontWeight = 'bold'
       setTimeout(() => {
-        this.bitmap.tint = TINT_DEFAULT
-        this.bitmap.style.letterSpacing = 0
-        this.bitmap.style.fontWeight = 'normal'
+        this.textObj.tint = TINT_DEFAULT
+        this.textObj.style.letterSpacing = 0
+        this.textObj.style.fontWeight = 'normal'
       }, 100)
     }
   }

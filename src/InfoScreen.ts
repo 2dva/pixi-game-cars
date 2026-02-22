@@ -1,5 +1,6 @@
-import { Container, Graphics, Text, Ticker, type DestroyOptions } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, GAME_MODES, type GameMode } from './configuration'
+import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
+import { APP_HEIGHT, APP_WIDTH, zIndexFixed } from './configuration'
+import { GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 
 export const SCREEN_MODE = {
   START: 'mode_start',
@@ -21,20 +22,26 @@ export type ScreenEvent = {
   mode: GameMode
 }
 
-const fontTitle = {
+const fontTitle: TextStyleOptions = {
   fontFamily: 'Arial',
   fontSize: 36,
   fill: '#eeeeee',
   letterSpacing: 2,
 }
-const fontMain = {
+const fontMain: TextStyleOptions = {
   fontFamily: 'Arial',
   fontSize: 24,
   letterSpacing: 2,
   fill: '#eeeeee',
   lineHeight: 46,
+  tagStyles: {
+    b: {
+      fontWeight: 'bold',
+      fill: 0xfff568,
+    },
+  },
 }
-const fontSecondary = {
+const fontSecondary: TextStyleOptions = {
   fontFamily: 'Arial',
   fontSize: 18,
   fill: '#eeeeee',
@@ -50,7 +57,7 @@ export class InfoScreen extends Container {
 
   constructor() {
     super()
-    this.zIndex = 10
+    this.zIndex = zIndexFixed.infoScreens
     this.ticker = new Ticker()
     this.elapsedSeconds = 0
     this.blinkText = new Text()
@@ -101,7 +108,7 @@ export class InfoScreen extends Container {
       text: 'Нажми клавишу для выбора режима',
       style: fontSecondary,
       x: APP_WIDTH / 2,
-      y: 410,
+      y: 435,
     })
     text3.anchor.set(0.5, 0)
     this.blinkText = text3
@@ -109,28 +116,32 @@ export class InfoScreen extends Container {
     this.addChild(text1, text2, text3)
   }
 
-  setupEndScreen() {
+  setupEndScreen(reason: GameModeReason, score: number) {
     this.removeChildren()
     this.setupBackground()
 
+    const title = reason === GAME_MODE_REASON.END_TIME_IS_UP ? 'Время вышло' : 'Игра закончена'
+    const content = reason === GAME_MODE_REASON.END_TIME_IS_UP ? `Ты набрал <b>${score}</b> очков` : 'Машина разбилась'
+    const info = 'Нажми пробел чтобы продолжить'
+
     const text1 = new Text({
-      text: 'Игра закончена',
+      text: title,
       style: fontTitle,
       x: APP_WIDTH / 2,
       y: 180,
     })
     text1.anchor.set(0.5, 0)
     const text2 = new Text({
-      text: 'Машина разбилась',
+      text: content,
       style: fontMain,
       x: 240,
       y: 260,
     })
     const text3 = new Text({
-      text: 'Нажми пробел чтобы продолжить',
+      text: info,
       style: fontSecondary,
       x: APP_WIDTH / 2,
-      y: 410,
+      y: 435,
     })
     text3.anchor.set(0.5, 0)
     this.blinkText = text3
@@ -150,26 +161,27 @@ export class InfoScreen extends Container {
     const keyCode = event.code
     if (this.screenMode === SCREEN_MODE.START) {
       if (keyCode === 'Digit1') {
-        this.emitAndHide(GAME_MODES.FREE_RIDE) // start FREE_RIDE game
+        this.emitAndHide(GAME_MODE.FREE_RIDE) // start FREE_RIDE game
       } else if (keyCode === 'Digit2') {
-        this.emitAndHide(GAME_MODES.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
+        this.emitAndHide(GAME_MODE.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
       }
     } else if (this.screenMode === SCREEN_MODE.END) {
       if (keyCode === 'Space') {
-        this.emitAndHide(GAME_MODES.DEMO)
+        this.emitAndHide(GAME_MODE.DEMO)
       }
     }
   }
 
-  show(mode: ScreenMode) {
+  show(mode: ScreenMode, state: State) {
     if (this.visible) return
-    
+
     this.screenMode = mode
     this.ticker.start()
     if (mode === SCREEN_MODE.START) {
       this.setupStartScreen()
     } else if (mode === SCREEN_MODE.END) {
-      this.setupEndScreen()
+      const { modeReason, score } = state
+      this.setupEndScreen(modeReason, score)
     }
     this.visible = true
     setTimeout(() => {
