@@ -3,8 +3,8 @@ import type { State } from '../state'
 import { throttle } from '../utils'
 import { Gauges } from './Gauges'
 import { Health } from './Health'
-import { Logo } from './Logo'
-import { Score } from './Score'
+import { Logo } from './_logo'
+import { Score } from './_score'
 import { Timer } from './Timer'
 import { GAME_MODE } from "../state"
 

@@ -1,12 +1,12 @@
 import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
-import { Cars } from './Cars'
+import { Cars } from './_cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
-import { Controller } from './Controller'
+import { Controller } from './_controller'
 import { Hero } from './Hero/Hero'
-import { HUD } from './HUD/HUD'
+import { HUD } from './HUD/_hud'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
-import { Terrain } from './Terrain/Terrain'
+import { Terrain } from './Terrain/_terrain'
 import { calculateDistance } from './utils'
 
 export class Game {
