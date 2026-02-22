@@ -41,6 +41,11 @@ const fontMain: TextStyleOptions = {
     },
   },
 }
+const fontMainSmall: TextStyleOptions = {
+  fontFamily: 'Arial',
+  fontSize: 18,
+  fill: '#c1c1c1',
+}
 const fontSecondary: TextStyleOptions = {
   fontFamily: 'Arial',
   fontSize: 18,
@@ -91,29 +96,54 @@ export class InfoScreen extends Container {
     this.removeChildren()
     this.setupBackground()
 
-    const text1 = new Text({
+    const txtFields: Text[] = []
+    const txtTitle = new Text({
       text: 'Выбери тип игры:',
       style: fontTitle,
       x: APP_WIDTH / 2,
-      y: 180,
+      y: 160,
     })
-    text1.anchor.set(0.5, 0)
-    const text2 = new Text({
-      text: '1 - Свободная езда\n2 - Собери монетки',
+    txtTitle.anchor.set(0.5, 0)
+    txtFields.push(txtTitle)
+    txtFields.push(new Text({
+      text: '1 - Свободная езда',
       style: fontMain,
-      x: 240,
+      x: 200,
+      y: 220,
+    }))
+    txtFields.push(new Text({
+      text: 'Без ограничений, бесконечная жизнь',
+      style: fontMainSmall,
+      x: 200,
       y: 260,
-    })
-    const text3 = new Text({
+    }))
+    txtFields.push(
+      new Text({
+        text: '2 - Собрать за 60 секунд',
+        style: fontMain,
+        x: 200,
+        y: 320,
+      })
+    )
+    txtFields.push(
+      new Text({
+        text: 'У тебя есть минута чтобы набрать очки',
+        style: fontMainSmall,
+        x: 200,
+        y: 360,
+      })
+    )
+    const txtBlink = new Text({
       text: 'Нажми клавишу для выбора режима',
       style: fontSecondary,
       x: APP_WIDTH / 2,
       y: 435,
     })
-    text3.anchor.set(0.5, 0)
-    this.blinkText = text3
+    txtBlink.anchor.set(0.5, 0)
+    txtFields.push(txtBlink)
+    this.blinkText = txtBlink
 
-    this.addChild(text1, text2, text3)
+    this.addChild(...txtFields)
   }
 
   setupEndScreen(reason: GameModeReason, score: number) {
@@ -124,29 +154,29 @@ export class InfoScreen extends Container {
     const content = reason === GAME_MODE_REASON.END_TIME_IS_UP ? `Ты набрал <b>${score}</b> очков` : 'Машина разбилась'
     const info = 'Нажми пробел чтобы продолжить'
 
-    const text1 = new Text({
+    const txtTitle = new Text({
       text: title,
       style: fontTitle,
       x: APP_WIDTH / 2,
       y: 180,
     })
-    text1.anchor.set(0.5, 0)
-    const text2 = new Text({
+    txtTitle.anchor.set(0.5, 0)
+    const txtContent = new Text({
       text: content,
       style: fontMain,
       x: 240,
       y: 260,
     })
-    const text3 = new Text({
+    const txtBlink = new Text({
       text: info,
       style: fontSecondary,
       x: APP_WIDTH / 2,
       y: 435,
     })
-    text3.anchor.set(0.5, 0)
-    this.blinkText = text3
+    txtBlink.anchor.set(0.5, 0)
+    this.blinkText = txtBlink
 
-    this.addChild(text1, text2, text3)
+    this.addChild(txtTitle, txtContent, txtBlink)
   }
 
   tickHandler(time: Ticker) {
@@ -173,10 +203,10 @@ export class InfoScreen extends Container {
   }
 
   show(mode: ScreenMode, state: State) {
-    if (this.visible) return
+    if (this.visible && mode === this.screenMode) return
 
     this.screenMode = mode
-    this.ticker.start()
+    if (!this.ticker.started) this.ticker.start()
     if (mode === SCREEN_MODE.START) {
       this.setupStartScreen()
     } else if (mode === SCREEN_MODE.END) {
@@ -186,7 +216,7 @@ export class InfoScreen extends Container {
     this.visible = true
     setTimeout(() => {
       window.addEventListener('keydown', this.keydownHandlerBound)
-    }, 500)
+    }, 400)
   }
 
   private emitAndHide(mode: number) {
