@@ -22,11 +22,14 @@ const terrainAssets = [
 ]
 
 let elapsedDistance = 0.0
-function runEveryHundredMeters(deltaDistance: number, cb: () => void) {
+let distanceSegments = 0
+const segmentSizeInMeters = 10.0
+function runEverySegment(deltaDistance: number, cb: (segments: number) => void) {
   elapsedDistance += deltaDistance
-  if (elapsedDistance < 100.0) return
-  elapsedDistance -= 100.0
-  cb()
+  if (elapsedDistance < segmentSizeInMeters) return
+  elapsedDistance -= segmentSizeInMeters
+  distanceSegments++
+  cb(distanceSegments)
 }
 
 export class Terrain extends Container {
@@ -65,8 +68,8 @@ export class Terrain extends Container {
     this.road.draw(speed)
     this.claimable.draw(speed)
 
-    runEveryHundredMeters(deltaDistance, () => {
-      this.checkObjectRelease()
+    runEverySegment(deltaDistance, (segments: number) => {
+      this.checkObjectRelease(segments)
     })
 
     this.terrainObjects.forEach((sprite) => {
@@ -94,15 +97,20 @@ export class Terrain extends Container {
     sprite.destroy()
   }
 
-  checkObjectRelease() {
-    this.claimable.checkObjectRelease()
+  checkObjectRelease(segments: number) {
+    // рисуем монеты
+    if (segments % 10 === 8) {
+      this.claimable.checkObjectRelease()
+    }
 
-    // бросаем кубик, и если ок, то рисуем объект
+    // бросаем кубик, и если ок, то рисуем статичный объект
     if (rollBoolDice(3)) {
       this.addObject('tree01', APP_WIDTH - 15)
     }
-    // рисуем А-полосу
-    this.addObject(new Sprite(this.letterAtexture), APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
+    // рисуем А-полосу каждые 200 метров
+    if (segments % 20 === 0) {
+      this.addObject(new Sprite(this.letterAtexture), APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
+    }
   }
 
   checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {

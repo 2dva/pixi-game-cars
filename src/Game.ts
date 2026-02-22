@@ -7,7 +7,7 @@ import { HUD } from './_HUD/_hud'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './_Terrain/_terrain'
-import { calculateDistance } from './utils'
+import { calculateDistanceBySpeed } from './utils'
 
 export class Game {
   private stage: Container
@@ -161,7 +161,7 @@ export class Game {
     const collision = this.cars.checkCollisionCars(heroBoundsWithShift)
     let crash = !!collision
     if (collision) deltaX = deltaX * 0.6
-    const deltaDistance = calculateDistance(speed)
+    const deltaDistance = calculateDistanceBySpeed(speed)
     distance += deltaDistance
 
     if (this.state.mode === GAME_MODE.GAME_OVER) {

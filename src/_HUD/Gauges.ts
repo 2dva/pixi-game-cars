@@ -1,6 +1,6 @@
 import { BitmapText, Container, Graphics } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
-import { calculateGear } from '../utils'
+import { calculateGear, formatDistance } from '../utils'
 
 const POS_X = APP_WIDTH - 200
 const POS_Y = 20
@@ -98,8 +98,8 @@ export class Gauges extends Container {
   }
 
   draw(speed: number, distance: number) {
-    this.speed.text = `${'' + Math.floor(speed)} kmh`
+    this.speed.text = `${Math.floor(speed)} kmh`
     this.gear.text = calculateGear(speed)
-    this.odo.text = `${'' + (Math.floor(distance / 10) / 100).toFixed(1).padStart(7, '0')} km`
+    this.odo.text = `${formatDistance(distance, 7)} km`
   }
 }

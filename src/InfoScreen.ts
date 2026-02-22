@@ -1,6 +1,7 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, zIndexFixed } from './configuration'
 import { GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
+import { formatDistance } from './utils'
 
 export const SCREEN_MODE = {
   START: 'mode_start',
@@ -31,7 +32,7 @@ const fontTitle: TextStyleOptions = {
 const fontMain: TextStyleOptions = {
   fontFamily: 'Arial',
   fontSize: 24,
-  letterSpacing: 2,
+  letterSpacing: 1.2,
   fill: '#eeeeee',
   lineHeight: 46,
   tagStyles: {
@@ -97,14 +98,13 @@ export class InfoScreen extends Container {
     this.setupBackground()
 
     const txtFields: Text[] = []
-    const txtTitle = new Text({
+    txtFields.push(new Text({
       text: 'Выбери тип игры:',
       style: fontTitle,
       x: APP_WIDTH / 2,
       y: 160,
-    })
-    txtTitle.anchor.set(0.5, 0)
-    txtFields.push(txtTitle)
+      anchor: 0.5,
+    }))
     txtFields.push(new Text({
       text: '1 - Свободная езда',
       style: fontMain,
@@ -137,46 +137,49 @@ export class InfoScreen extends Container {
       text: 'Нажми клавишу для выбора режима',
       style: fontSecondary,
       x: APP_WIDTH / 2,
-      y: 435,
+      y: 445,
+      anchor: 0.5,
     })
-    txtBlink.anchor.set(0.5, 0)
     txtFields.push(txtBlink)
     this.blinkText = txtBlink
 
     this.addChild(...txtFields)
   }
 
-  setupEndScreen(reason: GameModeReason, score: number) {
+  setupEndScreen(reason: GameModeReason, score: number, distance: number) {
     this.removeChildren()
     this.setupBackground()
 
     const title = reason === GAME_MODE_REASON.END_TIME_IS_UP ? 'Время вышло' : 'Игра закончена'
-    const content = reason === GAME_MODE_REASON.END_TIME_IS_UP ? `Ты набрал <b>${score}</b> очков` : 'Машина разбилась'
+    const content = reason === GAME_MODE_REASON.END_TIME_IS_UP ? `Ты проехал ${formatDistance(distance)}км и набрал <b>${score}</b> очков` : 'Машина разбилась'
     const info = 'Нажми пробел чтобы продолжить'
 
-    const txtTitle = new Text({
+    const txtFields: Text[] = []
+    txtFields.push(new Text({
       text: title,
       style: fontTitle,
       x: APP_WIDTH / 2,
       y: 180,
-    })
-    txtTitle.anchor.set(0.5, 0)
-    const txtContent = new Text({
+      anchor: 0.5,
+    }))
+    txtFields.push(new Text({
       text: content,
       style: fontMain,
-      x: 240,
-      y: 260,
-    })
+      x: APP_WIDTH / 2,
+      y: 290,
+      anchor: 0.5,
+    }))
     const txtBlink = new Text({
       text: info,
       style: fontSecondary,
       x: APP_WIDTH / 2,
-      y: 435,
+      y: 445,
+      anchor: 0.5,
     })
-    txtBlink.anchor.set(0.5, 0)
     this.blinkText = txtBlink
+    txtFields.push(txtBlink)
 
-    this.addChild(txtTitle, txtContent, txtBlink)
+    this.addChild(...txtFields)
   }
 
   tickHandler(time: Ticker) {
@@ -210,8 +213,7 @@ export class InfoScreen extends Container {
     if (mode === SCREEN_MODE.START) {
       this.setupStartScreen()
     } else if (mode === SCREEN_MODE.END) {
-      const { modeReason, score } = state
-      this.setupEndScreen(modeReason, score)
+      this.setupEndScreen(state.modeReason, state.score, state.distance)
     }
     this.visible = true
     setTimeout(() => {

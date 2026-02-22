@@ -6,8 +6,12 @@ export function rollBoolDice(n: number) {
   return Math.floor(Math.random() * n) === n - 1
 }
 
-export function calculateDistance(speed: number) {
+export function calculateDistanceBySpeed(speed: number) {
   return speed * 0.01
+}
+
+export function formatDistance(distance: number, pad: number = 0) {
+  return (Math.floor(distance / 10) / 100).toFixed(1).padStart(pad, '0')
 }
 
 const gears = [0, 25, 50, 85, 120]
