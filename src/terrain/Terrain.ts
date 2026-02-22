@@ -1,4 +1,4 @@
-import { Application, Assets, Bounds, Container, Sprite, Text, Texture } from 'pixi.js'
+import { Assets, Bounds, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
 import type { State } from '../state'
@@ -21,18 +21,28 @@ const terrainAssets = [
   },
 ]
 
-export class Terrain {
-  terrainContainer: Container
+let elapsedDistance = 0.0
+function runEveryHundredMeters(deltaDistance: number, cb: () => void) {
+  elapsedDistance += deltaDistance
+  if (elapsedDistance < 100.0) return
+  elapsedDistance -= 100.0
+  cb()
+}
+
+export class Terrain extends Container {
   terrainObjects: Set<Sprite | GifSprite>
   road: Road
   letterAtexture!: Texture
   claimable: ClaimableObjects
 
-  constructor() {
-    this.terrainContainer = new Container()
+  constructor(renderer: Renderer) {
+    super()
     this.terrainObjects = new Set()
     this.road = new Road()
-    this.claimable = new ClaimableObjects(this.terrainContainer)
+    this.claimable = new ClaimableObjects(this)
+
+    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
+    this.letterAtexture = renderer.generateTexture(letterA)
   }
 
   async preloadAssets() {
@@ -40,17 +50,24 @@ export class Terrain {
     await this.claimable.preloadAssets()
   }
 
-  setup(app: Application) {
-    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
-    this.letterAtexture = app.renderer.generateTexture(letterA)
-
-    this.road.setup(app)
-    app.stage.addChild(this.terrainContainer)
+  setup(stage: Container) {
+    this.road.setup(stage)
+    stage.addChild(this)
   }
 
-  draw({ speed }: State) {
+  reset() {
+    this.terrainObjects.forEach((s) => this.removeObject(s))
+    this.road.reset()
+    this.claimable.reset()
+  }
+
+  draw({ speed, deltaDistance }: State) {
     this.road.draw(speed)
     this.claimable.draw(speed)
+
+    runEveryHundredMeters(deltaDistance, () => {
+      this.checkObjectRelease()
+    })
 
     this.terrainObjects.forEach((sprite) => {
       sprite.y += speed * 0.1
@@ -68,12 +85,12 @@ export class Terrain {
     sprite.x = x
     sprite.y = -50
     this.terrainObjects.add(sprite)
-    this.terrainContainer.addChild(sprite)
+    this.addChild(sprite)
   }
 
   private removeObject(sprite: Sprite | GifSprite) {
     this.terrainObjects.delete(sprite)
-    this.terrainContainer.removeChild(sprite)
+    this.removeChild(sprite)
     sprite.destroy()
   }
 

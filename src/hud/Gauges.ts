@@ -1,6 +1,9 @@
-import { BitmapText, Container, Graphics, type Application } from 'pixi.js'
+import { BitmapText, Container, Graphics } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
 import { calculateGear } from '../utils'
+
+const POS_X = APP_WIDTH - 200
+const POS_Y = 20
 
 const FONT_STYLE = {
   speedBg: {
@@ -28,18 +31,19 @@ const FONT_STYLE = {
   },
 }
 
-export class Gauges {
+export class Gauges extends Container {
   private speed!: BitmapText
   private gear!: BitmapText
   private odo!: BitmapText
 
-  constructor() {}
+  constructor() {
+    super()
+  }
 
   async preloadAssets() {}
 
-  setup(app: Application) {
-    const cont = new Container()
-    cont.position.set(APP_WIDTH - 200, 20)
+  setup(parent: Container) {
+    this.position.set(POS_X, POS_Y)
 
     const background = new Graphics()
     background.roundRect(0, 0, 180, 100, 10).fill({
@@ -50,7 +54,7 @@ export class Gauges {
       color: 0x000000,
       alpha: 0.4,
     })
-    cont.addChild(background)
+    this.addChild(background)
 
     const textSpeedBG = new BitmapText({
       text: '888 kmh',
@@ -82,15 +86,15 @@ export class Gauges {
       y: 55,
     })
 
-    cont.addChild(textSpeedBG)
-    cont.addChild(textSpeed)
-    cont.addChild(textGear)
-    cont.addChild(textOdo)
+    this.addChild(textSpeedBG)
+    this.addChild(textSpeed)
+    this.addChild(textGear)
+    this.addChild(textOdo)
 
     this.speed = textSpeed
     this.gear = textGear
     this.odo = textOdo
-    app.stage.addChild(cont)
+    parent.addChild(this)
   }
 
   draw(speed: number, distance: number) {

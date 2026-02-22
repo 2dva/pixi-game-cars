@@ -30,6 +30,10 @@ export class ClaimableObjects {
     })
   }
 
+  reset() {
+    this.claimableObjects.forEach((s) => this.removeObject(s))
+  }
+
   addCoin(x: number) {
     const sprite = new GifSprite({ source: this.coinSource })
     sprite.anchor.set(0.5)

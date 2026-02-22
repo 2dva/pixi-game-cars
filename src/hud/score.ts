@@ -1,4 +1,7 @@
-import { Application, BitmapText, Container, Graphics } from 'pixi.js'
+import { Container, Graphics, Text } from 'pixi.js'
+
+const POS_X = 15
+const POS_Y = 20
 
 const FONT_STYLE = {
   score: {
@@ -9,22 +12,26 @@ const FONT_STYLE = {
   },
 }
 
-const DEFAULT_TINT = 0xf5f5f5
+const TINT_DEFAULT = 0xf5f5f5
+const TINT_BRIGHT = 0xfff568
 
-export class Score {
-  bitmap!: BitmapText
+export class Score extends Container {
+  private textObj!: Text
 
-  constructor() {}
+  constructor() {
+    super()
+  }
 
-  setup(app: Application) {
-    const cont = new Container()
-    cont.position.set(20, 20)
+  setup(parent: Container) {
+    this.position.set(POS_X, POS_Y)
+
     const background = new Graphics()
     background.roundRect(0, 0, 180, 40, 10).fill({
       color: 0x000000,
       alpha: 0.4,
     })
-    const textScore = new BitmapText({
+    
+    const textScore = new Text({
       text: '0',
       style: FONT_STYLE.score,
       x: 170,
@@ -32,25 +39,25 @@ export class Score {
     })
     textScore.style.letterSpacing = 0
     textScore.style.fontWeight = 'normal'
-    textScore.tint = DEFAULT_TINT
+    textScore.tint = TINT_DEFAULT
     textScore.anchor.set(1, 0)
-    cont.addChild(background)
-    cont.addChild(textScore)
-
-    this.bitmap = textScore
-    app.stage.addChild(cont)
+    this.textObj = textScore
+    
+    this.addChild(background)
+    this.addChild(textScore)
+    parent.addChild(this)
   }
 
   draw(score: number) {
-    if (String(score) != this.bitmap.text) {
-      this.bitmap.text = `${score}`
-      this.bitmap.tint = 0xfff568
-      this.bitmap.style.letterSpacing = 0.8
-      this.bitmap.style.fontWeight = 'bold'
+    if (String(score) != this.textObj.text) {
+      this.textObj.text = `${score}`
+      this.textObj.tint = TINT_BRIGHT
+      this.textObj.style.letterSpacing = 0.8
+      this.textObj.style.fontWeight = 'bold'
       setTimeout(() => {
-        this.bitmap.tint = DEFAULT_TINT
-        this.bitmap.style.letterSpacing = 0
-        this.bitmap.style.fontWeight = 'normal'
+        this.textObj.tint = TINT_DEFAULT
+        this.textObj.style.letterSpacing = 0
+        this.textObj.style.fontWeight = 'normal'
       }, 100)
     }
   }

@@ -1,17 +1,21 @@
-import { Graphics, Ticker, type Container } from 'pixi.js'
+import { Container, Graphics, Ticker } from 'pixi.js'
 
-const BASE_X = 40
-const BASE_Y = 120
+const POS_X = 40
+const POS_Y = 120
 
-export class Exhaust {
+export class Exhaust extends Container {
   groups: Graphics[] = []
   smokePos: number[] = []
 
-  constructor() {}
+  constructor() {
+    super()
+  }
 
   async preloadAssets() {}
 
-  setup(container: Container) {
+  setup(parent: Container) {
+    this.position.set(POS_X, POS_Y)
+
     const groupCount = 3
     const particleCount = 4
 
@@ -25,15 +29,14 @@ export class Exhaust {
 
         smokeGroup.circle(x, y, radius)
       }
-
       smokeGroup.fill({ color: 0xc9c9c9, alpha: 0.5 })
 
-      smokeGroup.x = BASE_X
-      smokeGroup.y = BASE_Y
       this.smokePos[i] = i * (1 / groupCount)
       this.groups.push(smokeGroup)
-      container.addChild(smokeGroup)
+      this.addChild(smokeGroup)
     }
+
+    parent.addChild(this)
   }
 
   draw(speed: number, deltaSpeed: number, time: Ticker) {
@@ -44,8 +47,8 @@ export class Exhaust {
       group.visible = speed > 0
       group.alpha = visible ? 0.5 : 0.06
       this.smokePos[i] = (this.smokePos[i] + dt) % 1
-      group.x = BASE_X - Math.pow(this.smokePos[i], 2) * 4
-      group.y = BASE_Y + this.smokePos[i] * 80
+      group.x = -Math.pow(this.smokePos[i], 2) * 4
+      group.y = this.smokePos[i] * 80
       group.scale.set(Math.pow(this.smokePos[i], 0.75))
     })
   }
