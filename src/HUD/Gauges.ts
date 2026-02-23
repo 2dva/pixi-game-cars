@@ -1,35 +1,10 @@
 import { BitmapText, Container, Graphics } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
+import fontStyles from '../fontStyles.json'
 import { calculateGear, formatDistance } from '../utils'
 
 const POS_X = APP_WIDTH - 200
 const POS_Y = 20
-
-const FONT_STYLE = {
-  speedBg: {
-    fontFamily: 'alarm clock, Arial',
-    fontSize: 36,
-    fill: '#565656',
-    stroke: '#000000',
-  },
-  speed: {
-    fontFamily: 'alarm clock, Arial',
-    fontSize: 36,
-    fill: '#ccffcc',
-    stroke: { color: '#000000', width: 2 },
-  },
-  odo: {
-    fontFamily: 'alarm clock, Arial',
-    fontSize: 16,
-    fill: '#ffffff',
-    stroke: '#000000',
-  },
-  gear: {
-    fontFamily: 'alarm clock, Arial',
-    fontSize: 38,
-    fill: '#a9a9a9',
-  },
-}
 
 export class Gauges extends Container {
   private speed!: BitmapText
@@ -46,19 +21,22 @@ export class Gauges extends Container {
     this.position.set(POS_X, POS_Y)
 
     const background = new Graphics()
-    background.roundRect(0, 0, 180, 100, 10).fill({
-      color: 0x000000,
-      alpha: 0.4,
-    })
-    background.roundRect(138, 51, 34, 40, 4).fill({
-      color: 0x000000,
-      alpha: 0.4,
-    })
+    background
+      .roundRect(0, 0, 180, 100, 10)
+      .fill({
+        color: 0x000000,
+        alpha: 0.4,
+      })
+      .roundRect(138, 51, 34, 40, 4)
+      .fill({
+        color: 0x000000,
+        alpha: 0.4,
+      })
     this.addChild(background)
 
     const textSpeedBG = new BitmapText({
       text: '888 kmh',
-      style: FONT_STYLE.speedBg,
+      style: fontStyles.fontGaugesSpeedBg,
       x: 170,
       y: 10,
     })
@@ -66,7 +44,7 @@ export class Gauges extends Container {
 
     const textSpeed = new BitmapText({
       text: '',
-      style: FONT_STYLE.speed,
+      style: fontStyles.fontGaugesSpeed,
       x: 170,
       y: 10,
     })
@@ -74,14 +52,14 @@ export class Gauges extends Container {
 
     const textOdo = new BitmapText({
       text: '',
-      style: FONT_STYLE.odo,
+      style: fontStyles.fontGaugesOdometer,
       x: 22,
       y: 72,
     })
 
     const textGear = new BitmapText({
       text: 'P',
-      style: FONT_STYLE.gear,
+      style: fontStyles.fontGaugesGear,
       x: 145,
       y: 55,
     })

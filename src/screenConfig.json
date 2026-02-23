@@ -5,25 +5,25 @@
     "content": [
       {
         "text": "1 - Свободная езда",
-        "style": "fontMain",
+        "style": "fontScreenPrimary",
         "x": 75,
         "y": 95
       },
       {
         "text": "Без ограничений, бесконечная жизнь",
-        "style": "fontMainSmall",
+        "style": "fontScreenSecondary",
         "x": 75,
         "y": 135
       },
       {
         "text": "2 - Собрать за 60 секунд",
-        "style": "fontMain",
+        "style": "fontScreenPrimary",
         "x": 75,
         "y": 195
       },
       {
         "text": "У тебя есть минута чтобы набрать очки",
-        "style": "fontMainSmall",
+        "style": "fontScreenSecondary",
         "x": 75,
         "y": 235
       }
@@ -35,7 +35,7 @@
     "content": [
       {
         "text": "Тут можно написать какой-то текст",
-        "style": "fontMain",
+        "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
         "center": true
@@ -48,7 +48,7 @@
     "content": [
       {
         "text": "Машина разбилась",
-        "style": "fontMain",
+        "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
         "center": true
@@ -61,7 +61,7 @@
     "content": [
       {
         "text": "Ты проехал ${distance}км и набрал <b>${score}</b> очков",
-        "style": "fontMain",
+        "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
         "center": true

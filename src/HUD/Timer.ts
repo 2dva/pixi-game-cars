@@ -1,22 +1,9 @@
 import { Container, Text } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
+import fontStyles from '../fontStyles.json'
 
 const POS_X = APP_WIDTH / 2
 const POS_Y = 50
-
-const FONT_STYLE = {
-  score: {
-    fontFamily: 'Arial',
-    fontSize: 64,
-    fill: '#ffffff',
-    stroke: { color: '#000000', width: 4 },
-    dropShadow: true, // Enable the drop shadow
-    dropShadowColor: '#000000', // Shadow color (red)
-    dropShadowAngle: Math.PI / 4, // 30 degrees angle
-    dropShadowBlur: 4, // Shadow blur radius
-    dropShadowDistance: 6, // Shadow distance
-  },
-}
 
 const TINT_DEFAULT = 0xf5f5f5
 const TINT_BRIGHT = 0xfb8e8e
@@ -33,7 +20,7 @@ export class Timer extends Container {
 
     this.textObj = new Text({
       text: '60',
-      style: FONT_STYLE.score,
+      style: fontStyles.fontHUDTimer,
       x: 0,
       y: 0,
     })

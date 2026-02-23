@@ -2,6 +2,7 @@ import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
 import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
 import { Controller } from './Controller'
+import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
@@ -39,11 +40,7 @@ export class Game {
   async preloadAssets() {
     const textLoading = new Text({
       text: 'Loading...',
-      style: {
-        fontFamily: 'Arial',
-        fontSize: 36,
-        fill: '#ffffff',
-      },
+      style: fontStyles.fontGameLoading,
       x: APP_WIDTH / 2,
       y: APP_HEIGHT / 2,
     })

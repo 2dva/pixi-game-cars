@@ -1,0 +1,82 @@
+{
+  "fontGameLoading": {
+    "fontFamily": "Arial",
+    "fontSize": 36,
+    "fill": "#ffffff"
+  },
+  "fontHUDScore": {
+    "fontFamily": "alarm clock, Arial",
+    "fontSize": 36,
+    "fill": "#ffffff",
+    "stroke": "#000000"
+  },
+  "fontHUDTimer": {
+    "fontFamily": "Arial",
+    "fontSize": 64,
+    "fill": "#ffffff",
+    "stroke": { "color": "#000000", "width": 4 },
+    "dropShadow": true,
+    "dropShadowColor": "#000000",
+    "dropShadowAngle": 0.785,
+    "dropShadowBlur": 4,
+    "dropShadowDistance": 6
+  },
+  "fontGaugesSpeedBg": {
+    "fontFamily": "alarm clock, Arial",
+    "fontSize": 36,
+    "fill": "#565656",
+    "stroke": "#000000"
+  },
+  "fontGaugesSpeed": {
+    "fontFamily": "alarm clock, Arial",
+    "fontSize": 36,
+    "fill": "#ccffcc",
+    "stroke": { "color": "#000000", "width": 2 }
+  },
+  "fontGaugesOdometer": {
+    "fontFamily": "alarm clock, Arial",
+    "fontSize": 16,
+    "fill": "#ffffff",
+    "stroke": "#000000"
+  },
+  "fontGaugesGear": {
+    "fontFamily": "alarm clock, Arial",
+    "fontSize": 38,
+    "fill": "#a9a9a9"
+  },
+  "fontRoadLetterA": {
+    "fontFamily": "Arial",
+    "fontSize": 112,
+    "fill": "0xe5e5e5"
+  },
+  "fontScreenTitle": {
+    "fontFamily": "Arial",
+    "fontSize": 36,
+    "fill": "#eeeeee",
+    "letterSpacing": 2
+  },
+  "fontScreenPrimary": {
+    "fontFamily": "Arial",
+    "fontSize": 24,
+    "letterSpacing": 1.2,
+    "fill": "#eeeeee",
+    "lineHeight": 46,
+    "tagStyles": {
+      "b": {
+        "fontWeight": "bold",
+        "fill": "#fff568"
+      }
+    }
+  },
+  "fontScreenSecondary": {
+    "fontFamily": "Arial",
+    "fontSize": 18,
+    "fill": "#c1c1c1"
+  },
+  "fontScreenBlink": {
+    "fontFamily": "Arial",
+    "fontSize": 18,
+    "fill": "#eeeeee",
+    "letterSpacing": 2
+  }
+}

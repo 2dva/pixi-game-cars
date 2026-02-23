@@ -1,16 +1,8 @@
 import { Container, Graphics, Text } from 'pixi.js'
+import fontStyles from '../fontStyles.json'
 
 const POS_X = 15
 const POS_Y = 20
-
-const FONT_STYLE = {
-  score: {
-    fontFamily: 'alarm clock, Arial',
-    fontSize: 36,
-    fill: '#ffffff',
-    stroke: '#000000',
-  },
-}
 
 const TINT_DEFAULT = 0xf5f5f5
 const TINT_BRIGHT = 0xfff568
@@ -33,7 +25,7 @@ export class Score extends Container {
     
     const textScore = new Text({
       text: '0',
-      style: FONT_STYLE.score,
+      style: fontStyles.fontHUDScore,
       x: 170,
       y: 4,
     })

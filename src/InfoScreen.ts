@@ -1,5 +1,6 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, zIndexFixed } from './configuration'
+import fontStyles from './fontStyles.json'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
@@ -30,38 +31,7 @@ export type ScreenEvent = {
   mode: GameMode
 }
 
-const FONT_STYLE: Record<string, TextStyleOptions> = {
-  fontTitle: {
-    fontFamily: 'Arial',
-    fontSize: 36,
-    fill: '#eeeeee',
-    letterSpacing: 2,
-  },
-  fontMain: {
-    fontFamily: 'Arial',
-    fontSize: 24,
-    letterSpacing: 1.2,
-    fill: '#eeeeee',
-    lineHeight: 46,
-    tagStyles: {
-      b: {
-        fontWeight: 'bold',
-        fill: 0xfff568,
-      },
-    },
-  },
-  fontMainSmall: {
-    fontFamily: 'Arial',
-    fontSize: 18,
-    fill: '#c1c1c1',
-  },
-  fontSecondary: {
-    fontFamily: 'Arial',
-    fontSize: 18,
-    fill: '#eeeeee',
-    letterSpacing: 2,
-  },
-} as const
+type FontStyleKey = keyof typeof fontStyles
 
 export class InfoScreen extends Container {
   content: Container
@@ -113,10 +83,11 @@ export class InfoScreen extends Container {
 
     for (const textObj of cfgScreen.content) {
       const alignCenter = 'center' in textObj
+      const style = fontStyles[textObj.style as FontStyleKey] as TextStyleOptions
       txtFields.push(
         new Text({
           text: applyTemplate(textObj.text, data),
-          style: { ...FONT_STYLE[textObj.style], wordWrap: true, wordWrapWidth: CONTENT_WIDTH - 20 },
+          style: { ...style, wordWrap: true, wordWrapWidth: CONTENT_WIDTH - 20 },
           x: alignCenter ? CONTENT_WIDTH / 2 : textObj.x,
           y: textObj.y,
           anchor: alignCenter ? 0.5 : 0,
@@ -126,7 +97,7 @@ export class InfoScreen extends Container {
     txtFields.push(
       new Text({
         text: cfgScreen.titleText,
-        style: FONT_STYLE['fontTitle'],
+        style: fontStyles.fontScreenTitle,
         x: CONTENT_WIDTH / 2,
         y: 35,
         anchor: 0.5,
@@ -134,7 +105,7 @@ export class InfoScreen extends Container {
     )
     const txtBlink = new Text({
       text: cfgScreen.blinkText,
-      style: FONT_STYLE['fontSecondary'],
+      style: fontStyles.fontScreenBlink,
       x: CONTENT_WIDTH / 2,
       y: 325,
       anchor: 0.5,
@@ -150,7 +121,7 @@ export class InfoScreen extends Container {
     this.elapsedSeconds += time.elapsedMS
     if (this.elapsedSeconds > 1000.0) {
       this.elapsedSeconds -= 1000.0
-      this.blinkText.visible = !this.blinkText.visible
+      if (document.hasFocus()) this.blinkText.visible = !this.blinkText.visible
     }
   }
 

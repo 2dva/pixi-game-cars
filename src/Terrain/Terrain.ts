@@ -1,18 +1,11 @@
 import { Assets, Bounds, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
+import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import { rollBoolDice } from '../utils'
 import { ClaimableObjects, type claimableType } from './ClaimableObjects'
 import { Road } from './Road'
-
-const FONT_STYLE = {
-  letterA: {
-    fontFamily: 'Arial',
-    fontSize: 112,
-    fill: 0xe5e5e5,
-  },
-}
 
 const terrainAssets = [
   {
@@ -44,7 +37,7 @@ export class Terrain extends Container {
     this.road = new Road()
     this.claimable = new ClaimableObjects(this)
 
-    const letterA = new Text({ text: 'A', style: FONT_STYLE.letterA })
+    const letterA = new Text({ text: 'A', style: fontStyles.fontRoadLetterA })
     this.letterAtexture = renderer.generateTexture(letterA)
   }
 
