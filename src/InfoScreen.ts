@@ -118,10 +118,11 @@ export class InfoScreen extends Container {
   }
 
   tickHandler(time: Ticker) {
+    if (!document.hasFocus()) return
     this.elapsedSeconds += time.elapsedMS
     if (this.elapsedSeconds > 1000.0) {
       this.elapsedSeconds -= 1000.0
-      if (document.hasFocus()) this.blinkText.visible = !this.blinkText.visible
+      this.blinkText.visible = !this.blinkText.visible
     }
   }
 

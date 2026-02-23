@@ -113,7 +113,7 @@ export class Game {
 
   private updateOnTick(time: Ticker) {
     let { speed, distance, score, health, timeLeft } = this.state
-    const { keyUp, keyDown, keyLeft, keyRight, keySpace, m } = this.controller.state
+    const { keyUp, keyDown, keyLeft, keyRight, keySpace, keyOther } = this.controller.state
 
     this.hud.draw(this.state)
     this.hero.draw(this.state, time)
@@ -175,9 +175,13 @@ export class Game {
       }
     }
 
-    if (m) {
+    if (keyOther === 'KeyM') {
       this.switchMode(GAME_MODE.DEMO, GAME_MODE_REASON.END_MANUAL)
       return
+    }
+
+    if (keyOther === 'KeyP') {
+      // TODO: pause the game
     }
 
     const claim = this.terrain.checkObjectIsClaimed(heroBounds)
