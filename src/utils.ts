@@ -35,3 +35,8 @@ export function throttle<T extends (...args: any[]) => any>(func: T, wait: numbe
     }
   }
 }
+
+export type TemplateData = Record<string, string | number>
+export const applyTemplate = (str: string, obj: TemplateData) => {
+  return str.replace(/\${([^}]+)}/g, (_, prop) => String(obj[prop]))
+}

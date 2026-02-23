@@ -86,7 +86,10 @@ export class Game {
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
       this.state.modeReason = modeReason
-      this.infoScreen.show(SCREEN_MODE.END, this.state)
+      this.infoScreen.show(
+        modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE,
+        this.state
+      )
       this.state.speed = 0
       this.controller.disabled = true
       return

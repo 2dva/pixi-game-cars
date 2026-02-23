@@ -8,23 +8,14 @@ import { rollBoolDice, rollDice } from './utils'
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
 const STAGE_PADDING = 120
 
-type CarAlias = 'car01' | 'car02' | 'car03'
-
-type CarData = {
-  alias: CarAlias
-  src: string
-}
-
-type CarConfig = {
-  [k in CarAlias]: CarData
-}
-
 // Create an array of asset data to load.
-const carConfig: CarConfig = {
+const carConfig = {
   car01: { alias: 'car01', src: 'cars/car01.png' },
   car02: { alias: 'car02', src: 'cars/car02.png' },
   car03: { alias: 'car03', src: 'cars/car03.png' },
 }
+
+// type CarAlias = keyof typeof carConfig
 
 type Car = {
   sprite: Sprite

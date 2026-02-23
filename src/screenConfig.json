@@ -1,0 +1,71 @@
+{
+  "startScreen": {
+    "titleText": "Выбери тип игры:",
+    "blinkText": "Нажми клавишу для выбора режима",
+    "content": [
+      {
+        "text": "1 - Свободная езда",
+        "style": "fontMain",
+        "x": 75,
+        "y": 95
+      },
+      {
+        "text": "Без ограничений, бесконечная жизнь",
+        "style": "fontMainSmall",
+        "x": 75,
+        "y": 135
+      },
+      {
+        "text": "2 - Собрать за 60 секунд",
+        "style": "fontMain",
+        "x": 75,
+        "y": 195
+      },
+      {
+        "text": "У тебя есть минута чтобы набрать очки",
+        "style": "fontMainSmall",
+        "x": 75,
+        "y": 235
+      }
+    ]
+  },
+  "pauseScreen": {
+    "titleText": "Пауза",
+    "blinkText": "Нажми пробел чтобы продолжить",
+    "content": [
+      {
+        "text": "Тут можно написать какой-то текст",
+        "style": "fontMain",
+        "x": 0,
+        "y": 165,
+        "center": true
+      }
+    ]
+  },
+  "endScreenCrashed": {
+    "titleText": "Игра закончена",
+    "blinkText": "Нажми пробел чтобы продолжить",
+    "content": [
+      {
+        "text": "Машина разбилась",
+        "style": "fontMain",
+        "x": 0,
+        "y": 165,
+        "center": true
+      }
+    ]
+  },
+  "endScreenTimeIsUp": {
+    "titleText": "Время вышло",
+    "blinkText": "Нажми пробел чтобы продолжить",
+    "content": [
+      {
+        "text": "Ты проехал ${distance}км и набрал <b>${score}</b> очков",
+        "style": "fontMain",
+        "x": 0,
+        "y": 165,
+        "center": true
+      }
+    ]
+  }
+}

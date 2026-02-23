@@ -1,12 +1,20 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, zIndexFixed } from './configuration'
-import { GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
-import { formatDistance } from './utils'
+import screenConfig from './screenConfig.json'
+import { GAME_MODE, type GameMode, type State } from './state'
+import { applyTemplate, formatDistance, type TemplateData } from './utils'
 
-export const SCREEN_MODE = {
-  START: 'mode_start',
-  PAUSE: 'mode_pause',
-  END: 'mode_end',
+const CONTENT_PADDING = 125
+const CONTENT_WIDTH = APP_WIDTH - 2 * CONTENT_PADDING
+const CONTENT_HEIGHT = APP_HEIGHT - 2 * CONTENT_PADDING
+
+type ScreenMode = keyof typeof screenConfig
+
+export const SCREEN_MODE: Record<string, ScreenMode> = {
+  START: 'startScreen',
+  PAUSE: 'pauseScreen',
+  FAILURE: 'endScreenCrashed',
+  FINISH: 'endScreenTimeIsUp',
 } as const
 
 export const screenEventName = 'screenEvent'
@@ -15,7 +23,6 @@ export const EVENT_TYPE = {
   SELECT_GAME_MODE: 'selectGameMode',
 } as const
 
-export type ScreenMode = (typeof SCREEN_MODE)[keyof typeof SCREEN_MODE]
 export type EventType = (typeof EVENT_TYPE)[keyof typeof EVENT_TYPE]
 
 export type ScreenEvent = {
@@ -23,46 +30,50 @@ export type ScreenEvent = {
   mode: GameMode
 }
 
-const fontTitle: TextStyleOptions = {
-  fontFamily: 'Arial',
-  fontSize: 36,
-  fill: '#eeeeee',
-  letterSpacing: 2,
-}
-const fontMain: TextStyleOptions = {
-  fontFamily: 'Arial',
-  fontSize: 24,
-  letterSpacing: 1.2,
-  fill: '#eeeeee',
-  lineHeight: 46,
-  tagStyles: {
-    b: {
-      fontWeight: 'bold',
-      fill: 0xfff568,
+const FONT_STYLE: Record<string, TextStyleOptions> = {
+  fontTitle: {
+    fontFamily: 'Arial',
+    fontSize: 36,
+    fill: '#eeeeee',
+    letterSpacing: 2,
+  },
+  fontMain: {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    letterSpacing: 1.2,
+    fill: '#eeeeee',
+    lineHeight: 46,
+    tagStyles: {
+      b: {
+        fontWeight: 'bold',
+        fill: 0xfff568,
+      },
     },
   },
-}
-const fontMainSmall: TextStyleOptions = {
-  fontFamily: 'Arial',
-  fontSize: 18,
-  fill: '#c1c1c1',
-}
-const fontSecondary: TextStyleOptions = {
-  fontFamily: 'Arial',
-  fontSize: 18,
-  fill: '#eeeeee',
-  letterSpacing: 2,
-}
+  fontMainSmall: {
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fill: '#c1c1c1',
+  },
+  fontSecondary: {
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fill: '#eeeeee',
+    letterSpacing: 2,
+  },
+} as const
 
 export class InfoScreen extends Container {
-  keydownHandlerBound = this.keydownHandler.bind(this)
+  content: Container
   ticker: Ticker
   elapsedSeconds: number
   blinkText: Text
   screenMode: ScreenMode | null
+  keydownHandlerBound = this.keydownHandler.bind(this)
 
   constructor() {
     super()
+    this.content = new Container()
     this.zIndex = zIndexFixed.infoScreens
     this.ticker = new Ticker()
     this.elapsedSeconds = 0
@@ -73,9 +84,13 @@ export class InfoScreen extends Container {
   async preloadAssets() {}
 
   setup(stage: Container) {
+    this.content.x = this.content.y = CONTENT_PADDING
+
     this.ticker.add(this.tickHandler, this)
 
     this.visible = false
+    this.setupBackground()
+    this.addChild(this.content)
     stage.addChild(this)
   }
 
@@ -85,101 +100,50 @@ export class InfoScreen extends Container {
       color: 0x000000,
       alpha: 0.2,
     })
-    const padding = 125
-    background.roundRect(padding, padding, APP_WIDTH - 2 * padding, APP_HEIGHT - 2 * padding, 10).fill({
+    background.roundRect(CONTENT_PADDING, CONTENT_PADDING, CONTENT_WIDTH, CONTENT_HEIGHT, 10).fill({
       color: 0x000000,
       alpha: 0.5,
     })
     this.addChild(background)
   }
 
-  setupStartScreen() {
-    this.removeChildren()
-    this.setupBackground()
-
+  setupScreen(screenId: ScreenMode, data: TemplateData = {}) {
+    const cfgScreen = screenConfig[screenId]
     const txtFields: Text[] = []
-    txtFields.push(new Text({
-      text: 'Выбери тип игры:',
-      style: fontTitle,
-      x: APP_WIDTH / 2,
-      y: 160,
-      anchor: 0.5,
-    }))
-    txtFields.push(new Text({
-      text: '1 - Свободная езда',
-      style: fontMain,
-      x: 200,
-      y: 220,
-    }))
-    txtFields.push(new Text({
-      text: 'Без ограничений, бесконечная жизнь',
-      style: fontMainSmall,
-      x: 200,
-      y: 260,
-    }))
+
+    for (const textObj of cfgScreen.content) {
+      const alignCenter = 'center' in textObj
+      txtFields.push(
+        new Text({
+          text: applyTemplate(textObj.text, data),
+          style: { ...FONT_STYLE[textObj.style], wordWrap: true, wordWrapWidth: CONTENT_WIDTH - 20 },
+          x: alignCenter ? CONTENT_WIDTH / 2 : textObj.x,
+          y: textObj.y,
+          anchor: alignCenter ? 0.5 : 0,
+        })
+      )
+    }
     txtFields.push(
       new Text({
-        text: '2 - Собрать за 60 секунд',
-        style: fontMain,
-        x: 200,
-        y: 320,
-      })
-    )
-    txtFields.push(
-      new Text({
-        text: 'У тебя есть минута чтобы набрать очки',
-        style: fontMainSmall,
-        x: 200,
-        y: 360,
+        text: cfgScreen.titleText,
+        style: FONT_STYLE['fontTitle'],
+        x: CONTENT_WIDTH / 2,
+        y: 35,
+        anchor: 0.5,
       })
     )
     const txtBlink = new Text({
-      text: 'Нажми клавишу для выбора режима',
-      style: fontSecondary,
-      x: APP_WIDTH / 2,
-      y: 445,
+      text: cfgScreen.blinkText,
+      style: FONT_STYLE['fontSecondary'],
+      x: CONTENT_WIDTH / 2,
+      y: 325,
       anchor: 0.5,
     })
     txtFields.push(txtBlink)
     this.blinkText = txtBlink
 
-    this.addChild(...txtFields)
-  }
-
-  setupEndScreen(reason: GameModeReason, score: number, distance: number) {
-    this.removeChildren()
-    this.setupBackground()
-
-    const title = reason === GAME_MODE_REASON.END_TIME_IS_UP ? 'Время вышло' : 'Игра закончена'
-    const content = reason === GAME_MODE_REASON.END_TIME_IS_UP ? `Ты проехал ${formatDistance(distance)}км и набрал <b>${score}</b> очков` : 'Машина разбилась'
-    const info = 'Нажми пробел чтобы продолжить'
-
-    const txtFields: Text[] = []
-    txtFields.push(new Text({
-      text: title,
-      style: fontTitle,
-      x: APP_WIDTH / 2,
-      y: 180,
-      anchor: 0.5,
-    }))
-    txtFields.push(new Text({
-      text: content,
-      style: fontMain,
-      x: APP_WIDTH / 2,
-      y: 290,
-      anchor: 0.5,
-    }))
-    const txtBlink = new Text({
-      text: info,
-      style: fontSecondary,
-      x: APP_WIDTH / 2,
-      y: 445,
-      anchor: 0.5,
-    })
-    this.blinkText = txtBlink
-    txtFields.push(txtBlink)
-
-    this.addChild(...txtFields)
+    this.content.removeChildren()
+    this.content.addChild(...txtFields)
   }
 
   tickHandler(time: Ticker) {
@@ -194,11 +158,11 @@ export class InfoScreen extends Container {
     const keyCode = event.code
     if (this.screenMode === SCREEN_MODE.START) {
       if (keyCode === 'Digit1') {
-        this.emitAndHide(GAME_MODE.FREE_RIDE) // start FREE_RIDE game
+        this.emitAndHide(GAME_MODE.FREE_RIDE)
       } else if (keyCode === 'Digit2') {
-        this.emitAndHide(GAME_MODE.COLLECT_IN_TIME) // start COLLECT_IN_TIME game
+        this.emitAndHide(GAME_MODE.COLLECT_IN_TIME)
       }
-    } else if (this.screenMode === SCREEN_MODE.END) {
+    } else if (this.screenMode === SCREEN_MODE.FINISH || this.screenMode === SCREEN_MODE.FAILURE) {
       if (keyCode === 'Space') {
         this.emitAndHide(GAME_MODE.DEMO)
       }
@@ -210,11 +174,8 @@ export class InfoScreen extends Container {
 
     this.screenMode = mode
     if (!this.ticker.started) this.ticker.start()
-    if (mode === SCREEN_MODE.START) {
-      this.setupStartScreen()
-    } else if (mode === SCREEN_MODE.END) {
-      this.setupEndScreen(state.modeReason, state.score, state.distance)
-    }
+    this.setupScreen(mode, { score: state.score, distance: formatDistance(state.distance) })
+
     this.visible = true
     setTimeout(() => {
       window.addEventListener('keydown', this.keydownHandlerBound)
