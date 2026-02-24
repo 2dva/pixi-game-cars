@@ -1,5 +1,5 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, zIndexFixed } from './configuration'
+import { APP_HEIGHT, APP_VERSION, APP_WIDTH, zIndexFixed } from './configuration'
 import fontStyles from './fontStyles.json'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
@@ -69,7 +69,17 @@ export class InfoScreen extends Container {
       color: 0x000000,
       alpha: 0.5,
     })
-
+    if (APP_VERSION) {
+      this.addChild(
+        new Text({
+          text: `v ${APP_VERSION}`,
+          style: fontStyles.fontScreenVersion as TextStyleOptions,
+          x: APP_WIDTH - CONTENT_PADDING - 5,
+          y: APP_HEIGHT - CONTENT_PADDING - 3,
+          anchor: 1,
+        })
+      )
+    }
     this.addChild(background)
     this.addChild(this.content)
     stage.addChild(this)
