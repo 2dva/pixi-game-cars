@@ -50,10 +50,10 @@ export class Health extends Container {
 
   draw(health: number) {
     if (this.health !== health) {
-      this.health = health
+      this.health = Math.min(health, 100)
       this.scaleObj.clear()
       this.scaleObj.moveTo(15, 155)
-      this.scaleObj.lineTo(15, 155 - Math.round((SCALE_HEIGHT / 100) * health))
+      this.scaleObj.lineTo(15, 155 - Math.round((SCALE_HEIGHT / 100) * this.health))
       this.scaleObj.stroke({ width: 20, alpha: 0.9, fill: this.scaleGradient })
       this.scaleObj.tint = this.calcTint
     }

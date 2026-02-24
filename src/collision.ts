@@ -1,3 +1,4 @@
+import { gameConfiguration } from './configuration'
 import type { BoundsLike } from './types'
 
 export type CollisionDirection = 'head' | 'back' | 'left' | 'right'
@@ -10,6 +11,8 @@ export type CollisionObject = {
   lane: number
 }
 
+const amortization = 0.5
+
 export function checkCollisionWithObject(hero: BoundsLike, obj: BoundsLike): boolean {
   const rightmostLeft = hero.left < obj.left ? obj.left : hero.left
   const leftmostRight = hero.right > obj.right ? obj.right : hero.right
@@ -21,7 +24,6 @@ export function checkCollisionWithObject(hero: BoundsLike, obj: BoundsLike): boo
 }
 
 export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike, lane: number): CollisionObject | null {
-  const amortization = 0.5
   const rightmostLeft = hero.left < car.left ? car.left : hero.left
   const leftmostRight = hero.right > car.right ? car.right : hero.right
 
@@ -68,11 +70,38 @@ export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike, lane: n
       recoil = [4, 0]
       break
   }
-
-  return { direction, force, damage, speedLoss, recoil, lane }
+  const collision = { direction, force, damage, speedLoss, recoil, lane }
+  logCollision(collision)
+  return collision
 }
 
 // Проверяем, есть ли препятствие впереди от героя
 export function checkObstacleAhead(hero: BoundsLike, car: BoundsLike): boolean {
-  return car.right >= hero.left && car.left <= hero.right && car.bottom >= hero.top && car.top < hero.top
+  const distance = hero.top - car.bottom
+  const flag = car.right >= hero.left && car.left <= hero.right && car.top < hero.top && distance <= 2 && distance > -10
+  logObstacle(flag, distance, car.left - hero.right)
+  return flag
+}
+
+function logCollision(col: CollisionObject | null) {
+  if (!col) return
+  if (!gameConfiguration.isDevPlatform) return
+  // eslint-disable-next-line no-console
+  console.log(
+    `%cCollision:%c Dir=${col.direction} F=${Math.floor(col.force)} Recoil=${col.recoil} `,
+    'background-color:red; color: #fff',
+    'color: blue'
+  )
+}
+
+function logObstacle(flag: boolean, distance: number, distanceX: number) {
+  if (!gameConfiguration.isDevPlatform) return
+  if (!flag) return
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `%cObstacle Ahead%c Dist=${Math.round(distance)} DistX=${Math.round(distanceX)}`,
+    'background-color: blue; color: #fff',
+    'color:blue'
+  )
 }

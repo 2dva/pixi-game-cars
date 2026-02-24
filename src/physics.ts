@@ -23,7 +23,8 @@ export function calculateNextMove(
 
   // Проверяем препятствие впереди перед изменением скорости
   let obstacleAhead = false
-  for (const bound of Object.values(carBounds)) {
+
+  for (const bound of carBounds.values()) {
     if (checkObstacleAhead(heroBounds, bound)) {
       obstacleAhead = true
       break
@@ -62,10 +63,9 @@ export function calculateNextMove(
     crash = false
   for (const [lane, bound] of carBounds) {
     collision = checkCollisionWithCar(heroBoundsWithShift, bound, lane)
-    if (collision) crash = true
     if (collision !== null) {
-      // TODO: collect all collisions
-      break
+      crash = true
+      break // TODO: collect all collisions
     }
   }
 

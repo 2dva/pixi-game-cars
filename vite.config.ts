@@ -8,7 +8,7 @@ export default defineConfig(() => {
   return {
     define: {
       // Expose the version to your application code
-      __APP_VERSION__: '1100',//JSON.stringify(version),
+      __APP_VERSION__: JSON.stringify(version),
       'process.env': publicEnv,
     },
   }

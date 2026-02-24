@@ -6,6 +6,8 @@ import type { BoundsLike } from '../types'
 
 export type claimableType = 'coin'
 
+const COIN_SCORE = 100
+
 const coinAsset = 'terrain/coin.gif'
 
 export class ClaimableObjects {
@@ -57,15 +59,15 @@ export class ClaimableObjects {
     sprite.destroy()
   }
 
-  checkObjectIsClaimed(heroBounds: BoundsLike): claimableType | null {
+  checkObjectIsClaimed(heroBounds: BoundsLike): number {
     for (const sprite of this.claimableObjects) {
       const bounds = sprite.getBounds()
       const claimed = checkCollisionWithObject(heroBounds, bounds)
       if (claimed) {
         this.removeObject(sprite)
-        return 'coin'
+        return COIN_SCORE
       }
     }
-    return null
+    return 0
   }
 }

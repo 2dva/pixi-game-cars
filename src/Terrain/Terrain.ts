@@ -5,7 +5,7 @@ import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
 import { rollBoolDice } from '../utils'
-import { ClaimableObjects, type claimableType } from './ClaimableObjects'
+import { ClaimableObjects } from './ClaimableObjects'
 import { Road } from './Road'
 
 const terrainAssets = [
@@ -107,7 +107,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     }
   }
 
-  checkObjectIsClaimed(heroBounds: BoundsLike): claimableType | null {
+  checkObjectIsClaimed(heroBounds: BoundsLike): number {
     return this.claimable.checkObjectIsClaimed(heroBounds)
   }
 }

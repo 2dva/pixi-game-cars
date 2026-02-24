@@ -127,13 +127,11 @@ export class Game {
   }
 
   private handleClaimable(heroBounds: BoundsLike) {
-    let score = this.state.score
-    const claim = this.terrain.checkObjectIsClaimed(heroBounds)
-    if (claim) score += 100
+    const claimed = this.terrain.checkObjectIsClaimed(heroBounds)
 
     Object.assign(this.state, {
-      score,
-      claim,
+      score: this.state.score + claimed,
+      claim: claimed > 0,
     })
   }
 
@@ -165,17 +163,16 @@ export class Game {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
       timeLeft -= time.elapsedMS / 1000
+      Object.assign(this.state, {
+        health,
+        timeLeft,
+      })
 
       if (timeLeft <= 0.0) {
         this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_TIME_IS_UP)
       } else if (health === 0) {
         this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_CRASHED)
       }
-
-      Object.assign(this.state, {
-        health,
-        timeLeft,
-      })
     }
 
     this.handleClaimable(heroBounds)
