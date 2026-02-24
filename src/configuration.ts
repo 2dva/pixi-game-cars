@@ -1,6 +1,6 @@
 // export const APP_VERSION = import.meta.env.VITE_APP_VERSION
-// export const APP_VERSION = process.env.VITE_APP_VERSION_PUBLIC
-export const APP_VERSION = window.__APP_VERSION__
+// export const APP_VERSION = window.__APP_VERSION__
+export const APP_VERSION = process.env.VITE_APP_VERSION_PUBLIC
 export const APP_BACKGROUND = 0x545457
 export const APP_WIDTH = 740
 export const APP_HEIGHT = 600

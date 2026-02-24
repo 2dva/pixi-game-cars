@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 
-// const version = process.env.npm_package_version
+const version = process.env.npm_package_version
 
 export default defineConfig(() => {
-  const publicEnv = { VITE_APP_VERSION_PUBLIC : '2200' }
+  const publicEnv = { VITE_APP_VERSION_PUBLIC: version }
 
   return {
     define: {
