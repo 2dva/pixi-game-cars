@@ -34,6 +34,12 @@ const defaultState: ControllerKeys = {
   other: { pressed: false },
 }
 
+type KeyName = 'keyUp' | 'keyDown' | 'keyRight' | 'keyLeft' | 'keySpace' | 'keyOther'
+
+export type ControllerState = {
+  [keyName in KeyName]: boolean | string
+}
+
 // Class for handling keyboard inputs.
 export class Controller {
   private keys: ControllerKeys
@@ -49,7 +55,7 @@ export class Controller {
     window.addEventListener('keyup', (event) => this.keyupHandler(event))
   }
 
-  get state() {
+  get state(): ControllerState {
     if (this.disabled) {
       return {
         keyUp: false,

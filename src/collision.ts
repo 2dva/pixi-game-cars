@@ -1,6 +1,5 @@
-import type { Bounds } from 'pixi.js'
+import type { BoundsLike } from './types'
 
-export type BoundsLike = Partial<Bounds> & Pick<Bounds, 'left' | 'right' | 'top' | 'bottom'>
 export type CollisionDirection = 'head' | 'back' | 'left' | 'right'
 export type CollisionObject = {
   direction: CollisionDirection
@@ -8,6 +7,7 @@ export type CollisionObject = {
   damage: number
   speedLoss: number
   recoil: [number, number]
+  lane: number
 }
 
 export function checkCollisionWithObject(hero: BoundsLike, obj: BoundsLike): boolean {
@@ -20,7 +20,7 @@ export function checkCollisionWithObject(hero: BoundsLike, obj: BoundsLike): boo
   return topmostBottom > bottommostTop
 }
 
-export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike): CollisionObject | null {
+export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike, lane: number): CollisionObject | null {
   const amortization = 0.5
   const rightmostLeft = hero.left < car.left ? car.left : hero.left
   const leftmostRight = hero.right > car.right ? car.right : hero.right
@@ -49,7 +49,7 @@ export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike): Collis
     Math.abs(hero.left - car.left) * 2 < Math.abs(hero.top - car.top) ? collisionY : collisionX
 
   let speedLoss = 0
-  let recoil: [number, number] = [0,0]
+  let recoil: [number, number] = [0, 0]
   switch (direction) {
     case 'head':
       speedLoss = -2
@@ -69,10 +69,10 @@ export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike): Collis
       break
   }
 
-  return { direction: direction, force, damage, speedLoss, recoil }
+  return { direction, force, damage, speedLoss, recoil, lane }
 }
 
+// Проверяем, есть ли препятствие впереди от героя
 export function checkObstacleAhead(hero: BoundsLike, car: BoundsLike): boolean {
-  // Проверяем, есть ли препятствие впереди от героя
   return car.right >= hero.left && car.left <= hero.right && car.bottom >= hero.top && car.top < hero.top
 }

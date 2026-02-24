@@ -80,7 +80,7 @@ export class Hero extends Container implements IMajorGameContainer {
   }
 
   getBounds() {
-    return this.sprite!.getBounds()
+    return this.sprite.getBounds()
   }
 
   calculateOffset(delta: number, speed: number) {
@@ -91,6 +91,6 @@ export class Hero extends Container implements IMajorGameContainer {
     const filters: ColorOverlayFilter[] = []
     if (state.crash) filters.push(crashFilter)
     if (state.claim) filters.push(claimFilter)
-    this.sprite!.filters = filters
+    this.sprite.filters = filters
   }
 }

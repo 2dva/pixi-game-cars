@@ -1,14 +1,15 @@
 import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
-import { APP_HEIGHT, APP_WIDTH, TOP_SPEED } from './configuration'
+import { APP_HEIGHT, APP_WIDTH } from './configuration'
 import { Controller } from './Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
+import { calculateNextMove } from './physics'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
-import { calculateDistanceBySpeed } from './utils'
+import type { BoundsLike } from './types'
 
 export class Game {
   private stage: Container
@@ -111,56 +112,53 @@ export class Game {
     this.hero.setVisible(!isDemo)
   }
 
+  private handleHotkeys() {
+    let stopCurrentUpdate = false
+    const { keyOther } = this.controller.state
+    if (keyOther === 'KeyM') {
+      this.switchMode(GAME_MODE.DEMO, GAME_MODE_REASON.END_MANUAL)
+      stopCurrentUpdate = true
+    }
+
+    if (keyOther === 'KeyP') {
+      // TODO: pause the game
+    }
+    return stopCurrentUpdate
+  }
+
+  private handleClaimable(heroBounds: BoundsLike) {
+    let score = this.state.score
+    const claim = this.terrain.checkObjectIsClaimed(heroBounds)
+    if (claim) score += 100
+
+    Object.assign(this.state, {
+      score,
+      claim,
+    })
+  }
+
   private updateOnTick(time: Ticker) {
-    let { speed, distance, score, health, timeLeft } = this.state
-    const { keyUp, keyDown, keyLeft, keyRight, keySpace, keyOther } = this.controller.state
+    if (this.handleHotkeys()) return
 
     this.hud.draw(this.state)
     this.hero.draw(this.state, time)
     this.cars.draw(this.state, time)
     this.terrain.draw(this.state)
 
-    // Проверяем препятствие впереди перед изменением скорости
     const heroBounds = this.hero.getBounds()
-    const obstacleAhead = this.cars.checkCarsAheadHero(heroBounds)
+    const carBounds = this.cars.getCarsBounds()
+    const collision = calculateNextMove(this.state, this.controller.state, heroBounds, carBounds)
 
-    let deltaX = 0
-    if (keyRight) deltaX = 3
-    if (keyLeft) deltaX = -3
+    // apply collision effect on cars
+    this.cars.applyCollisionOnCar(collision)
 
-    // Если препятствие впереди, не позволяем увеличивать скорость
-    let deltaSpeed = 0
-    if (!obstacleAhead && keyUp) deltaSpeed = 1
-    if (keyDown) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-    if (keySpace) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-    speed += Math.floor(deltaSpeed)
-
-    // Если препятствие впереди, полностью останавливаемся
-    if (obstacleAhead) {
-      speed -= 15
-    }
-
-    // Проверка чтобы не выйти за границу скорости
-    speed = Math.min(Math.max(speed, 0), TOP_SPEED)
-
-    const offsetX = this.hero.calculateOffset(deltaX, speed)
-
-    const heroBoundsWithShift = {
-      left: heroBounds.left + offsetX,
-      right: heroBounds.right + offsetX,
-      top: heroBounds.top,
-      bottom: heroBounds.bottom,
-    }
-    const collision = this.cars.checkCollisionCars(heroBoundsWithShift)
-    let crash = !!collision
-    if (collision) deltaX = deltaX * 0.6
-    const deltaDistance = calculateDistanceBySpeed(speed)
-    distance += deltaDistance
-
+    let { health, timeLeft } = this.state
     if (this.state.mode === GAME_MODE.GAME_OVER) {
-      crash = health === 0
-      speed = 0
-      deltaSpeed = 0
+      Object.assign(this.state, {
+        speed: 0,
+        deltaSpeed: 0,
+        crash: health === 0,
+      })
     }
 
     if (this.state.mode === GAME_MODE.COLLECT_IN_TIME) {
@@ -173,31 +171,13 @@ export class Game {
       } else if (health === 0) {
         this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_CRASHED)
       }
+
+      Object.assign(this.state, {
+        health,
+        timeLeft,
+      })
     }
 
-    if (keyOther === 'KeyM') {
-      this.switchMode(GAME_MODE.DEMO, GAME_MODE_REASON.END_MANUAL)
-      return
-    }
-
-    if (keyOther === 'KeyP') {
-      // TODO: pause the game
-    }
-
-    const claim = this.terrain.checkObjectIsClaimed(heroBounds)
-    if (claim) score += 100
-
-    Object.assign(this.state, {
-      speed,
-      deltaSpeed,
-      distance,
-      deltaDistance,
-      deltaX,
-      score,
-      health,
-      timeLeft,
-      crash,
-      claim,
-    })
+    this.handleClaimable(heroBounds)
   }
 }

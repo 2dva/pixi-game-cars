@@ -1,9 +1,10 @@
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
-import { checkCollisionWithCar, checkObstacleAhead, type BoundsLike, type CollisionObject } from './collision'
+import { type CollisionObject } from './collision'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 import type { State } from './state'
-import { rollBoolDice, rollDice } from './utils'
 import type { IMajorGameContainer } from './types'
+import { type BoundsLike } from './types'
+import { rollBoolDice, rollDice } from './utils'
 
 // Cars configuration
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
@@ -17,10 +18,11 @@ const carConfig = {
 }
 
 // type CarAlias = keyof typeof carConfig
-
+type Lane = number // -1 .. ROAD_LANE_COUNT-1
 type Car = {
+  lane: Lane
+  active: boolean
   sprite: Sprite
-  lane: number
   speed: number
 }
 
@@ -33,7 +35,7 @@ export function runEverySecond(elapsedMS: number, cb: () => void) {
 }
 
 export class Cars extends Container implements IMajorGameContainer {
-  cars: Set<Car> = new Set()
+  cars: Map<number, Car> = new Map()
   occupiedLanes: Record<string, boolean> = {}
 
   constructor() {
@@ -45,25 +47,30 @@ export class Cars extends Container implements IMajorGameContainer {
   }
 
   setup(stage: Container) {
+    for (let i = -1; i < ROAD_LANE_COUNT; i++) {
+      this.createCarOnLane(i)
+    }
+
     stage.addChild(this)
   }
 
   reset() {
-    this.cars.forEach((car) => {
+    for (const car of this.cars.values()) {
       this.removeCar(car)
-    })
+    }
   }
 
   draw(state: State, time: Ticker) {
     const { speed } = state
-    this.cars.forEach((car) => {
+    for (const car of this.cars.values()) {
+      if (!car.active) continue
       const deltaSpeed = speed - car.speed
       car.sprite.y += deltaSpeed * 0.1
       // машинка уехала - убираем со сцены
       if (car.sprite.y < -STAGE_PADDING || car.sprite.y > APP_HEIGHT + STAGE_PADDING) {
         this.removeCar(car)
       }
-    })
+    }
 
     runEverySecond(time.elapsedMS, () => {
       this.checkReleaseCar(state)
@@ -78,18 +85,25 @@ export class Cars extends Container implements IMajorGameContainer {
     return sprite
   }
 
-  private addCarToLane(n: number, globalSpeed: number) {
+  private createCarOnLane(n: Lane) {
+    this.cars.set(n, { lane: n, active: false, sprite: new Sprite(), speed: 0 })
+  }
+
+  private addCarToLane(n: Lane, globalSpeed: number) {
     const speed = Math.floor(25 + rollDice(30)) * Math.sign(n + 0.1)
     const carSprite = this.createRandomCarSprite()
     carSprite.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
     carSprite.y = speed > globalSpeed ? APP_HEIGHT + STAGE_PADDING : -STAGE_PADDING
     carSprite.rotation = n < 0 ? Math.PI : 0
-    this.cars.add({ sprite: carSprite, lane: n, speed })
+    const car = this.cars.get(n)!
+    car.sprite = carSprite
+    car.speed = speed
+    car.active = true
     this.addChild(carSprite)
   }
 
   private removeCar(car: Car) {
-    this.cars.delete(car)
+    car.active = false
     this.occupiedLanes[car.lane] = false
     this.removeChild(car.sprite)
     car.sprite.destroy()
@@ -109,22 +123,21 @@ export class Cars extends Container implements IMajorGameContainer {
     }
   }
 
-  checkCollisionCars(heroBounds: BoundsLike): CollisionObject | null {
-    for (const car of this.cars) {
-      const collision = checkCollisionWithCar(heroBounds, car.sprite.getBounds())
-      if (collision === null) continue
-      car.speed = Math.max(car.speed - collision.speedLoss, 0)
-      car.sprite.x += collision.recoil[0]
-      car.sprite.y += collision.recoil[1]
-      return collision
+  getCarsBounds() {
+    const bounds: Map<Lane, BoundsLike> = new Map()
+    for (const [n, car] of this.cars) {
+      if (!car.active) continue
+      bounds.set(n, car.sprite.getBounds())
     }
-    return null
+    return bounds
   }
 
-  checkCarsAheadHero(heroBounds: BoundsLike): boolean {
-    for (const { sprite } of this.cars) {
-      if (checkObstacleAhead(heroBounds, sprite.getBounds())) return true
-    }
-    return false
+  applyCollisionOnCar(collision: CollisionObject | null) {
+    if (collision === null) return
+
+    const car = this.cars.get(collision.lane)!
+    car.speed = Math.max(car.speed - collision.speedLoss, 0)
+    car.sprite.x += collision.recoil[0]
+    car.sprite.y += collision.recoil[1]
   }
 }

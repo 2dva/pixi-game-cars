@@ -1,7 +1,8 @@
-import { Assets, Bounds, Container, Sprite } from 'pixi.js'
+import { Assets, Container, Sprite } from 'pixi.js'
 import { GifSource, GifSprite } from 'pixi.js/gif'
 import { checkCollisionWithObject } from '../collision'
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, STAGE_PADDING } from '../configuration'
+import type { BoundsLike } from '../types'
 
 export type claimableType = 'coin'
 
@@ -56,7 +57,7 @@ export class ClaimableObjects {
     sprite.destroy()
   }
 
-  checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {
+  checkObjectIsClaimed(heroBounds: BoundsLike): claimableType | null {
     for (const sprite of this.claimableObjects) {
       const bounds = sprite.getBounds()
       const claimed = checkCollisionWithObject(heroBounds, bounds)

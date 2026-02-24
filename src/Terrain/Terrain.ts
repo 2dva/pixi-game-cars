@@ -1,12 +1,12 @@
-import { Assets, Bounds, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
+import { Assets, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
+import type { BoundsLike, IMajorGameContainer } from '../types'
 import { rollBoolDice } from '../utils'
 import { ClaimableObjects, type claimableType } from './ClaimableObjects'
 import { Road } from './Road'
-import type { IMajorGameContainer } from '../types'
 
 const terrainAssets = [
   {
@@ -107,7 +107,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     }
   }
 
-  checkObjectIsClaimed(heroBounds: Bounds): claimableType | null {
+  checkObjectIsClaimed(heroBounds: BoundsLike): claimableType | null {
     return this.claimable.checkObjectIsClaimed(heroBounds)
   }
 }

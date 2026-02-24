@@ -6,10 +6,6 @@ export function rollBoolDice(n: number) {
   return Math.floor(Math.random() * n) === n - 1
 }
 
-export function calculateDistanceBySpeed(speed: number) {
-  return speed * 0.01
-}
-
 export function formatDistance(distance: number, pad: number = 0) {
   return (Math.floor(distance / 10) / 100).toFixed(1).padStart(pad, '0')
 }
