@@ -59,12 +59,7 @@ export class InfoScreen extends Container {
     this.ticker.add(this.tickHandler, this)
 
     this.visible = false
-    this.setupBackground()
-    this.addChild(this.content)
-    stage.addChild(this)
-  }
 
-  setupBackground() {
     const background = new Graphics()
     background.rect(0, 0, APP_WIDTH, APP_HEIGHT).fill({
       color: 0x000000,
@@ -74,7 +69,10 @@ export class InfoScreen extends Container {
       color: 0x000000,
       alpha: 0.5,
     })
+
     this.addChild(background)
+    this.addChild(this.content)
+    stage.addChild(this)
   }
 
   setupScreen(screenId: ScreenMode, data: TemplateData = {}) {

@@ -7,8 +7,9 @@ import { Logo } from './Logo'
 import { Score } from './Score'
 import { Timer } from './Timer'
 import { GAME_MODE } from "../state"
+import type { IMajorGameContainer } from '../types'
 
-export class HUD {
+export class HUD extends Container implements IMajorGameContainer {
   private gauges: Gauges
   private score: Score
   private logo: Logo
@@ -17,6 +18,7 @@ export class HUD {
   draw = throttle(this.instantDraw, 200)
 
   constructor() {
+    super()
     this.gauges = new Gauges()
     this.score = new Score()
     this.logo = new Logo()

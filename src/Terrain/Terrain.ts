@@ -6,6 +6,7 @@ import type { State } from '../state'
 import { rollBoolDice } from '../utils'
 import { ClaimableObjects, type claimableType } from './ClaimableObjects'
 import { Road } from './Road'
+import type { IMajorGameContainer } from '../types'
 
 const terrainAssets = [
   {
@@ -25,7 +26,7 @@ function runEverySegment(deltaDistance: number, cb: (segments: number) => void) 
   cb(distanceSegments)
 }
 
-export class Terrain extends Container {
+export class Terrain extends Container implements IMajorGameContainer {
   terrainObjects: Set<Sprite | GifSprite>
   road: Road
   letterAtexture!: Texture

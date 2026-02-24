@@ -3,6 +3,7 @@ import { checkCollisionWithCar, checkObstacleAhead, type BoundsLike, type Collis
 import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
 import type { State } from './state'
 import { rollBoolDice, rollDice } from './utils'
+import type { IMajorGameContainer } from './types'
 
 // Cars configuration
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
@@ -31,7 +32,7 @@ export function runEverySecond(elapsedMS: number, cb: () => void) {
   cb()
 }
 
-export class Cars extends Container {
+export class Cars extends Container implements IMajorGameContainer {
   cars: Set<Car> = new Set()
   occupiedLanes: Record<string, boolean> = {}
 

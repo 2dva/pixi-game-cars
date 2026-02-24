@@ -3,6 +3,7 @@ import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
 import type { State } from '../state'
 import { Exhaust } from './Exhaust'
+import type { IMajorGameContainer } from '../types'
 
 // Hero configuration
 const START_POSITION_X = APP_WIDTH - SIDEWALK_WIDTH - 80
@@ -16,7 +17,7 @@ const extraBrakeRotation = [
   0.01, 0.02, 0.03, 0.04, 0.03, 0.02, 0.01, 0, -0.01, -0.02, -0.03, -0.04, -0.03, -0.02, -0.01, 0,
 ]
 
-export class Hero extends Container {
+export class Hero extends Container implements IMajorGameContainer {
   sprite!: Sprite
   exhaust: Exhaust
   extraBrake = true
