@@ -12,6 +12,7 @@ window.__PIXI_DEVTOOLS__ = { app }
 try {
   console.log('App env version:', import.meta.env.VITE_APP_VERSION)
   console.log('App win version:', window.__APP_VERSION__)
+  console.log('App proc version:', process.env.VITE_APP_VERSION_PUBLIC)
 } catch(e) {
   // fail
 }
