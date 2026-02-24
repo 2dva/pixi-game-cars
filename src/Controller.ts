@@ -55,6 +55,10 @@ export class Controller {
     window.addEventListener('keyup', (event) => this.keyupHandler(event))
   }
 
+  reset() {
+    this.keys = structuredClone(defaultState)
+  }
+
   get state(): ControllerState {
     if (this.disabled) {
       return {

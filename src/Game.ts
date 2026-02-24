@@ -70,7 +70,9 @@ export class Game {
     this.hud.setup(stage)
 
     this.infoScreen.on(screenEventName, (event: ScreenEvent) => {
-      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode)
+      this.controller.reset()
+      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode!)
+      else if (event.type === EVENT_TYPE.UNPAUSE_GAME) this.state.paused = false
     })
   }
 
@@ -121,7 +123,9 @@ export class Game {
     }
 
     if (keyOther === 'KeyP') {
-      // TODO: pause the game
+      this.state.paused = true
+      this.infoScreen.show(SCREEN_MODE.PAUSE, this.state)
+      stopCurrentUpdate = true
     }
     return stopCurrentUpdate
   }
@@ -136,6 +140,7 @@ export class Game {
   }
 
   private updateOnTick(time: Ticker) {
+    if (this.state.paused) return
     if (this.handleHotkeys()) return
 
     this.hud.draw(this.state)

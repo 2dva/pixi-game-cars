@@ -20,6 +20,7 @@ export type GameModeReason = (typeof GAME_MODE_REASON)[keyof typeof GAME_MODE_RE
 export type State = {
   mode: GameMode
   modeReason: GameModeReason
+  paused: boolean
   score: number
   speed: number
   deltaSpeed: number
@@ -35,6 +36,7 @@ export type State = {
 export const defaultState: State = {
   mode: GAME_MODE.DEMO,
   modeReason: GAME_MODE_REASON.NO_REASON,
+  paused: false,
   score: 0,
   speed: 0,
   deltaSpeed: 0,

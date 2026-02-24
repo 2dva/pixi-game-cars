@@ -22,13 +22,14 @@ export const screenEventName = 'screenEvent'
 
 export const EVENT_TYPE = {
   SELECT_GAME_MODE: 'selectGameMode',
+  UNPAUSE_GAME: 'unpauseGame',
 } as const
 
 export type EventType = (typeof EVENT_TYPE)[keyof typeof EVENT_TYPE]
 
 export type ScreenEvent = {
   type: EventType
-  mode: GameMode
+  mode?: GameMode
 }
 
 type FontStyleKey = keyof typeof fontStyles
@@ -138,13 +139,17 @@ export class InfoScreen extends Container {
     const keyCode = event.code
     if (this.screenMode === SCREEN_MODE.START) {
       if (keyCode === 'Digit1') {
-        this.emitAndHide(GAME_MODE.FREE_RIDE)
+        this.emitAndHide(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.FREE_RIDE)
       } else if (keyCode === 'Digit2') {
-        this.emitAndHide(GAME_MODE.COLLECT_IN_TIME)
+        this.emitAndHide(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.COLLECT_IN_TIME)
+      }
+    } else if (this.screenMode === SCREEN_MODE.PAUSE) {
+      if (keyCode === 'Space') {
+        this.emitAndHide(EVENT_TYPE.UNPAUSE_GAME)
       }
     } else if (this.screenMode === SCREEN_MODE.FINISH || this.screenMode === SCREEN_MODE.FAILURE) {
       if (keyCode === 'Space') {
-        this.emitAndHide(GAME_MODE.DEMO)
+        this.emitAndHide(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.DEMO)
       }
     }
   }
@@ -162,10 +167,10 @@ export class InfoScreen extends Container {
     }, 400)
   }
 
-  private emitAndHide(mode: number) {
+  private emitAndHide(type: EventType, mode?: GameMode) {
     this.hide()
     this.emit(screenEventName, {
-      type: EVENT_TYPE.SELECT_GAME_MODE,
+      type,
       mode,
     })
   }
