@@ -9,6 +9,13 @@ globalThis.__PIXI_APP__ = app
 // @ts-expect-error this is for debug extension
 window.__PIXI_DEVTOOLS__ = { app }
 
+try {
+  console.log('App env version:', import.meta.env.VITE_APP_VERSION)
+  console.log('App win version:', window.__APP_VERSION__)
+} catch(e) {
+  // fail
+}
+
 ;(async () => {
   // Intialize the application.
   await app.init({ width: APP_WIDTH, height: APP_HEIGHT, backgroundColor: APP_BACKGROUND })
