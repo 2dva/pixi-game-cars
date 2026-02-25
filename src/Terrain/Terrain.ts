@@ -77,6 +77,7 @@ export class Terrain extends Container implements IMajorGameContainer {
 
   private addObject(assetName: string | Sprite, x: number) {
     const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
+    sprite.cullable = true
     sprite.anchor.set(0.5)
     sprite.scale.set(0.6)
     sprite.x = x

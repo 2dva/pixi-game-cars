@@ -15,6 +15,7 @@ window.__PIXI_DEVTOOLS__ = { app }
     height: APP_HEIGHT,
     backgroundColor: APP_BACKGROUND,
     resizeTo: root,
+    autoDensity: true,
   })
 
   // Then adding the application's canvas to the DOM.

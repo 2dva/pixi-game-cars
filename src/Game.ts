@@ -36,6 +36,8 @@ export class Game {
     this.hud = new HUD()
     this.cars = new Cars()
     this.hero = new Hero()
+
+    app.renderer.addListener('resize', this.onResizeThrottled)
   }
 
   private initState() {
@@ -79,7 +81,6 @@ export class Game {
       else if (event.type === EVENT_TYPE.UNPAUSE_GAME) this.state.paused = false
     })
 
-    window.addEventListener('resize', this.onResizeThrottled)
     this.onResize()
   }
 

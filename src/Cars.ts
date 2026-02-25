@@ -80,6 +80,7 @@ export class Cars extends Container implements IMajorGameContainer {
   private createRandomCarSprite() {
     const carAsset = Object.keys(carConfig)[rollDice(3)]
     const sprite = Sprite.from(carAsset)
+    sprite.cullable = true
     sprite.anchor.set(0.5)
     sprite.scale.set(0.6)
     return sprite
