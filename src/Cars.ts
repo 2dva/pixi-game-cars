@@ -4,7 +4,7 @@ import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './c
 import type { State } from './state'
 import type { IMajorGameContainer } from './types'
 import { type BoundsLike } from './types'
-import { rollBoolDice, rollDice } from './utils'
+import { rollDiceBool, rollDice } from './utils'
 
 // Cars configuration
 const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
@@ -115,7 +115,7 @@ export class Cars extends Container implements IMajorGameContainer {
       // если есть свободная полоса
       if (!this.occupiedLanes[i]) {
         // бросаем кубик, и если ок, то выпускаем машину
-        if (rollBoolDice(CHANCE_TO_RELEASE_CAR)) {
+        if (rollDiceBool(CHANCE_TO_RELEASE_CAR)) {
           this.addCarToLane(i, speed)
           this.occupiedLanes[i] = true
         }

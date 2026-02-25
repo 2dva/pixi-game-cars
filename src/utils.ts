@@ -1,8 +1,10 @@
+// Chance: 1 of n 
 export function rollDice(n: number) {
   return Math.floor(Math.random() * n)
 }
 
-export function rollBoolDice(n: number) {
+// Chance: 1 of n 
+export function rollDiceBool(n: number) {
   return Math.floor(Math.random() * n) === n - 1
 }
 

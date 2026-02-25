@@ -4,7 +4,7 @@ import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING }
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
-import { rollBoolDice } from '../utils'
+import { rollDiceBool } from '../utils'
 import { ClaimableObjects } from './ClaimableObjects'
 import { Road } from './Road'
 
@@ -98,7 +98,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     }
 
     // бросаем кубик, и если ок, то рисуем статичный объект
-    if (rollBoolDice(3)) {
+    if (rollDiceBool(3)) {
       this.addObject('tree01', APP_WIDTH - 15)
     }
     // рисуем А-полосу каждые 200 метров
