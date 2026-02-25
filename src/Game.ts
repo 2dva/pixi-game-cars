@@ -10,10 +10,12 @@ import { calculateNextMove } from './physics'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
+import { throttle } from './utils'
 
 export class Game {
   private stage: Container
   private ticker: Ticker
+  private rootContainer: HTMLElement
   private state!: State
   private controller: Controller
   private hero: Hero
@@ -21,9 +23,11 @@ export class Game {
   private hud: HUD
   private terrain: Terrain
   private infoScreen: InfoScreen
+  private onResizeThrottled = throttle(this.onResize.bind(this), 300)
 
   constructor(app: Application) {
     this.initState()
+    this.rootContainer = app.canvas.parentElement!
     this.stage = app.stage
     this.ticker = app.ticker
     this.infoScreen = new InfoScreen()
@@ -74,6 +78,20 @@ export class Game {
       if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode!)
       else if (event.type === EVENT_TYPE.UNPAUSE_GAME) this.state.paused = false
     })
+
+    window.addEventListener('resize', this.onResizeThrottled)
+    this.onResize()
+  }
+
+  private onResize(): void {
+    let ratio = 1
+    const { offsetWidth , offsetHeight } = this.rootContainer
+    if (offsetWidth < APP_WIDTH) {
+      ratio = Math.round(Math.max(offsetWidth / APP_WIDTH, 0.4) * 100) / 100
+    } else if (offsetHeight < APP_HEIGHT) {
+      ratio = Math.round(Math.max(offsetHeight / APP_HEIGHT, 0.4) * 100) / 100
+    }
+    this.stage.scale.y = this.stage.scale.x = ratio
   }
 
   launch() {
