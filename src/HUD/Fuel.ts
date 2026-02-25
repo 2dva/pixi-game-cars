@@ -1,7 +1,7 @@
 import { Assets, Color, Container, FillGradient, Graphics, Sprite } from 'pixi.js'
 
 const POS_X = 15
-const POS_Y = 100
+const POS_Y = 310
 const SCALE_HEIGHT = 155
 
 const colorStops = [
@@ -12,7 +12,7 @@ const colorStops = [
 
 type ColorPair = [number, number]
 
-export class Health extends Container {
+export class Fuel extends Container {
   private gradientColorMap: number[][]
   private scaleGradient: FillGradient
   private scaleObj!: Graphics
@@ -30,13 +30,14 @@ export class Health extends Container {
   }
 
   async preloadAssets() {
-    await Assets.load({ alias: 'wrench', src: 'wrench.png' })
+    await Assets.load({ alias: 'gas', src: 'gas.png' })
   }
 
   setup(parent: Container) {
+    this.visible = false
     this.position.set(POS_X, POS_Y)
 
-    const icon = Sprite.from('wrench')
+    const icon = Sprite.from('gas')
     icon.width = 30
     icon.scale.y = icon.scale.x
     icon.alpha = 0.4

@@ -8,12 +8,14 @@ import { Score } from './Score'
 import { Timer } from './Timer'
 import { GAME_MODE } from "../state"
 import type { IMajorGameContainer } from '../types'
+import { Fuel } from './Fuel'
 
 export class HUD extends Container implements IMajorGameContainer {
   private gauges: Gauges
   private score: Score
   private logo: Logo
   private health: Health
+  private fuel: Fuel
   private timer: Timer
   draw = throttle(this.instantDraw, 200)
 
@@ -23,11 +25,14 @@ export class HUD extends Container implements IMajorGameContainer {
     this.score = new Score()
     this.logo = new Logo()
     this.health = new Health()
+    this.fuel = new Fuel()
     this.timer = new Timer()
   }
 
   async preloadAssets() {
     await Assets.load('fonts/alarm_clock.ttf')
+    await this.health.preloadAssets()
+    await this.fuel.preloadAssets()
     await this.logo.preloadAssets()
   }
 
@@ -36,6 +41,7 @@ export class HUD extends Container implements IMajorGameContainer {
     this.score.setup(stage)
     this.logo.setup(stage)
     this.health.setup(stage)
+    this.fuel.setup(stage)
     this.timer.setup(stage)
   }
 

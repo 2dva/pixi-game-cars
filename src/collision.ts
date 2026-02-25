@@ -78,7 +78,7 @@ export function checkCollisionWithCar(hero: BoundsLike, car: BoundsLike, lane: n
 // Проверяем, есть ли препятствие впереди от героя
 export function checkObstacleAhead(hero: BoundsLike, car: BoundsLike): boolean {
   const distance = hero.top - car.bottom
-  const flag = car.right >= hero.left && car.left <= hero.right && car.top < hero.top && distance <= 2 && distance > -10
+  const flag = car.right >= hero.left && car.left <= hero.right && car.top < hero.top && distance <= 3 && distance > -50
   logObstacle(flag, distance, car.left - hero.right)
   return flag
 }
