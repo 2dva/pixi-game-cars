@@ -1,9 +1,10 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 const version = process.env.npm_package_version
 
-export default defineConfig(() => {
-  const publicEnv = { VITE_APP_VERSION_PUBLIC: version }
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const publicEnv = { VITE_APP_VERSION_PUBLIC: version, NODE_ENV: env.NODE_ENV }
 
   return {
     define: {

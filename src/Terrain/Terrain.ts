@@ -9,11 +9,14 @@ import { ClaimableObjects } from './ClaimableObjects'
 import { Road } from './Road'
 
 const terrainAssets = [
-  {
-    alias: 'tree01',
-    src: 'terrain/tree01.png',
-  },
+  { alias: 'tree01', src: 'terrain/tree01.png' },
+  { alias: 'tree02', src: 'terrain/tree02.png' },
+  { alias: 'tree03', src: 'terrain/tree03.png' },
+  { alias: 'tree04', src: 'terrain/tree04.png' },
 ]
+
+const BASE_Y_POS = -50
+const terrainAliases = terrainAssets.map((el) => el.alias)
 
 let elapsedDistance = 0.0
 let distanceSegments = 0
@@ -75,13 +78,13 @@ export class Terrain extends Container implements IMajorGameContainer {
     })
   }
 
-  private addObject(assetName: string | Sprite, x: number) {
+  private addObject(assetName: string | Sprite, scale: number, x: number, y: number = BASE_Y_POS) {
     const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
     sprite.cullable = true
     sprite.anchor.set(0.5)
-    sprite.scale.set(0.6)
+    sprite.scale.set(scale)
     sprite.x = x
-    sprite.y = -50
+    sprite.y = y
     this.terrainObjects.add(sprite)
     this.addChild(sprite)
   }
@@ -92,19 +95,36 @@ export class Terrain extends Container implements IMajorGameContainer {
     sprite.destroy()
   }
 
+  private drawTrees() {
+    // бросаем кубик, и если ок, то рисуем статичный объект
+    let i = 0
+    if (rollDiceBool(3)) {
+      for (const alias of terrainAliases) {
+        if (rollDiceBool(2 + i)) {
+          this.addObject(
+            alias,
+            0.5 + Math.random()*0.2,
+            APP_WIDTH - 20 + Math.random() * 30,
+            BASE_Y_POS + Math.random() * 50
+          )
+        }
+        i++
+      }
+    }
+  }
+
   checkObjectRelease(segments: number) {
     // рисуем монеты
     if (segments % 10 === 8) {
       this.claimable.checkObjectRelease()
     }
 
-    // бросаем кубик, и если ок, то рисуем статичный объект
-    if (rollDiceBool(3)) {
-      this.addObject('tree01', APP_WIDTH - 15)
-    }
+    // рисуем деревья
+    this.drawTrees()
+
     // рисуем А-полосу каждые 200 метров
     if (segments % 20 === 0) {
-      this.addObject(new Sprite(this.letterAtexture), APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
+      this.addObject(new Sprite(this.letterAtexture), 0.6, APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
     }
   }
 

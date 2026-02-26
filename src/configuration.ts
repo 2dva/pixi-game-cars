@@ -14,10 +14,12 @@ export const SIDEWALK_WIDTH = 80
 
 export const TOP_SPEED = 150
 
-const isDevPlatform = window.location.hostname.indexOf('localhost') > -1
+const isDevPlatform = process.env.NODE_ENV === 'development'
+const isLocalPlatform = window.location.hostname.indexOf('localhost') > -1
 
 export const gameConfiguration = {
-  isDevPlatform: isDevPlatform,
+  isDevPlatform,
+  isLocalPlatform,
 }
 
 export const zIndexFixed = {

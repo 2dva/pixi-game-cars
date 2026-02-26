@@ -12,6 +12,13 @@ function calculateDistanceBySpeed(speed: number) {
   return speed * 0.01
 }
 
+const gears = [0, 25, 50, 85, 120]
+export function calculateGear(speed: number) {
+  let gear = 0
+  while (speed > gears[gear]) gear++
+  return gear ? String(gear) : 'P'
+}
+
 export function calculateNextMove(
   state: State,
   controllerState: ControllerState,
@@ -84,3 +91,4 @@ export function calculateNextMove(
 
   return collision
 }
+

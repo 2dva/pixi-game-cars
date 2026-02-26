@@ -1,7 +1,8 @@
 import { BitmapText, Container, Graphics } from 'pixi.js'
 import { APP_WIDTH } from '../configuration'
 import fontStyles from '../fontStyles.json'
-import { calculateGear, formatDistance } from '../utils'
+import { formatDistance } from '../utils'
+import { calculateGear } from "../physics"
 
 const POS_X = APP_WIDTH - 200
 const POS_Y = 20

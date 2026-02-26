@@ -86,7 +86,7 @@ export class Game {
 
   private onResize(): void {
     let ratio = 1
-    const { offsetWidth , offsetHeight } = this.rootContainer
+    const { offsetWidth, offsetHeight } = this.rootContainer
     if (offsetWidth < APP_WIDTH) {
       ratio = Math.round(Math.max(offsetWidth / APP_WIDTH, 0.4) * 100) / 100
     } else if (offsetHeight < APP_HEIGHT) {
@@ -162,11 +162,6 @@ export class Game {
     if (this.state.paused) return
     if (this.handleHotkeys()) return
 
-    this.hud.draw(this.state)
-    this.hero.draw(this.state, time)
-    this.cars.draw(this.state, time)
-    this.terrain.draw(this.state)
-
     const heroBounds = this.hero.getBounds()
     const carBounds = this.cars.getCarsBounds()
     const collision = calculateNextMove(this.state, this.controller.state, heroBounds, carBounds)
@@ -200,5 +195,10 @@ export class Game {
     }
 
     this.handleClaimable(heroBounds)
+
+    this.hud.draw(this.state)
+    this.hero.draw(this.state, time)
+    this.cars.draw(this.state, time)
+    this.terrain.draw(this.state)
   }
 }
