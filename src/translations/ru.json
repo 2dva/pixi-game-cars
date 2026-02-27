@@ -1,0 +1,26 @@
+{
+  "ru": {
+    "startScreen": {
+      "selectGameMode": "Выбери тип игры:",
+      "mode1_training": "1 - Тренировка",
+      "unlimitedHealth": "Без ограничений, бесконечная жизнь",
+      "mode2_collectIn60Seconds": "2 - Собрать за 60 секунд",
+      "youHaveAMinute": "У тебя есть минута чтобы набрать очки"
+    },
+    "pauseScreen": {
+      "pause": "Пауза",
+      "pauseText": "Тут можно написать какой-то текст"
+    },
+    "endScreen": {
+      "gameOver": "Игра закончена",
+      "carIsBroken": "Машина разбилась",
+      "timeIsUp": "Время вышло",
+      "youGainScores": "Ты проехал ${distance}км и набрал <b>${score}</b> очков",
+      "topScore": "Лучшие результаты"
+    },
+    "blinkText": {
+      "pressKeyToSelect": "Нажми клавишу для выбора режима",
+      "pressSpaceToContinue": "Нажми пробел чтобы продолжить"
+    }
+  }
+}

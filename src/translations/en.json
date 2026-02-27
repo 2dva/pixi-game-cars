@@ -1,0 +1,26 @@
+{
+  "en": {
+    "startScreen": {
+      "selectGameMode": "Select game type:",
+      "mode1_training": "1 - Free ride",
+      "unlimitedHealth": "Infinite health",
+      "mode2_collectIn60Seconds": "2 - Collect in 60 seconds",
+      "youHaveAMinute": "You have a minute to gain score"
+    },
+    "pauseScreen": {
+      "pause": "Pause",
+      "pauseText": "You can write some text here"
+    },
+    "endScreen": {
+      "gameOver": "Game Over",
+      "carIsBroken": "Car Broken",
+      "timeIsUp": "Time is up",
+      "youGainScores": "You traveled ${distance}km and scored <b>${score}</b> points",
+      "topScore": "Top score"
+    },
+    "blinkText": {
+      "pressKeyToSelect": "Press the key to select game mode",
+      "pressSpaceToContinue": "Press space to continue"
+    }
+  }
+}

@@ -5,14 +5,15 @@ import { Controller } from './Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
+import { loadTranslations } from './i18n'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { calculateNextMove } from './physics'
+import { Sound } from './sound'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
+import { saveMyScore } from './topScore'
 import type { BoundsLike } from './types'
 import { throttle } from './utils'
-import { saveMyScore } from './topScore'
-import { Sound } from './sound'
 
 export class Game {
   private stage: Container
@@ -57,6 +58,8 @@ export class Game {
 
     this.stage.addChild(textLoading)
 
+    await loadTranslations()
+    
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
     await this.cars.preloadAssets()
@@ -156,7 +159,7 @@ export class Game {
 
   private handleClaimable(heroBounds: BoundsLike) {
     const claimed = this.terrain.checkObjectIsClaimed(heroBounds)
-    
+
     if (claimed) Sound.pickCoin.play()
 
     Object.assign(this.state, {

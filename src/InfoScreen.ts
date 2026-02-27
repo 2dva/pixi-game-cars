@@ -1,10 +1,11 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
 import { APP_HEIGHT, APP_VERSION, APP_WIDTH, zIndexFixed } from './configuration'
 import fontStyles from './fontStyles.json'
+import { tr } from './i18n'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
-import { applyTemplate, formatDistance, type TemplateData } from './utils'
 import { getTopResults } from './topScore'
+import { applyTemplate, formatDistance, type TemplateData } from './utils'
 
 const CONTENT_PADDING = 125
 const CONTENT_WIDTH = APP_WIDTH - 2 * CONTENT_PADDING
@@ -109,7 +110,7 @@ export class InfoScreen extends Container {
       const style = fontStyles[textObj.style as FontStyleKey] as TextStyleOptions
       txtFields.push(
         new Text({
-          text: applyTemplate(textObj.text, data),
+          text: applyTemplate(tr(textObj.text), data),
           style: { ...style, wordWrap: true, wordWrapWidth: CONTENT_WIDTH - 20 },
           x: alignCenter ? CONTENT_WIDTH / 2 : textObj.x,
           y: textObj.y,
@@ -119,7 +120,7 @@ export class InfoScreen extends Container {
     }
     txtFields.push(
       new Text({
-        text: cfgScreen.titleText,
+        text: tr(cfgScreen.titleText),
         style: fontStyles.fontScreenTitle,
         x: CONTENT_WIDTH / 2,
         y: 35,
@@ -127,7 +128,7 @@ export class InfoScreen extends Container {
       })
     )
     const txtBlink = new Text({
-      text: cfgScreen.blinkText,
+      text: tr(cfgScreen.blinkText),
       style: fontStyles.fontScreenBlink,
       x: CONTENT_WIDTH / 2,
       y: 325,

@@ -1,28 +1,28 @@
 {
   "startScreen": {
-    "titleText": "Выбери тип игры:",
-    "blinkText": "Нажми клавишу для выбора режима",
+    "titleText": "startScreen.selectGameMode",
+    "blinkText": "blinkText.pressKeyToSelect",
     "content": [
       {
-        "text": "1 - Тренировка",
+        "text": "startScreen.mode1_training",
         "style": "fontScreenPrimary",
         "x": 75,
         "y": 95
       },
       {
-        "text": "Без ограничений, бесконечная жизнь",
+        "text": "startScreen.unlimitedHealth",
         "style": "fontScreenSecondary",
         "x": 75,
         "y": 135
       },
       {
-        "text": "2 - Собрать за 60 секунд",
+        "text": "startScreen.mode2_collectIn60Seconds",
         "style": "fontScreenPrimary",
         "x": 75,
         "y": 195
       },
       {
-        "text": "У тебя есть минута чтобы набрать очки",
+        "text": "startScreen.youHaveAMinute",
         "style": "fontScreenSecondary",
         "x": 75,
         "y": 235
@@ -30,11 +30,11 @@
     ]
   },
   "pauseScreen": {
-    "titleText": "Пауза",
-    "blinkText": "Нажми пробел чтобы продолжить",
+    "titleText": "pauseScreen.pause",
+    "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {
-        "text": "Тут можно написать какой-то текст",
+        "text": "pauseScreen.pauseText",
         "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
@@ -43,11 +43,11 @@
     ]
   },
   "endScreenCrashed": {
-    "titleText": "Игра закончена",
-    "blinkText": "Нажми пробел чтобы продолжить",
+    "titleText": "endScreen.gameOver",
+    "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {
-        "text": "Машина разбилась",
+        "text": "endScreen.carIsBroken",
         "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
@@ -56,11 +56,11 @@
     ]
   },
   "endScreenTimeIsUp": {
-    "titleText": "Время вышло",
-    "blinkText": "Нажми пробел чтобы продолжить",
+    "titleText": "endScreen.timeIsUp",
+    "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {
-        "text": "Ты проехал ${distance}км и набрал <b>${score}</b> очков",
+        "text": "endScreen.youGainScores",
         "style": "fontScreenPrimary",
         "x": 0,
         "y": 165,
@@ -69,8 +69,8 @@
     ]
   },
   "endScreenTopScore": {
-    "titleText": "Лучшие результаты",
-    "blinkText": "Нажми пробел чтобы продолжить",
+    "titleText": "endScreen.topScore",
+    "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {
         "text": "${topScore}",
