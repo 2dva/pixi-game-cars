@@ -67,5 +67,17 @@
         "center": true
       }
     ]
+  },
+  "endScreenTopScore": {
+    "titleText": "Лучшие результаты",
+    "blinkText": "Нажми пробел чтобы продолжить",
+    "content": [
+      {
+        "text": "${topScore}",
+        "style": "fontScreenMono",
+        "x": 100,
+        "y": 80
+      }
+    ]
   }
 }

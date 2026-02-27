@@ -11,6 +11,7 @@ import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameMode
 import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
 import { throttle } from './utils'
+import { saveMyScore } from './topScore'
 
 export class Game {
   private stage: Container
@@ -105,6 +106,9 @@ export class Game {
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
       this.state.modeReason = modeReason
+      if (modeReason === GAME_MODE_REASON.END_TIME_IS_UP) {
+        saveMyScore('User', this.state.score)
+      }
       this.infoScreen.show(
         modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE,
         this.state

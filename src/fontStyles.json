@@ -73,6 +73,12 @@
     "fontSize": 18,
     "fill": "#c1c1c1"
   },
+  "fontScreenMono": {
+    "fontFamily": "Courier New, monospace",
+    "fontSize": 28,
+    "fill": "#eeeeee",
+    "letterSpacing": 2
+  },
   "fontScreenBlink": {
     "fontFamily": "Arial",
     "fontSize": 18,

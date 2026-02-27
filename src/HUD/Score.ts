@@ -22,7 +22,7 @@ export class Score extends Container {
       color: 0x000000,
       alpha: 0.4,
     })
-    
+
     const textScore = new Text({
       text: '0',
       style: fontStyles.fontHUDScore,
@@ -34,7 +34,7 @@ export class Score extends Container {
     textScore.tint = TINT_DEFAULT
     textScore.anchor.set(1, 0)
     this.textObj = textScore
-    
+
     this.addChild(background)
     this.addChild(textScore)
     parent.addChild(this)
@@ -43,9 +43,11 @@ export class Score extends Container {
   draw(score: number) {
     if (String(score) != this.textObj.text) {
       this.textObj.text = `${score}`
-      this.textObj.tint = TINT_BRIGHT
-      this.textObj.style.letterSpacing = 0.8
-      this.textObj.style.fontWeight = 'bold'
+      if (score > 0) {
+        this.textObj.tint = TINT_BRIGHT
+        this.textObj.style.letterSpacing = 0.8
+        this.textObj.style.fontWeight = 'bold'
+      }
       setTimeout(() => {
         this.textObj.tint = TINT_DEFAULT
         this.textObj.style.letterSpacing = 0

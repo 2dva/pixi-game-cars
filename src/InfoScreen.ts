@@ -4,6 +4,7 @@ import fontStyles from './fontStyles.json'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
+import { getTopResults } from './topScore'
 
 const CONTENT_PADDING = 125
 const CONTENT_WIDTH = APP_WIDTH - 2 * CONTENT_PADDING
@@ -16,6 +17,7 @@ export const SCREEN_MODE: Record<string, ScreenMode> = {
   PAUSE: 'pauseScreen',
   FAILURE: 'endScreenCrashed',
   FINISH: 'endScreenTimeIsUp',
+  TOP_SCORE: 'endScreenTopScore',
 } as const
 
 export const screenEventName = 'screenEvent'
@@ -40,6 +42,7 @@ export class InfoScreen extends Container {
   elapsedSeconds: number
   blinkText: Text
   screenMode: ScreenMode | null
+  timer: NodeJS.Timeout | null = null
   keydownHandlerBound = this.keydownHandler.bind(this)
 
   constructor() {
@@ -84,6 +87,17 @@ export class InfoScreen extends Container {
     this.addChild(background)
     this.addChild(this.content)
     stage.addChild(this)
+  }
+
+  private buildTopScoreTable() {
+    const data = getTopResults()
+    let results = ''
+    for (let i = 0; i < Math.min(6, data.length); i++) {
+      const [name, score] = data[i]
+      results += String(name).padEnd(6) + '   ' + String(score).padStart(6, '0') + '\n'
+    }
+
+    return results
   }
 
   setupScreen(screenId: ScreenMode, data: TemplateData = {}) {
@@ -147,7 +161,11 @@ export class InfoScreen extends Container {
       if (keyCode === 'Space') {
         this.emitAndHide(EVENT_TYPE.UNPAUSE_GAME)
       }
-    } else if (this.screenMode === SCREEN_MODE.FINISH || this.screenMode === SCREEN_MODE.FAILURE) {
+    } else if (
+      this.screenMode === SCREEN_MODE.FINISH ||
+      this.screenMode === SCREEN_MODE.TOP_SCORE ||
+      this.screenMode === SCREEN_MODE.FAILURE
+    ) {
       if (keyCode === 'Space') {
         this.emitAndHide(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.DEMO)
       }
@@ -156,10 +174,20 @@ export class InfoScreen extends Container {
 
   show(mode: ScreenMode, state: State) {
     if (this.visible && mode === this.screenMode) return
+    if (this.timer) clearTimeout(this.timer)
 
     this.screenMode = mode
     if (!this.ticker.started) this.ticker.start()
-    this.setupScreen(mode, { score: state.score, distance: formatDistance(state.distance) })
+    let data: TemplateData = {}
+    if (mode === SCREEN_MODE.FINISH) data = { score: state.score, distance: formatDistance(state.distance) }
+    if (mode === SCREEN_MODE.TOP_SCORE) data = { topScore: this.buildTopScoreTable() }
+    this.setupScreen(mode, data)
+
+    if (mode === SCREEN_MODE.FINISH && state.score > 0) {
+      this.timer = setTimeout(() => {
+        this.show(SCREEN_MODE.TOP_SCORE, state)
+      }, 2000)
+    }
 
     this.visible = true
     setTimeout(() => {
@@ -176,6 +204,7 @@ export class InfoScreen extends Container {
   }
 
   private hide() {
+    if (this.timer) clearTimeout(this.timer)
     if (this.ticker.started) this.ticker.stop()
     window.removeEventListener('keydown', this.keydownHandlerBound)
     this.visible = false
