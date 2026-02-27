@@ -6,6 +6,7 @@ import type { BoundsLike } from '../types'
 import { rollDiceBool } from '../utils'
 
 const CHANCE_TO_RELEASE_PLATINUM = 15 // 1 to n
+const BASE_Y_POS = -60
 
 const coinsConfig = {
   coin: {
@@ -53,7 +54,7 @@ export class ClaimableObjects {
     sprite.anchor.set(0.5)
     sprite.scale.set(0.3)
     sprite.x = x
-    sprite.y = -50
+    sprite.y = BASE_Y_POS
     sprite.label = key
     sprite.animationSpeed = 1.7
     this.activeObjects.add(sprite)

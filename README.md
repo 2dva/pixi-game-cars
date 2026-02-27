@@ -21,4 +21,4 @@ http://localhost:5173/
 
 # Stack
 
-Pixi.js + Typescript + Vite
+Pixi.js, Typescript, Vite, i18n-js, Howler

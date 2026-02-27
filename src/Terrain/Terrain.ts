@@ -15,7 +15,7 @@ const terrainAssets = [
   { alias: 'tree04', src: 'terrain/tree04.png' },
 ]
 
-const BASE_Y_POS = -50
+const BASE_Y_POS = -60
 const terrainAliases = terrainAssets.map((el) => el.alias)
 
 let elapsedDistance = 0.0
@@ -27,6 +27,12 @@ function runEverySegment(deltaDistance: number, cb: (segments: number) => void) 
   elapsedDistance -= segmentSizeInMeters
   distanceSegments++
   cb(distanceSegments)
+}
+
+type SpriteOption = 'x' | 'y' | 'rotation' | 'scale'
+
+type SpriteOptionsObject = {
+  [k in SpriteOption]?: number
 }
 
 export class Terrain extends Container implements IMajorGameContainer {
@@ -77,14 +83,14 @@ export class Terrain extends Container implements IMajorGameContainer {
       }
     })
   }
-
-  private addObject(assetName: string | Sprite, scale: number, x: number, y: number = BASE_Y_POS) {
+  private addObject(assetName: string | Sprite, options: SpriteOptionsObject) {
     const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
     sprite.cullable = true
     sprite.anchor.set(0.5)
-    sprite.scale.set(scale)
-    sprite.x = x
-    sprite.y = y
+    sprite.y = BASE_Y_POS
+    for (const k in options) {
+      sprite[k as SpriteOption] = options[k as SpriteOption]!
+    }
     this.terrainObjects.add(sprite)
     this.addChild(sprite)
   }
@@ -101,12 +107,12 @@ export class Terrain extends Container implements IMajorGameContainer {
     if (rollDiceBool(3)) {
       for (const alias of terrainAliases) {
         if (rollDiceBool(2 + i)) {
-          this.addObject(
-            alias,
-            0.5 + Math.random()*0.2,
-            APP_WIDTH - 20 + Math.random() * 30,
-            BASE_Y_POS + Math.random() * 50
-          )
+          this.addObject(alias, {
+            scale: 0.5 + Math.random() * 0.2,
+            rotation: Math.random() * Math.PI * 2,
+            x: APP_WIDTH - 20 + Math.random() * 30,
+            y: BASE_Y_POS + Math.random() * 45,
+          })
         }
         i++
       }
@@ -124,7 +130,10 @@ export class Terrain extends Container implements IMajorGameContainer {
 
     // рисуем А-полосу каждые 200 метров
     if (segments % 20 === 0) {
-      this.addObject(new Sprite(this.letterAtexture), 0.6, APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2)
+      this.addObject(new Sprite(this.letterAtexture), {
+        scale: 0.6,
+        x: APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2,
+      })
     }
   }
 
