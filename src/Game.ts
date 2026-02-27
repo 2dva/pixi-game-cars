@@ -12,6 +12,7 @@ import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
 import { throttle } from './utils'
 import { saveMyScore } from './topScore'
+import { Sound } from './sound'
 
 export class Game {
   private stage: Container
@@ -155,6 +156,8 @@ export class Game {
 
   private handleClaimable(heroBounds: BoundsLike) {
     const claimed = this.terrain.checkObjectIsClaimed(heroBounds)
+    
+    if (claimed) Sound.pickCoin.play()
 
     Object.assign(this.state, {
       score: this.state.score + claimed,
@@ -169,6 +172,10 @@ export class Game {
     const heroBounds = this.hero.getBounds()
     const carBounds = this.cars.getCarsBounds()
     const collision = calculateNextMove(this.state, this.controller.state, heroBounds, carBounds)
+
+    if (collision && !Sound.carHit.playing()) {
+      Sound.carHit.play()
+    }
 
     // apply collision effect on cars
     this.cars.applyCollisionOnCar(collision)
