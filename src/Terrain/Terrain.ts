@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
-import { gameConfig } from '../configuration'
+import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
@@ -40,9 +40,12 @@ export class Terrain extends Container implements IMajorGameContainer {
   road: Road
   letterAtexture!: Texture
   claimable: ClaimableObjects
+  hiObjectContainer: Container
 
   constructor(renderer: Renderer) {
     super()
+    this.hiObjectContainer = new Container()
+    this.hiObjectContainer.zIndex = zIndexFixed.flyingObjects
     this.terrainObjects = new Set()
     this.road = new Road()
     this.claimable = new ClaimableObjects(this)
@@ -59,6 +62,7 @@ export class Terrain extends Container implements IMajorGameContainer {
   setup(stage: Container) {
     this.road.setup(stage)
     stage.addChild(this)
+    stage.addChild(this.hiObjectContainer)
   }
 
   reset() {
@@ -83,7 +87,8 @@ export class Terrain extends Container implements IMajorGameContainer {
       }
     })
   }
-  private addObject(assetName: string | Sprite, options: SpriteOptionsObject) {
+
+  private addObject(assetName: string | Sprite, options: SpriteOptionsObject, flyLevel = false) {
     const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
     sprite.cullable = true
     sprite.anchor.set(0.5)
@@ -92,7 +97,11 @@ export class Terrain extends Container implements IMajorGameContainer {
       sprite[k as SpriteOption] = options[k as SpriteOption]!
     }
     this.terrainObjects.add(sprite)
-    this.addChild(sprite)
+    if (flyLevel) {
+      this.hiObjectContainer.addChild(sprite)
+    } else {
+      this.addChild(sprite)
+    }
   }
 
   private removeObject(sprite: Sprite | GifSprite) {
@@ -112,7 +121,7 @@ export class Terrain extends Container implements IMajorGameContainer {
             rotation: Math.random() * Math.PI * 2,
             x: gameConfig.appWidth - 20 + Math.random() * 30,
             y: BASE_Y_POS + Math.random() * 45,
-          })
+          }, true)
         }
         i++
       }

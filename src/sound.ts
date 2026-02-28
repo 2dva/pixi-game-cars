@@ -1,6 +1,6 @@
 import { Howl } from 'howler'
-import pickCoinMp3 from '../public/assets/sound/coin_pick.mp3'
-import carHitMp3 from '../public/assets/sound/car_hit.mp3'
+import pickCoinMp3 from './assets/sound/coin_pick.mp3'
+import carHitMp3 from './assets/sound/car_hit.mp3'
 
 export const Sound = {
   pickCoin: new Howl({

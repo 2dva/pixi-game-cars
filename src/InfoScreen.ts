@@ -1,13 +1,11 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
-import { APP_VERSION, gameConfig, zIndexFixed } from './configuration'
+import { gameConfig, zIndexFixed } from './configuration'
 import fontStyles from './fontStyles.json'
 import { tr } from './i18n'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
 import { getTopResults } from './topScore'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
-
-const CONTENT_PADDING = 125
 
 type ScreenMode = keyof typeof screenConfig
 
@@ -59,9 +57,9 @@ export class InfoScreen extends Container {
   async preloadAssets() {}
 
   setup(stage: Container) {
-    this.contentWidth = gameConfig.appWidth - 2 * CONTENT_PADDING
-    this.contentHeight = gameConfig.appHeight - 2 * CONTENT_PADDING
-    this.content.x = this.content.y = CONTENT_PADDING
+    this.contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
+    this.contentHeight = Math.min(gameConfig.appHeight - 2 * gameConfig.screenContentPadding, 350)
+    this.content.x = this.content.y = gameConfig.screenContentPadding
 
     this.ticker.add(this.tickHandler, this)
 
@@ -72,17 +70,17 @@ export class InfoScreen extends Container {
       color: 0x000000,
       alpha: 0.2,
     })
-    background.roundRect(CONTENT_PADDING, CONTENT_PADDING, this.contentWidth, this.contentHeight, 10).fill({
+    background.roundRect(gameConfig.screenContentPadding, gameConfig.screenContentPadding, this.contentWidth, this.contentHeight, 10).fill({
       color: 0x000000,
       alpha: 0.5,
     })
-    if (APP_VERSION) {
+    if (gameConfig.appVersion) {
       this.addChild(
         new Text({
-          text: `v ${APP_VERSION}`,
+          text: `v ${gameConfig.appVersion}`,
           style: fontStyles.fontScreenVersion as TextStyleOptions,
-          x: gameConfig.appWidth - CONTENT_PADDING - 5,
-          y: gameConfig.appHeight - CONTENT_PADDING - 3,
+          x: gameConfig.appWidth - gameConfig.screenContentPadding - 5,
+          y: gameConfig.appHeight - gameConfig.screenContentPadding - 3,
           anchor: 1,
         })
       )

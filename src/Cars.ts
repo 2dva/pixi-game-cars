@@ -93,7 +93,7 @@ export class Cars extends Container implements IMajorGameContainer {
   private addCarToLane(n: Lane, globalSpeed: number) {
     const speed = Math.floor(25 + rollDice(30)) * Math.sign(n + 0.1)
     const carSprite = this.createRandomCarSprite()
-    carSprite.x = gameConfig.roadLeftGap + 50 + gameConfig.roadLaneWidth * n
+    carSprite.x = gameConfig.roadLeftGap + gameConfig.roadLaneWidth * (n + 0.5)
     carSprite.y = speed > globalSpeed ? gameConfig.appHeight + gameConfig.stagePadding : -gameConfig.stagePadding
     carSprite.rotation = n < 0 ? Math.PI : 0
     const car = this.cars.get(n)!

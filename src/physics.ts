@@ -1,6 +1,6 @@
 import type { ControllerState } from './Controller'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'
-import { TOP_SPEED } from './configuration'
+import { gameConfig } from './configuration'
 import type { State } from './state'
 import { type BoundsLike } from './types'
 
@@ -55,7 +55,7 @@ export function calculateNextMove(
   }
 
   // Проверка чтобы не выйти за границу скорости
-  speed = Math.min(Math.max(speed, 0), TOP_SPEED)
+  speed = Math.min(Math.max(speed, 0), gameConfig.topSpeed)
 
   const offsetX = calculateHeroOffset(deltaX, speed)
 
@@ -91,4 +91,3 @@ export function calculateNextMove(
 
   return collision
 }
-

@@ -34,7 +34,7 @@ export class Hero extends Container implements IMajorGameContainer {
 
   setup(stage: Container) {
     this.startPositionX = gameConfig.appWidth - gameConfig.roadSidewalkWidth - 80
-    this.startPositionY = gameConfig.appHeight - 160
+    this.startPositionY = gameConfig.appHeight - gameConfig.heroPositionYFromBottom
     this.moveLimits = [gameConfig.roadLeftGap, gameConfig.appWidth - gameConfig.roadSidewalkWidth - HERO_WIDTH - 5]
 
     const sprite = Sprite.from('hero')
