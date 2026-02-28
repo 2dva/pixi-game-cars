@@ -15,7 +15,7 @@
         margin: 0;
         background-color: #d1d1d1;
       }
-      #canvasRoot {
+      .canvas-root {
         max-width: 740px;
         min-width: 300px;
         max-height: 600px;
@@ -25,19 +25,19 @@
         margin: 0 auto;
       }
       @media screen and (max-width: 740px) {
-        #canvasRoot {
+        .canvas-root {
           width: 100%;
         }
       }
       @media screen and (max-height: 600px) {
-        #canvasRoot {
+        .canvas-root {
           height: 100vh;
         }
       }
     </style>
   </head>
   <body>
-    <div id="canvasRoot"></div>
+    <div id="canvasRoot" class="canvas-root"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

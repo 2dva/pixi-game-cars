@@ -1,5 +1,5 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
-import { APP_HEIGHT, APP_VERSION, APP_WIDTH, zIndexFixed } from './configuration'
+import { APP_VERSION, gameConfig, zIndexFixed } from './configuration'
 import fontStyles from './fontStyles.json'
 import { tr } from './i18n'
 import screenConfig from './screenConfig.json'
@@ -8,8 +8,6 @@ import { getTopResults } from './topScore'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
 
 const CONTENT_PADDING = 125
-const CONTENT_WIDTH = APP_WIDTH - 2 * CONTENT_PADDING
-const CONTENT_HEIGHT = APP_HEIGHT - 2 * CONTENT_PADDING
 
 type ScreenMode = keyof typeof screenConfig
 
@@ -45,6 +43,8 @@ export class InfoScreen extends Container {
   screenMode: ScreenMode | null
   timer: NodeJS.Timeout | null = null
   keydownHandlerBound = this.keydownHandler.bind(this)
+  contentWidth!: number
+  contentHeight!: number
 
   constructor() {
     super()
@@ -59,6 +59,8 @@ export class InfoScreen extends Container {
   async preloadAssets() {}
 
   setup(stage: Container) {
+    this.contentWidth = gameConfig.appWidth - 2 * CONTENT_PADDING
+    this.contentHeight = gameConfig.appHeight - 2 * CONTENT_PADDING
     this.content.x = this.content.y = CONTENT_PADDING
 
     this.ticker.add(this.tickHandler, this)
@@ -66,11 +68,11 @@ export class InfoScreen extends Container {
     this.visible = false
 
     const background = new Graphics()
-    background.rect(0, 0, APP_WIDTH, APP_HEIGHT).fill({
+    background.rect(0, 0, gameConfig.appWidth, gameConfig.appHeight).fill({
       color: 0x000000,
       alpha: 0.2,
     })
-    background.roundRect(CONTENT_PADDING, CONTENT_PADDING, CONTENT_WIDTH, CONTENT_HEIGHT, 10).fill({
+    background.roundRect(CONTENT_PADDING, CONTENT_PADDING, this.contentWidth, this.contentHeight, 10).fill({
       color: 0x000000,
       alpha: 0.5,
     })
@@ -79,8 +81,8 @@ export class InfoScreen extends Container {
         new Text({
           text: `v ${APP_VERSION}`,
           style: fontStyles.fontScreenVersion as TextStyleOptions,
-          x: APP_WIDTH - CONTENT_PADDING - 5,
-          y: APP_HEIGHT - CONTENT_PADDING - 3,
+          x: gameConfig.appWidth - CONTENT_PADDING - 5,
+          y: gameConfig.appHeight - CONTENT_PADDING - 3,
           anchor: 1,
         })
       )
@@ -111,8 +113,8 @@ export class InfoScreen extends Container {
       txtFields.push(
         new Text({
           text: applyTemplate(tr(textObj.text), data),
-          style: { ...style, wordWrap: true, wordWrapWidth: CONTENT_WIDTH - 20 },
-          x: alignCenter ? CONTENT_WIDTH / 2 : textObj.x,
+          style: { ...style, wordWrap: true, wordWrapWidth: this.contentWidth - 20 },
+          x: alignCenter ? this.contentWidth / 2 : textObj.x,
           y: textObj.y,
           anchor: alignCenter ? 0.5 : 0,
         })
@@ -122,7 +124,7 @@ export class InfoScreen extends Container {
       new Text({
         text: tr(cfgScreen.titleText),
         style: fontStyles.fontScreenTitle,
-        x: CONTENT_WIDTH / 2,
+        x: this.contentWidth / 2,
         y: 35,
         anchor: 0.5,
       })
@@ -130,7 +132,7 @@ export class InfoScreen extends Container {
     const txtBlink = new Text({
       text: tr(cfgScreen.blinkText),
       style: fontStyles.fontScreenBlink,
-      x: CONTENT_WIDTH / 2,
+      x: this.contentWidth / 2,
       y: 325,
       anchor: 0.5,
     })

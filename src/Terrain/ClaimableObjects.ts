@@ -1,7 +1,7 @@
 import { Assets, Container, Sprite } from 'pixi.js'
 import { GifSource, GifSprite } from 'pixi.js/gif'
 import { checkCollisionWithObject } from '../collision'
-import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP, STAGE_PADDING } from '../configuration'
+import { gameConfig } from '../configuration'
 import type { BoundsLike } from '../types'
 import { rollDiceBool } from '../utils'
 
@@ -39,7 +39,7 @@ export class ClaimableObjects {
   draw(speed: number) {
     this.activeObjects.forEach((sprite) => {
       sprite.y += speed * 0.1
-      if (sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      if (sprite.y > gameConfig.appHeight + gameConfig.stagePadding) {
         this.removeObject(sprite)
       }
     })
@@ -62,9 +62,9 @@ export class ClaimableObjects {
   }
 
   checkObjectRelease() {
-    const laneNumber = 1 + Math.floor(Math.random() * ROAD_LANE_COUNT)
+    const laneNumber = 1 + Math.floor(Math.random() * gameConfig.roadLaneCount)
     const claimableKey = rollDiceBool(CHANCE_TO_RELEASE_PLATINUM) ? 'coin_platinum' : 'coin'
-    this.addObject(claimableKey, ROAD_LEFT_GAP + laneNumber * ROAD_LANE_WIDTH - ROAD_LANE_WIDTH / 2)
+    this.addObject(claimableKey, gameConfig.roadLeftGap + gameConfig.roadLaneWidth * (laneNumber - 0.5))
   }
 
   private removeObject(sprite: Sprite | GifSprite) {

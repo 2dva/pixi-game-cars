@@ -1,15 +1,12 @@
 import { ColorOverlayFilter } from 'pixi-filters'
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LEFT_GAP, SIDEWALK_WIDTH } from '../configuration'
+import { gameConfig } from '../configuration'
 import type { State } from '../state'
-import { Exhaust } from './Exhaust'
 import type { IMajorGameContainer } from '../types'
+import { Exhaust } from './Exhaust'
 
 // Hero configuration
-const START_POSITION_X = APP_WIDTH - SIDEWALK_WIDTH - 80
-const START_POSITION_Y = APP_HEIGHT - 160
 const HERO_WIDTH = 60
-const MOVE_LIMITS = [ROAD_LEFT_GAP, APP_WIDTH - SIDEWALK_WIDTH - HERO_WIDTH - 5]
 const crashFilter = new ColorOverlayFilter({ color: 'red', alpha: 0.3 })
 const claimFilter = new ColorOverlayFilter({ color: 'yellow', alpha: 0.5 })
 
@@ -22,6 +19,9 @@ export class Hero extends Container implements IMajorGameContainer {
   exhaust: Exhaust
   extraBrake = true
   extraBrakeStage = 0
+  startPositionX!: number
+  startPositionY!: number
+  moveLimits!: [number, number]
 
   constructor() {
     super()
@@ -33,6 +33,10 @@ export class Hero extends Container implements IMajorGameContainer {
   }
 
   setup(stage: Container) {
+    this.startPositionX = gameConfig.appWidth - gameConfig.roadSidewalkWidth - 80
+    this.startPositionY = gameConfig.appHeight - 160
+    this.moveLimits = [gameConfig.roadLeftGap, gameConfig.appWidth - gameConfig.roadSidewalkWidth - HERO_WIDTH - 5]
+
     const sprite = Sprite.from('hero')
     sprite.scale.set(0.6)
     this.addChild(sprite)
@@ -45,13 +49,13 @@ export class Hero extends Container implements IMajorGameContainer {
   }
 
   reset() {
-    this.x = START_POSITION_X
-    this.y = START_POSITION_Y
+    this.x = this.startPositionX
+    this.y = this.startPositionY
   }
 
   setVisible(show: boolean) {
     this.visible = show
-    this.y = show ? START_POSITION_Y : -999
+    this.y = show ? this.startPositionY : -999
   }
 
   draw({ speed, deltaSpeed, deltaX, crash, claim }: State, time: Ticker) {
@@ -59,7 +63,7 @@ export class Hero extends Container implements IMajorGameContainer {
     if (!crash) {
       // Если не происходит коллизия - перемещаем машинку
       const newX = this.x + this.calculateOffset(deltaX, speed)
-      this.x = Math.max(MOVE_LIMITS[0], Math.min(MOVE_LIMITS[1], newX))
+      this.x = Math.max(this.moveLimits[0], Math.min(this.moveLimits[1], newX))
     }
 
     this.showEffect({ crash, claim })

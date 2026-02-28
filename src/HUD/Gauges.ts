@@ -1,11 +1,8 @@
 import { BitmapText, Container, Graphics } from 'pixi.js'
-import { APP_WIDTH } from '../configuration'
+import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
+import { calculateGear } from '../physics'
 import { formatDistance } from '../utils'
-import { calculateGear } from "../physics"
-
-const POS_X = APP_WIDTH - 200
-const POS_Y = 20
 
 export class Gauges extends Container {
   private speed!: BitmapText
@@ -19,6 +16,9 @@ export class Gauges extends Container {
   async preloadAssets() {}
 
   setup(parent: Container) {
+    const POS_X = gameConfig.appWidth - 200
+    const POS_Y = 20
+
     this.position.set(POS_X, POS_Y)
 
     const background = new Graphics()

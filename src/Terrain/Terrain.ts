@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
+import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
@@ -78,7 +78,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     this.terrainObjects.forEach((sprite) => {
       sprite.y += speed * 0.1
       // объект остался за экраном - убираем со сцены
-      if (sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      if (sprite.y > gameConfig.appHeight + gameConfig.stagePadding) {
         this.removeObject(sprite)
       }
     })
@@ -110,7 +110,7 @@ export class Terrain extends Container implements IMajorGameContainer {
           this.addObject(alias, {
             scale: 0.5 + Math.random() * 0.2,
             rotation: Math.random() * Math.PI * 2,
-            x: APP_WIDTH - 20 + Math.random() * 30,
+            x: gameConfig.appWidth - 20 + Math.random() * 30,
             y: BASE_Y_POS + Math.random() * 45,
           })
         }
@@ -132,7 +132,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     if (segments % 20 === 0) {
       this.addObject(new Sprite(this.letterAtexture), {
         scale: 0.6,
-        x: APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2,
+        x: gameConfig.appWidth - gameConfig.roadSidewalkWidth - gameConfig.roadLaneWidth / 2,
       })
     }
   }

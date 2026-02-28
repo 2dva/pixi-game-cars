@@ -1,6 +1,10 @@
 import { Application } from 'pixi.js'
-import { APP_BACKGROUND, APP_HEIGHT, APP_WIDTH } from './configuration'
+import { APP_BACKGROUND } from './configuration'
 import { Game } from './Game'
+
+
+const APP_WIDTH = 740 // fixme: убрать константы
+const APP_HEIGHT = 600 // fixme: убрать константы
 
 const app = new Application()
 
