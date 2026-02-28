@@ -1,9 +1,6 @@
 import { Container, Text } from 'pixi.js'
-import { APP_WIDTH } from '../configuration'
+import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
-
-const POS_X = APP_WIDTH / 2
-const POS_Y = 50
 
 const TINT_DEFAULT = 0xf5f5f5
 const TINT_BRIGHT = 0xfb8e8e
@@ -16,6 +13,9 @@ export class Timer extends Container {
   }
 
   setup(parent: Container) {
+    const POS_X = gameConfig.appWidth / 2
+    const POS_Y = 50
+
     this.position.set(POS_X, POS_Y)
 
     this.textObj = new Text({

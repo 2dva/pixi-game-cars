@@ -1,4 +1,4 @@
-import { gameConfiguration } from './configuration'
+import { gameConfig } from './configuration'
 import type { BoundsLike } from './types'
 
 export type CollisionDirection = 'head' | 'back' | 'left' | 'right'
@@ -85,7 +85,7 @@ export function checkObstacleAhead(hero: BoundsLike, car: BoundsLike): boolean {
 
 function logCollision(col: CollisionObject | null) {
   if (!col) return
-  if (!gameConfiguration.isDevPlatform) return
+  if (!gameConfig.isDevPlatform) return
   // eslint-disable-next-line no-console
   console.log(
     `%cCollision:%c Dir=${col.direction} F=${Math.floor(col.force)} Recoil=${col.recoil} `,
@@ -95,7 +95,7 @@ function logCollision(col: CollisionObject | null) {
 }
 
 function logObstacle(flag: boolean, distance: number, distanceX: number) {
-  if (!gameConfiguration.isDevPlatform) return
+  if (!gameConfig.isDevPlatform) return
   if (!flag) return
 
   // eslint-disable-next-line no-console

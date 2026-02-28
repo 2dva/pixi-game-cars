@@ -1,12 +1,5 @@
 import { Container, Graphics, GraphicsContext } from 'pixi.js'
-import {
-  APP_HEIGHT,
-  APP_WIDTH,
-  ROAD_LANE_COUNT,
-  ROAD_LANE_WIDTH,
-  ROAD_LEFT_GAP,
-  SIDEWALK_WIDTH,
-} from '../configuration'
+import { gameConfig } from '../configuration'
 
 // Road configuration
 const LINE_WIDTH = 5
@@ -29,14 +22,18 @@ export class Road extends Container {
   setup(stage: Container) {
     const lineCtx = new GraphicsContext()
 
-    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP - LINE_WIDTH, LINE_COLOR_YELLOW)
-    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP + LINE_WIDTH, LINE_COLOR_YELLOW)
-    this.drawSidewalkLine(lineCtx, APP_WIDTH - SIDEWALK_WIDTH)
+    this.drawSolidLine(lineCtx, gameConfig.roadLeftGap - LINE_WIDTH, LINE_COLOR_YELLOW)
+    this.drawSolidLine(lineCtx, gameConfig.roadLeftGap + LINE_WIDTH, LINE_COLOR_YELLOW)
+    this.drawSidewalkLine(lineCtx, gameConfig.appWidth - gameConfig.roadSidewalkWidth)
 
-    for (let i = 1; i < ROAD_LANE_COUNT; i++) {
-      this.drawDashedLine(lineCtx, ROAD_LEFT_GAP + i * ROAD_LANE_WIDTH)
+    for (let i = 1; i < gameConfig.roadLaneCount; i++) {
+      this.drawDashedLine(lineCtx, gameConfig.roadLeftGap + i * gameConfig.roadLaneWidth)
     }
-    this.drawSolidLine(lineCtx, ROAD_LEFT_GAP + ROAD_LANE_COUNT * ROAD_LANE_WIDTH, LINE_COLOR_WHITE)
+    this.drawSolidLine(
+      lineCtx,
+      gameConfig.roadLeftGap + gameConfig.roadLaneCount * gameConfig.roadLaneWidth,
+      LINE_COLOR_WHITE
+    )
 
     const lines = new Graphics(lineCtx)
 
@@ -57,7 +54,7 @@ export class Road extends Container {
 
   // Draw single line
   private drawDashedLine(ctx: GraphicsContext, cx: number) {
-    const segmentCount = Math.floor((APP_HEIGHT + 2 * LINE_REPEAT) / LINE_REPEAT)
+    const segmentCount = Math.floor((gameConfig.appHeight + 2 * LINE_REPEAT) / LINE_REPEAT)
 
     for (let i = 0; i < segmentCount; i++) {
       const start = i * LINE_REPEAT
@@ -75,7 +72,7 @@ export class Road extends Container {
   // Draw yellow line
   private drawSolidLine(ctx: GraphicsContext, cx: number, color: number) {
     ctx.moveTo(cx, -LINE_REPEAT)
-    ctx.lineTo(cx, APP_HEIGHT + LINE_REPEAT)
+    ctx.lineTo(cx, gameConfig.appHeight + LINE_REPEAT)
     ctx.setStrokeStyle({ width: LINE_WIDTH, color })
     ctx.stroke()
   }
@@ -83,11 +80,11 @@ export class Road extends Container {
   // Draw single line
   private drawSidewalkLine(ctx: GraphicsContext, cx: number) {
     ctx.moveTo(cx - 3, -LINE_REPEAT)
-    ctx.lineTo(cx - 3, APP_HEIGHT + LINE_REPEAT)
+    ctx.lineTo(cx - 3, gameConfig.appHeight + LINE_REPEAT)
     ctx.setStrokeStyle({ width: LINE_WIDTH + 4, color: 0x242424, alpha: 0.5 })
     ctx.stroke()
 
-    const segmentCount = Math.floor((APP_HEIGHT + 2 * LINE_REPEAT) / LINE_REPEAT)
+    const segmentCount = Math.floor((gameConfig.appHeight + 2 * LINE_REPEAT) / LINE_REPEAT)
     for (let i = 0; i < segmentCount; i++) {
       const start = i * LINE_REPEAT + 3
       ctx.moveTo(cx, start)

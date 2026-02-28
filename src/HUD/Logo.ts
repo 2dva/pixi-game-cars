@@ -1,8 +1,5 @@
 import { Assets, Container, Sprite } from 'pixi.js'
-import { APP_HEIGHT } from '../configuration'
-
-const POS_X = 12
-const POS_Y = APP_HEIGHT - 50
+import { gameConfig } from '../configuration'
 
 export class Logo extends Container {
   constructor() {
@@ -14,6 +11,9 @@ export class Logo extends Container {
   }
 
   setup(parent: Container) {
+    const POS_X = 12
+    const POS_Y = gameConfig.appHeight - 50
+
     this.position.set(POS_X, POS_Y)
 
     const logo = Sprite.from('logo')

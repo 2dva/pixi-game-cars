@@ -1,6 +1,6 @@
 import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
-import { APP_HEIGHT, APP_WIDTH } from './configuration'
+import { gameConfig } from './configuration'
 import { Controller } from './Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
@@ -16,6 +16,7 @@ import type { BoundsLike } from './types'
 import { throttle } from './utils'
 
 export class Game {
+  private app: Application
   private stage: Container
   private ticker: Ticker
   private rootContainer: HTMLElement
@@ -30,6 +31,7 @@ export class Game {
 
   constructor(app: Application) {
     this.initState()
+    this.app = app
     this.rootContainer = app.canvas.parentElement!
     this.stage = app.stage
     this.ticker = app.ticker
@@ -51,15 +53,15 @@ export class Game {
     const textLoading = new Text({
       text: 'Loading...',
       style: fontStyles.fontGameLoading,
-      x: APP_WIDTH / 2,
-      y: APP_HEIGHT / 2,
+      x: this.app.screen.width / 2,
+      y: this.app.screen.height / 2,
+      anchor: 0.5,
     })
-    textLoading.anchor.set(0.5, 0.5)
 
     this.stage.addChild(textLoading)
 
     await loadTranslations()
-    
+
     Assets.init({ basePath: 'assets/' })
     await this.hud.preloadAssets()
     await this.cars.preloadAssets()
@@ -92,10 +94,10 @@ export class Game {
   private onResize(): void {
     let ratio = 1
     const { offsetWidth, offsetHeight } = this.rootContainer
-    if (offsetWidth < APP_WIDTH) {
-      ratio = Math.round(Math.max(offsetWidth / APP_WIDTH, 0.4) * 100) / 100
-    } else if (offsetHeight < APP_HEIGHT) {
-      ratio = Math.round(Math.max(offsetHeight / APP_HEIGHT, 0.4) * 100) / 100
+    if (offsetWidth < gameConfig.appWidth) {
+      ratio = Math.round(Math.max(offsetWidth / gameConfig.appWidth, 0.4) * 100) / 100
+    } else if (offsetHeight < gameConfig.appHeight) {
+      ratio = Math.round(Math.max(offsetHeight / gameConfig.appHeight, 0.4) * 100) / 100
     }
     this.stage.scale.y = this.stage.scale.x = ratio
   }

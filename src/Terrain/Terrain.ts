@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js'
 import { GifSprite } from 'pixi.js/gif'
-import { APP_HEIGHT, APP_WIDTH, ROAD_LANE_WIDTH, SIDEWALK_WIDTH, STAGE_PADDING } from '../configuration'
+import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
@@ -40,9 +40,12 @@ export class Terrain extends Container implements IMajorGameContainer {
   road: Road
   letterAtexture!: Texture
   claimable: ClaimableObjects
+  hiObjectContainer: Container
 
   constructor(renderer: Renderer) {
     super()
+    this.hiObjectContainer = new Container()
+    this.hiObjectContainer.zIndex = zIndexFixed.flyingObjects
     this.terrainObjects = new Set()
     this.road = new Road()
     this.claimable = new ClaimableObjects(this)
@@ -59,6 +62,7 @@ export class Terrain extends Container implements IMajorGameContainer {
   setup(stage: Container) {
     this.road.setup(stage)
     stage.addChild(this)
+    stage.addChild(this.hiObjectContainer)
   }
 
   reset() {
@@ -78,12 +82,13 @@ export class Terrain extends Container implements IMajorGameContainer {
     this.terrainObjects.forEach((sprite) => {
       sprite.y += speed * 0.1
       // объект остался за экраном - убираем со сцены
-      if (sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      if (sprite.y > gameConfig.appHeight + gameConfig.stagePadding) {
         this.removeObject(sprite)
       }
     })
   }
-  private addObject(assetName: string | Sprite, options: SpriteOptionsObject) {
+
+  private addObject(assetName: string | Sprite, options: SpriteOptionsObject, flyLevel = false) {
     const sprite = assetName instanceof Sprite ? assetName : Sprite.from(assetName)
     sprite.cullable = true
     sprite.anchor.set(0.5)
@@ -92,7 +97,11 @@ export class Terrain extends Container implements IMajorGameContainer {
       sprite[k as SpriteOption] = options[k as SpriteOption]!
     }
     this.terrainObjects.add(sprite)
-    this.addChild(sprite)
+    if (flyLevel) {
+      this.hiObjectContainer.addChild(sprite)
+    } else {
+      this.addChild(sprite)
+    }
   }
 
   private removeObject(sprite: Sprite | GifSprite) {
@@ -110,9 +119,9 @@ export class Terrain extends Container implements IMajorGameContainer {
           this.addObject(alias, {
             scale: 0.5 + Math.random() * 0.2,
             rotation: Math.random() * Math.PI * 2,
-            x: APP_WIDTH - 20 + Math.random() * 30,
+            x: gameConfig.appWidth - 20 + Math.random() * 30,
             y: BASE_Y_POS + Math.random() * 45,
-          })
+          }, true)
         }
         i++
       }
@@ -132,7 +141,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     if (segments % 20 === 0) {
       this.addObject(new Sprite(this.letterAtexture), {
         scale: 0.6,
-        x: APP_WIDTH - SIDEWALK_WIDTH - ROAD_LANE_WIDTH / 2,
+        x: gameConfig.appWidth - gameConfig.roadSidewalkWidth - gameConfig.roadLaneWidth / 2,
       })
     }
   }

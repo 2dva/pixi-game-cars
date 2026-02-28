@@ -37,3 +37,20 @@ export type TemplateData = Record<string, string | number>
 export const applyTemplate = (str: string, obj: TemplateData) => {
   return str.replace(/\${([^}]+)}/g, (_, prop) => String(obj[prop]))
 }
+
+export function isMobileBrowser() {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i,
+    /Mobi/i,
+  ]
+
+  return toMatch.some((toMatchItem) => {
+    return navigator.userAgent.match(toMatchItem)
+  })
+}

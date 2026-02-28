@@ -1,10 +1,10 @@
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { type CollisionObject } from './collision'
-import { APP_HEIGHT, ROAD_LANE_COUNT, ROAD_LANE_WIDTH, ROAD_LEFT_GAP } from './configuration'
+import { gameConfig } from './configuration'
 import type { State } from './state'
 import type { IMajorGameContainer } from './types'
 import { type BoundsLike } from './types'
-import { rollDiceBool, rollDice } from './utils'
+import { rollDice, rollDiceBool } from './utils'
 
 // Cars configuration
 const TRAFFIC_DENSITY = 5 // 1 to n (per 1 sec for free lane)
@@ -47,7 +47,7 @@ export class Cars extends Container implements IMajorGameContainer {
   }
 
   setup(stage: Container) {
-    for (let i = -1; i < ROAD_LANE_COUNT; i++) {
+    for (let i = -1; i < gameConfig.roadLaneCount; i++) {
       this.createCarOnLane(i)
     }
 
@@ -67,7 +67,7 @@ export class Cars extends Container implements IMajorGameContainer {
       const deltaSpeed = speed - car.speed
       car.sprite.y += deltaSpeed * 0.1
       // машинка уехала - убираем со сцены
-      if (car.sprite.y < -STAGE_PADDING || car.sprite.y > APP_HEIGHT + STAGE_PADDING) {
+      if (car.sprite.y < -STAGE_PADDING || car.sprite.y > gameConfig.appHeight + gameConfig.stagePadding) {
         this.removeCar(car)
       }
     }
@@ -93,8 +93,8 @@ export class Cars extends Container implements IMajorGameContainer {
   private addCarToLane(n: Lane, globalSpeed: number) {
     const speed = Math.floor(25 + rollDice(30)) * Math.sign(n + 0.1)
     const carSprite = this.createRandomCarSprite()
-    carSprite.x = ROAD_LEFT_GAP + 50 + ROAD_LANE_WIDTH * n
-    carSprite.y = speed > globalSpeed ? APP_HEIGHT + STAGE_PADDING : -STAGE_PADDING
+    carSprite.x = gameConfig.roadLeftGap + gameConfig.roadLaneWidth * (n + 0.5)
+    carSprite.y = speed > globalSpeed ? gameConfig.appHeight + gameConfig.stagePadding : -gameConfig.stagePadding
     carSprite.rotation = n < 0 ? Math.PI : 0
     const car = this.cars.get(n)!
     car.sprite = carSprite
@@ -112,7 +112,7 @@ export class Cars extends Container implements IMajorGameContainer {
 
   checkReleaseCar({ speed }: State) {
     // в цикле проверяем свободные полосы
-    for (let i = -1; i < ROAD_LANE_COUNT; i++) {
+    for (let i = -1; i < gameConfig.roadLaneCount; i++) {
       // если есть свободная полоса
       if (!this.occupiedLanes[i]) {
         // бросаем кубик, и если ок, то выпускаем машину
