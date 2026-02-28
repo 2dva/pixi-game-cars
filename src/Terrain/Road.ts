@@ -11,7 +11,7 @@ const LINE_COLOR_YELLOW = 0xa99f2f
 const SIDEWALK_BORDER_COLOR = 0x717475
 
 export class Road extends Container {
-  roadDelta = 0
+  private roadDelta = 0
 
   constructor() {
     super()

@@ -21,9 +21,9 @@ const coinsConfig = {
 type ClaimableKey = keyof typeof coinsConfig
 
 export class ClaimableObjects {
-  activeObjects: Set<Sprite | GifSprite>
-  spriteSources: Record<string, GifSource> = {}
-  container: Container
+  private activeObjects: Set<Sprite | GifSprite>
+  private spriteSources: Record<string, GifSource> = {}
+  private container: Container
 
   constructor(container: Container) {
     this.activeObjects = new Set()

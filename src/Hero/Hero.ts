@@ -15,13 +15,13 @@ const extraBrakeRotation = [
 ]
 
 export class Hero extends Container implements IMajorGameContainer {
-  sprite!: Sprite
-  exhaust: Exhaust
-  extraBrake = true
-  extraBrakeStage = 0
-  startPositionX!: number
-  startPositionY!: number
-  moveLimits!: [number, number]
+  private sprite!: Sprite
+  private exhaust: Exhaust
+  private extraBrake = true
+  private extraBrakeStage = 0
+  private startPositionX!: number
+  private startPositionY!: number
+  private moveLimits!: [number, number]
 
   constructor() {
     super()
@@ -29,7 +29,7 @@ export class Hero extends Container implements IMajorGameContainer {
   }
 
   async preloadAssets() {
-    await Assets.load({ alias: 'hero', src: 'cars/car00.png' })
+    await Assets.load({ alias: 'hero', src: 'cars/hero01.png' })
   }
 
   setup(stage: Container) {

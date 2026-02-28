@@ -42,17 +42,18 @@ export class Score extends Container {
 
   draw(score: number) {
     if (String(score) != this.textObj.text) {
+      const gain = score - parseInt(this.textObj.text)
       this.textObj.text = `${score}`
-      if (score > 0) {
+      if (gain >= 100) {
         this.textObj.tint = TINT_BRIGHT
         this.textObj.style.letterSpacing = 0.8
         this.textObj.style.fontWeight = 'bold'
+        setTimeout(() => {
+          this.textObj.tint = TINT_DEFAULT
+          this.textObj.style.letterSpacing = 0
+          this.textObj.style.fontWeight = 'normal'
+        }, 100)
       }
-      setTimeout(() => {
-        this.textObj.tint = TINT_DEFAULT
-        this.textObj.style.letterSpacing = 0
-        this.textObj.style.fontWeight = 'normal'
-      }, 100)
     }
   }
 }

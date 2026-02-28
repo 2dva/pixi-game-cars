@@ -4,7 +4,7 @@ import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import type { State } from '../state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
-import { rollDiceBool } from '../utils'
+import { rollDiceBool, useRunEverySegment, type RunEverySegment } from '../utils'
 import { ClaimableObjects } from './ClaimableObjects'
 import { Road } from './Road'
 
@@ -18,17 +18,6 @@ const terrainAssets = [
 const BASE_Y_POS = -60
 const terrainAliases = terrainAssets.map((el) => el.alias)
 
-let elapsedDistance = 0.0
-let distanceSegments = 0
-const segmentSizeInMeters = 10.0
-function runEverySegment(deltaDistance: number, cb: (segments: number) => void) {
-  elapsedDistance += deltaDistance
-  if (elapsedDistance < segmentSizeInMeters) return
-  elapsedDistance -= segmentSizeInMeters
-  distanceSegments++
-  cb(distanceSegments)
-}
-
 type SpriteOption = 'x' | 'y' | 'rotation' | 'scale'
 
 type SpriteOptionsObject = {
@@ -36,11 +25,12 @@ type SpriteOptionsObject = {
 }
 
 export class Terrain extends Container implements IMajorGameContainer {
-  terrainObjects: Set<Sprite | GifSprite>
-  road: Road
-  letterAtexture!: Texture
-  claimable: ClaimableObjects
-  hiObjectContainer: Container
+  private terrainObjects: Set<Sprite | GifSprite>
+  private road: Road
+  private letterAtexture!: Texture
+  private claimable: ClaimableObjects
+  private hiObjectContainer: Container
+  private runEverySegment: RunEverySegment
 
   constructor(renderer: Renderer) {
     super()
@@ -50,6 +40,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     this.road = new Road()
     this.claimable = new ClaimableObjects(this)
 
+    this.runEverySegment = useRunEverySegment(10)
     const letterA = new Text({ text: 'A', style: fontStyles.fontRoadLetterA })
     this.letterAtexture = renderer.generateTexture(letterA)
   }
@@ -75,7 +66,7 @@ export class Terrain extends Container implements IMajorGameContainer {
     this.road.draw(speed)
     this.claimable.draw(speed)
 
-    runEverySegment(deltaDistance, (segments: number) => {
+    this.runEverySegment(deltaDistance, (segments: number) => {
       this.checkObjectRelease(segments)
     })
 
@@ -116,12 +107,16 @@ export class Terrain extends Container implements IMajorGameContainer {
     if (rollDiceBool(3)) {
       for (const alias of terrainAliases) {
         if (rollDiceBool(2 + i)) {
-          this.addObject(alias, {
-            scale: 0.5 + Math.random() * 0.2,
-            rotation: Math.random() * Math.PI * 2,
-            x: gameConfig.appWidth - 20 + Math.random() * 30,
-            y: BASE_Y_POS + Math.random() * 45,
-          }, true)
+          this.addObject(
+            alias,
+            {
+              scale: 0.5 + Math.random() * 0.2,
+              rotation: Math.random() * Math.PI * 2,
+              x: gameConfig.appWidth - 20 + Math.random() * 30,
+              y: BASE_Y_POS + Math.random() * 45,
+            },
+            true
+          )
         }
         i++
       }

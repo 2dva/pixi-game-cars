@@ -11,14 +11,15 @@ const TRAFFIC_DENSITY = 5 // 1 to n (per 1 sec for free lane)
 const STAGE_PADDING = 120
 
 // Create an array of asset data to load.
-const carConfig = {
-  car01: { alias: 'car01', src: 'cars/car01.png' },
-  car02: { alias: 'car02', src: 'cars/car02.png' },
-  car03: { alias: 'car03', src: 'cars/car03.png' },
-}
+const carConfig = [
+  { alias: 'car01', src: 'cars/car01.png' },
+  { alias: 'car02', src: 'cars/car02.png' },
+  { alias: 'car03', src: 'cars/car03.png' },
+  { alias: 'car04', src: 'cars/car04.png' },
+  { alias: 'car05', src: 'cars/car05.png' },
+]
 
-// type CarAlias = keyof typeof carConfig
-type Lane = number // -1 .. ROAD_LANE_COUNT-1
+type Lane = number // in range of [-1, ROAD_LANE_COUNT-1]
 type Car = {
   lane: Lane
   active: boolean
@@ -35,15 +36,15 @@ export function runEverySecond(elapsedMS: number, cb: () => void) {
 }
 
 export class Cars extends Container implements IMajorGameContainer {
-  cars: Map<number, Car> = new Map()
-  occupiedLanes: Record<string, boolean> = {}
+  private cars: Map<number, Car> = new Map()
+  private occupiedLanes: Record<string, boolean> = {}
 
   constructor() {
     super()
   }
 
   async preloadAssets() {
-    await Assets.load(Object.values(carConfig))
+    await Assets.load(carConfig)
   }
 
   setup(stage: Container) {
@@ -78,7 +79,7 @@ export class Cars extends Container implements IMajorGameContainer {
   }
 
   private createRandomCarSprite() {
-    const carAsset = Object.keys(carConfig)[rollDice(3)]
+    const carAsset = carConfig[rollDice(carConfig.length)].alias
     const sprite = Sprite.from(carAsset)
     sprite.cullable = true
     sprite.anchor.set(0.5)

@@ -4,8 +4,8 @@ const POS_X = 40
 const POS_Y = 120
 
 export class Exhaust extends Container {
-  groups: Graphics[] = []
-  smokePos: number[] = []
+  private groups: Graphics[] = []
+  private smokePos: number[] = []
 
   constructor() {
     super()

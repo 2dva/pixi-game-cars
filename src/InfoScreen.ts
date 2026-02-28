@@ -68,7 +68,7 @@ export class InfoScreen extends Container {
     const background = new Graphics()
     background.rect(0, 0, gameConfig.appWidth, gameConfig.appHeight).fill({
       color: 0x000000,
-      alpha: 0.2,
+      alpha: 0.25,
     })
     background.roundRect(gameConfig.screenContentPadding, gameConfig.screenContentPadding, this.contentWidth, this.contentHeight, 10).fill({
       color: 0x000000,
@@ -131,7 +131,7 @@ export class InfoScreen extends Container {
       text: tr(cfgScreen.blinkText),
       style: fontStyles.fontScreenBlink,
       x: this.contentWidth / 2,
-      y: 325,
+      y: 380,
       anchor: 0.5,
     })
     txtFields.push(txtBlink)

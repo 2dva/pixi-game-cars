@@ -13,7 +13,7 @@ import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameMode
 import { Terrain } from './Terrain/Terrain'
 import { saveMyScore } from './topScore'
 import type { BoundsLike } from './types'
-import { throttle } from './utils'
+import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
 
 export class Game {
   private app: Application
@@ -27,6 +27,7 @@ export class Game {
   private hud: HUD
   private terrain: Terrain
   private infoScreen: InfoScreen
+  private runEverySegment: RunEverySegment
   private onResizeThrottled = throttle(this.onResize.bind(this), 300)
 
   constructor(app: Application) {
@@ -41,6 +42,7 @@ export class Game {
     this.hud = new HUD()
     this.cars = new Cars()
     this.hero = new Hero()
+    this.runEverySegment = useRunEverySegment(100)
 
     app.renderer.addListener('resize', this.onResizeThrottled)
   }
@@ -160,13 +162,17 @@ export class Game {
   }
 
   private handleClaimable(heroBounds: BoundsLike) {
-    const claimed = this.terrain.checkObjectIsClaimed(heroBounds)
+    let claimed = this.terrain.checkObjectIsClaimed(heroBounds)
 
     if (claimed) Sound.pickCoin.play()
 
+    this.runEverySegment(this.state.deltaDistance, () => {
+      claimed += 10 // 10 очков за каждые 100 метров дороги
+    })
+
     Object.assign(this.state, {
       score: this.state.score + claimed,
-      claim: claimed > 0,
+      claim: claimed >= 100,
     })
   }
 

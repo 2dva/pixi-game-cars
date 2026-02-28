@@ -82,7 +82,7 @@
   "fontScreenBlink": {
     "fontFamily": "Arial",
     "fontSize": 18,
-    "fill": "#eeeeee",
+    "fill": "#f5f5f5",
     "letterSpacing": 2
   },
   "fontScreenVersion": {

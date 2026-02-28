@@ -1,4 +1,4 @@
-// Chances: 1 of n
+// Chances: 1 of n, returns number in range [0, n-1] 
 export function rollDice(n: number) {
   return Math.floor(Math.random() * n)
 }
@@ -39,18 +39,25 @@ export const applyTemplate = (str: string, obj: TemplateData) => {
 }
 
 export function isMobileBrowser() {
-  const toMatch = [
-    /Android/i,
-    /webOS/i,
-    /iPhone/i,
-    /iPad/i,
-    /iPod/i,
-    /BlackBerry/i,
-    /Windows Phone/i,
-    /Mobi/i,
-  ]
+  const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i, /Mobi/i]
 
   return toMatch.some((toMatchItem) => {
     return navigator.userAgent.match(toMatchItem)
   })
 }
+
+// Возвращает функцию, которая отсчитывает расстояние и запускает callback каждые n метров
+export function useRunEverySegment(segmentSizeInMeters = 10.0) {
+  let elapsedDistance = 0.0
+  let distanceSegments = 0
+
+  return (deltaDistance: number, cb: (segments: number) => void) => {
+    elapsedDistance += deltaDistance
+    if (elapsedDistance < segmentSizeInMeters) return
+    elapsedDistance -= segmentSizeInMeters
+    distanceSegments++
+    cb(distanceSegments)
+  }
+}
+
+export type RunEverySegment = ReturnType<typeof useRunEverySegment>
