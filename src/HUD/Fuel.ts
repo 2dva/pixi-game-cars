@@ -30,7 +30,7 @@ export class Fuel extends Container {
   }
 
   async preloadAssets() {
-    await Assets.load({ alias: 'gas', src: 'gas.png' })
+    await Assets.load({ alias: 'gas', src: 'hud/gas.png' })
   }
 
   setup(parent: Container) {

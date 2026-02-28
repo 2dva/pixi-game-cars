@@ -10,7 +10,7 @@ export class Logo extends Container {
   }
 
   async preloadAssets() {
-    await Assets.load({ alias: 'logo', src: 'logo.png' })
+    await Assets.load({ alias: 'logo', src: 'hud/logo.png' })
   }
 
   setup(parent: Container) {

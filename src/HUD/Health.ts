@@ -30,7 +30,7 @@ export class Health extends Container {
   }
 
   async preloadAssets() {
-    await Assets.load({ alias: 'wrench', src: 'wrench.png' })
+    await Assets.load({ alias: 'wrench', src: 'hud/wrench.png' })
   }
 
   setup(parent: Container) {

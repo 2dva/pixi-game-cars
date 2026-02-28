@@ -7,7 +7,7 @@ import { type BoundsLike } from './types'
 import { rollDiceBool, rollDice } from './utils'
 
 // Cars configuration
-const CHANCE_TO_RELEASE_CAR = 5 // 1 is always release (per 1 sec)
+const TRAFFIC_DENSITY = 5 // 1 to n (per 1 sec for free lane)
 const STAGE_PADDING = 120
 
 // Create an array of asset data to load.
@@ -116,7 +116,7 @@ export class Cars extends Container implements IMajorGameContainer {
       // если есть свободная полоса
       if (!this.occupiedLanes[i]) {
         // бросаем кубик, и если ок, то выпускаем машину
-        if (rollDiceBool(CHANCE_TO_RELEASE_CAR)) {
+        if (rollDiceBool(TRAFFIC_DENSITY)) {
           this.addCarToLane(i, speed)
           this.occupiedLanes[i] = true
         }
