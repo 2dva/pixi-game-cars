@@ -5,7 +5,7 @@ import { Game } from './Game'
 const app = new Application()
 const root = document.getElementById('canvasRoot')!
 
-root.classList.add(gameConfig.isMobilePlatform ? 'canvas-root_mobile' : 'canvas-root_desktop')
+root.classList.add(gameConfig.isMobileDevice ? 'canvas-root_mobile' : 'canvas-root_desktop')
 
 // @ts-expect-error this is for debug extension
 globalThis.__PIXI_APP__ = app

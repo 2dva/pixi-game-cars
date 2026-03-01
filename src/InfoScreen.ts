@@ -58,8 +58,9 @@ export class InfoScreen extends Container {
 
   setup(stage: Container) {
     this.contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
-    this.contentHeight = Math.min(gameConfig.appHeight - 2 * gameConfig.screenContentPadding, 350)
-    this.content.x = this.content.y = gameConfig.screenContentPadding
+    this.contentHeight = 350
+    this.content.x = gameConfig.screenContentPadding
+    this.content.y = (gameConfig.appHeight - this.contentHeight) / 2
 
     this.ticker.add(this.tickHandler, this)
 
@@ -70,22 +71,32 @@ export class InfoScreen extends Container {
       color: 0x000000,
       alpha: 0.25,
     })
-    background.roundRect(gameConfig.screenContentPadding, gameConfig.screenContentPadding, this.contentWidth, this.contentHeight, 10).fill({
-      color: 0x000000,
-      alpha: 0.5,
-    })
+    background
+      .roundRect(
+        gameConfig.screenContentPadding,
+        this.content.y,
+        this.contentWidth,
+        this.contentHeight,
+        10
+      )
+      .fill({
+        color: 0x000000,
+        alpha: 0.5,
+      })
+    this.addChild(background)
+
     if (gameConfig.appVersion) {
       this.addChild(
         new Text({
           text: `v ${gameConfig.appVersion}`,
           style: fontStyles.fontScreenVersion as TextStyleOptions,
-          x: gameConfig.appWidth - gameConfig.screenContentPadding - 5,
-          y: gameConfig.appHeight - gameConfig.screenContentPadding - 3,
+          x: gameConfig.screenContentPadding + this.contentWidth - 5,
+          y: this.content.y + this.contentHeight - 3,
           anchor: 1,
         })
       )
     }
-    this.addChild(background)
+
     this.addChild(this.content)
     stage.addChild(this)
   }
@@ -101,22 +112,30 @@ export class InfoScreen extends Container {
     return results
   }
 
-  setupScreen(screenId: ScreenMode, data: TemplateData = {}) {
+  private setupScreen(screenId: ScreenMode, data: TemplateData = {}) {
     const cfgScreen = screenConfig[screenId]
     const txtFields: Text[] = []
 
     for (const textObj of cfgScreen.content) {
       const alignCenter = 'center' in textObj
       const style = fontStyles[textObj.style as FontStyleKey] as TextStyleOptions
-      txtFields.push(
-        new Text({
-          text: applyTemplate(tr(textObj.text), data),
-          style: { ...style, wordWrap: true, wordWrapWidth: this.contentWidth - 20 },
-          x: alignCenter ? this.contentWidth / 2 : textObj.x,
-          y: textObj.y,
-          anchor: alignCenter ? 0.5 : 0,
+      const txt = new Text({
+        text: applyTemplate(tr(textObj.text), data),
+        style: { ...style, wordWrap: true, wordWrapWidth: this.contentWidth - 20 },
+        x: alignCenter ? this.contentWidth / 2 : textObj.x,
+        y: textObj.y,
+        anchor: alignCenter ? 0.5 : 0,
+      })
+      if ('clickAction' in textObj) {
+        txt.eventMode = 'static'
+        txt.cursor = 'pointer'
+        txt.on('pointerdown', () => {
+          this.doUserAction(textObj.clickAction!)
+          txt.scale.y *= 1.25
         })
-      )
+      }
+
+      txtFields.push(txt)
     }
     txtFields.push(
       new Text({
@@ -141,7 +160,7 @@ export class InfoScreen extends Container {
     this.content.addChild(...txtFields)
   }
 
-  tickHandler(time: Ticker) {
+  private tickHandler(time: Ticker) {
     if (!document.hasFocus()) return
     this.elapsedSeconds += time.elapsedMS
     if (this.elapsedSeconds > 1000.0) {
@@ -150,8 +169,12 @@ export class InfoScreen extends Container {
     }
   }
 
-  keydownHandler(event: KeyboardEvent) {
+  private keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
+    this.doUserAction(keyCode)
+  }
+
+  private doUserAction(keyCode: string) {
     if (this.screenMode === SCREEN_MODE.START) {
       if (keyCode === 'Digit1') {
         this.emitAndHide(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.FREE_RIDE)

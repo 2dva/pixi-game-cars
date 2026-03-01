@@ -7,7 +7,8 @@
         "text": "startScreen.mode1_training",
         "style": "fontScreenPrimary",
         "x": 75,
-        "y": 95
+        "y": 95,
+        "clickAction": "Digit1"
       },
       {
         "text": "startScreen.unlimitedHealth",
@@ -19,7 +20,8 @@
         "text": "startScreen.mode2_collectIn60Seconds",
         "style": "fontScreenPrimary",
         "x": 75,
-        "y": 195
+        "y": 195,
+        "clickAction": "Digit2"
       },
       {
         "text": "startScreen.youHaveAMinute",

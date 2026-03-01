@@ -38,12 +38,16 @@ export const applyTemplate = (str: string, obj: TemplateData) => {
   return str.replace(/\${([^}]+)}/g, (_, prop) => String(obj[prop]))
 }
 
-export function isMobileBrowser() {
+export function checkDeviceIsMobile() {
   const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i, /Mobi/i]
 
   return toMatch.some((toMatchItem) => {
     return navigator.userAgent.match(toMatchItem)
   })
+}
+
+export function checkDeviceIsTouch() {
+  return matchMedia('(hover: none), (pointer: coarse)').matches
 }
 
 // Возвращает функцию, которая отсчитывает расстояние и запускает callback каждые n метров

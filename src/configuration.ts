@@ -1,4 +1,4 @@
-import { isMobileBrowser } from './utils'
+import { checkDeviceIsTouch, checkDeviceIsMobile } from './utils'
 
 // export const APP_VERSION = import.meta.env.VITE_APP_VERSION
 // export const APP_VERSION = window.__APP_VERSION__
@@ -6,7 +6,8 @@ const APP_VERSION = process.env.VITE_APP_VERSION_PUBLIC
 
 const isDevPlatform = process.env.NODE_ENV === 'development'
 const isLocalPlatform = window.location.hostname.indexOf('localhost') > -1
-const isMobilePlatform = isMobileBrowser()
+const isMobileDevice = checkDeviceIsMobile()
+const isTouchDevice = checkDeviceIsTouch()
 
 const desktopConfig = {
   appWidth: 740,
@@ -24,7 +25,7 @@ const desktopConfig = {
 
 const mobileConfig = {
   appWidth: 720,
-  appHeight: 1600,
+  appHeight: 1280,
   stagePadding: 120,
   screenContentPadding: 63,
 
@@ -41,11 +42,12 @@ const commonConfig = {
   topSpeed: 150,
 }
 
-export const gameConfig = Object.assign({}, isMobilePlatform ? mobileConfig : desktopConfig, commonConfig, {
+export const gameConfig = Object.assign({}, isMobileDevice ? mobileConfig : desktopConfig, commonConfig, {
   appVersion: APP_VERSION,
   isDevPlatform,
   isLocalPlatform,
-  isMobilePlatform,
+  isMobileDevice,
+  isTouchDevice,
 })
 
 export const zIndexFixed = {
