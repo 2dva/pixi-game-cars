@@ -1,3 +1,9 @@
+import { Container, Graphics, Rectangle, type FederatedPointerEvent } from 'pixi.js'
+import { gameConfig } from './configuration'
+
+const MOVE_TRESHOLD = 10
+const TOUCH_AREA_SIZE = 250
+
 // Action keys type
 type ActionKey = 'up' | 'left' | 'down' | 'right' | 'space' | 'other'
 
@@ -44,15 +50,55 @@ export type ControllerState = {
 export class Controller {
   private keys: ControllerKeys
   private lastCode = ''
+  // private lastTouchActionX: ActionKey | null = null
+  // private lastTouchActionY: ActionKey | null = null
+  private centerPoint!: [number, number]
+  private touchArea!: Container
   disabled = false
 
   constructor() {
     // The controller's state.
     this.keys = structuredClone(defaultState)
+  }
+
+  setup(stage: Container) {
+    this.centerPoint = [gameConfig.appWidth / 2, gameConfig.appHeight - gameConfig.heroPositionYFromBottom + 5]
 
     // Register event listeners for keydown and keyup events.
     window.addEventListener('keydown', (event) => this.keydownHandler(event))
     window.addEventListener('keyup', (event) => this.keyupHandler(event))
+
+    if (gameConfig.isTouchDevice) {
+      this.touchArea = new Container({
+        x: (gameConfig.appWidth - TOUCH_AREA_SIZE) / 2,
+        y: gameConfig.appHeight - TOUCH_AREA_SIZE,
+        width: TOUCH_AREA_SIZE,
+        height: TOUCH_AREA_SIZE,
+      })
+      this.touchArea.eventMode = 'static'
+      this.touchArea.hitArea = new Rectangle(0, 0, TOUCH_AREA_SIZE, TOUCH_AREA_SIZE)
+      const roundPlace = new Graphics()
+      // roundPlace.rect(0, 0, TOUCH_AREA_SIZE, TOUCH_AREA_SIZE).fill({
+      //   color: 0x000000,
+      //   alpha: 0,
+      // })
+      // .stroke({
+      //   color: 0xffffff,
+      //   width: 2,
+      //   alpha: 0.7,
+      // })
+      roundPlace.circle(TOUCH_AREA_SIZE / 2, TOUCH_AREA_SIZE / 2, 60).fill({
+        color: 0x000000,
+        alpha: 0.25,
+      })
+      this.touchArea.addChild(roundPlace)
+      stage.addChild(this.touchArea)
+
+      this.touchArea.on('pointerdown', this.touchDown, this)
+      // this.touchArea.on('pointerup', this.touchUp, this)
+      this.touchArea.on('pointermove', this.touchMove, this)
+      stage.on('pointerup', this.resetTouch, this)
+    }
   }
 
   reset() {
@@ -78,6 +124,47 @@ export class Controller {
       keySpace: this.keys.space.pressed,
       keyOther: this.keys.other.pressed ? this.lastCode : false,
     }
+  }
+
+  private touchDown(e: FederatedPointerEvent) {
+    const localPos = this.touchArea.toLocal(e.global)
+    // this.resetTouch()
+    this.centerPoint = [localPos.x, localPos.y]
+    // console.log(`CENTER:`, this.centerPoint)
+  }
+
+  private touchMove(e: FederatedPointerEvent) {
+    const localPos = this.touchArea.toLocal(e.global)
+    const diffX = this.centerPoint[0] - localPos.x
+    const diffY = this.centerPoint[1] - localPos.y
+
+    let actionX: ActionKey | null = null
+    let actionY: ActionKey | null = null
+
+    if (Math.abs(diffX) > MOVE_TRESHOLD) {
+      actionX = diffX > 0 ? 'left' : 'right'
+    }
+    if (Math.abs(diffY) > MOVE_TRESHOLD) {
+      actionY = diffY > 0 ? 'up' : 'down'
+    }
+
+    // console.log(`key=`, actionX, actionY)
+
+    // this.lastTouchActionX = actionX
+    // this.lastTouchActionY = actionY
+    this.resetTouch()
+    if (actionX) this.keys[actionX].pressed = true
+    if (actionY) this.keys[actionY].pressed = true
+  }
+
+  private resetTouch() {
+    this.keys['up'].pressed = false
+    this.keys['down'].pressed = false
+    this.keys['left'].pressed = false
+    this.keys['right'].pressed = false
+
+    // if (this.lastTouchActionX) this.keys[this.lastTouchActionX].pressed = false
+    // if (this.lastTouchActionY) this.keys[this.lastTouchActionY].pressed = false
   }
 
   private keydownHandler(event: KeyboardEvent) {

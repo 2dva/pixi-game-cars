@@ -1,4 +1,4 @@
-import { Assets, Container, Text, Ticker, type Application } from 'pixi.js'
+import { Assets, Container, Rectangle, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
 import { gameConfig } from './configuration'
 import { Controller } from './Controller'
@@ -75,9 +75,12 @@ export class Game {
 
   async setup() {
     const { stage } = this
+    stage.eventMode = 'static'
+    stage.hitArea = new Rectangle(0, 0, gameConfig.appWidth, gameConfig.appHeight)
 
     await this.preloadAssets()
 
+    this.controller.setup(stage)
     this.infoScreen.setup(stage)
     this.terrain.setup(stage)
     this.cars.setup(stage)
