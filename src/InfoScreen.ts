@@ -129,10 +129,7 @@ export class InfoScreen extends Container {
       if ('clickAction' in textObj) {
         txt.eventMode = 'static'
         txt.cursor = 'pointer'
-        txt.on('pointerdown', () => {
-          this.doUserAction(textObj.clickAction!)
-          txt.scale.y *= 1.25
-        })
+        txt.on('pointerdown', this.doUserAction.bind(this, textObj.clickAction!))
       }
 
       txtFields.push(txt)

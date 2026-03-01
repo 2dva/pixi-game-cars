@@ -11,4 +11,7 @@ export const Sound = {
     src: carHitMp3,
     volume: 0.08,
   }),
+  mute: (off: boolean) => {
+      Howler.mute(off)
+  }
 }

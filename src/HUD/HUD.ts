@@ -1,19 +1,21 @@
 import { Assets, Container } from 'pixi.js'
 import type { State } from '../state'
+import { GAME_MODE } from "../state"
+import type { IMajorGameContainer } from '../types'
 import { throttle } from '../utils'
+import { Fuel } from './Fuel'
 import { Gauges } from './Gauges'
 import { Health } from './Health'
 import { Logo } from './Logo'
 import { Score } from './Score'
+import { SoundSwitch } from './SoundSwitch'
 import { Timer } from './Timer'
-import { GAME_MODE } from "../state"
-import type { IMajorGameContainer } from '../types'
-import { Fuel } from './Fuel'
 
 export class HUD extends Container implements IMajorGameContainer {
   private gauges: Gauges
   private score: Score
   private logo: Logo
+  private soundSwitch: SoundSwitch
   private health: Health
   private fuel: Fuel
   private timer: Timer
@@ -24,6 +26,7 @@ export class HUD extends Container implements IMajorGameContainer {
     this.gauges = new Gauges()
     this.score = new Score()
     this.logo = new Logo()
+    this.soundSwitch = new SoundSwitch()
     this.health = new Health()
     this.fuel = new Fuel()
     this.timer = new Timer()
@@ -34,12 +37,14 @@ export class HUD extends Container implements IMajorGameContainer {
     await this.health.preloadAssets()
     await this.fuel.preloadAssets()
     await this.logo.preloadAssets()
+    await this.soundSwitch.preloadAssets()
   }
 
   setup(stage: Container) {
     this.gauges.setup(stage)
     this.score.setup(stage)
     this.logo.setup(stage)
+    this.soundSwitch.setup(stage)
     this.health.setup(stage)
     this.fuel.setup(stage)
     this.timer.setup(stage)

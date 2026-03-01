@@ -1,4 +1,4 @@
-import { checkDeviceIsTouch, checkDeviceIsMobile } from './utils'
+import { checkDeviceIsMobile, checkDeviceIsTouch } from './utils'
 
 // export const APP_VERSION = import.meta.env.VITE_APP_VERSION
 // export const APP_VERSION = window.__APP_VERSION__
@@ -40,6 +40,7 @@ const mobileConfig = {
 const commonConfig = {
   appBackground: 0x545457,
   topSpeed: 150,
+  soundMutedByDefault: false,
 }
 
 export const gameConfig = Object.assign({}, isMobileDevice ? mobileConfig : desktopConfig, commonConfig, {
