@@ -1,7 +1,7 @@
 import { Assets, Container, Rectangle, Text, Ticker, type Application } from 'pixi.js'
 import { Cars } from './Cars'
 import { gameConfig } from './configuration'
-import { Controller } from './Controller'
+import { Controller } from './Controller/Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'

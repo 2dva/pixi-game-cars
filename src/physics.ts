@@ -1,4 +1,4 @@
-import type { ControllerState } from './Controller'
+import type { ControllerState } from './Controller/Controller'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'
 import { gameConfig } from './configuration'
 import type { State } from './state'

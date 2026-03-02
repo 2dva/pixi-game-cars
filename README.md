@@ -4,7 +4,7 @@
 Управление: w,a,s,d,space
 ## Демо
 https://pixi-game-cars.vercel.app/
-
+Работает на десктопе и смартфоне
 
 ## Запуск
 

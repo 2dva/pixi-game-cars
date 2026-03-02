@@ -9,3 +9,5 @@ export interface IMajorGameContainer extends Container {
 }
 
 export type BoundsLike = Partial<Bounds> & Pick<Bounds, 'left' | 'right' | 'top' | 'bottom'>
+
+export type DirectionKey = 'up' | 'left' | 'down' | 'right'
