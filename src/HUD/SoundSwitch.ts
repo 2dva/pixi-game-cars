@@ -1,5 +1,6 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
+import { Settings } from '../settings'
 import { Sound } from '../sound'
 
 export class SoundSwitch extends Container {
@@ -19,8 +20,15 @@ export class SoundSwitch extends Container {
   }
 
   setup(parent: Container) {
-    this.soundOn = !gameConfig.soundMutedByDefault
-    Howler.mute(!!gameConfig.soundMutedByDefault)
+    // сначала пробуем взять настройку из стораджа
+    let value = Settings.load('soundOn')
+    if (value === undefined) {
+      // затем значение по-умолчанию
+      value = !gameConfig.soundMutedByDefault
+    }
+    this.soundOn = Boolean(value)
+
+    Howler.mute(!this.soundOn)
 
     const POS_X = gameConfig.appWidth - 100
     const POS_Y = gameConfig.appHeight - 100
@@ -37,6 +45,7 @@ export class SoundSwitch extends Container {
       this.soundOn = !this.soundOn
       this.draw()
       Sound.mute(!this.soundOn)
+      Settings.save('soundOn', this.soundOn)
     })
     this.sprite = sprite
 
