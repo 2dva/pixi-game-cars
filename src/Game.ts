@@ -5,7 +5,7 @@ import { Controller } from './Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
-import { loadTranslations } from './i18n'
+import { loadTranslations, setMobileVersion } from './i18n'
 import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
 import { calculateNextMove } from './physics'
 import { Sound } from './sound'
@@ -44,6 +44,7 @@ export class Game {
     this.hero = new Hero()
     this.runEverySegment = useRunEverySegment(100)
 
+    setMobileVersion(gameConfig.isMobileDevice)
     app.renderer.addListener('resize', this.onResizeThrottled)
   }
 

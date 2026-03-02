@@ -78,7 +78,7 @@ export class Gauges extends Container {
   }
 
   draw(speed: number, distance: number) {
-    this.speed.text = `${Math.floor(speed)} kmh`
+    this.speed.text = `${Math.round(speed)} kmh`
     this.gear.text = calculateGear(speed)
     this.odo.text = `${formatDistance(distance, 7)} km`
   }

@@ -44,10 +44,10 @@ export function calculateNextMove(
 
   // Если препятствие впереди, не позволяем увеличивать скорость
   let deltaSpeed = 0
-  if (!obstacleAhead && keyUp) deltaSpeed = 1
+  if (!obstacleAhead && keyUp) deltaSpeed = gameConfig.heroAcceleration
   if (keyDown) deltaSpeed = -1.3 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
   if (keySpace) deltaSpeed = -2.5 * (speed > 25 ? Math.sqrt(speed) / 5 : 1)
-  speed += Math.floor(deltaSpeed)
+  speed += deltaSpeed
 
   // Если препятствие впереди, снижаем скорость
   if (obstacleAhead) {
@@ -55,7 +55,7 @@ export function calculateNextMove(
   }
 
   // Проверка чтобы не выйти за границу скорости
-  speed = Math.min(Math.max(speed, 0), gameConfig.topSpeed)
+  speed = Math.min(Math.max(speed, 0), gameConfig.heroTopSpeed)
 
   const offsetX = calculateHeroOffset(deltaX, speed)
 

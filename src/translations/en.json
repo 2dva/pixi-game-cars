@@ -9,7 +9,7 @@
     },
     "pauseScreen": {
       "pause": "Pause",
-      "pauseText": "You can write some text here"
+      "pauseText": "Take a rest and move on"
     },
     "endScreen": {
       "gameOver": "Game Over",
@@ -20,7 +20,9 @@
     },
     "blinkText": {
       "pressKeyToSelect": "Press the key to select game mode",
-      "pressSpaceToContinue": "Press space to continue"
+      "pressKeyToSelect_mobile": "Select game mode",
+      "pressSpaceToContinue": "Press space to continue",
+      "pressSpaceToContinue_mobile": "Tap to continue"
     }
   }
 }

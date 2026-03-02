@@ -21,6 +21,8 @@ const desktopConfig = {
   roadSidewalkWidth: 80,
 
   heroPositionYFromBottom: 160,
+  heroTopSpeed: 150,
+  heroAcceleration: 0.8,
 }
 
 const mobileConfig = {
@@ -34,12 +36,13 @@ const mobileConfig = {
   roadLeftGap: 30,
   roadSidewalkWidth: 50,
 
-  heroPositionYFromBottom: 280,
+  heroPositionYFromBottom: 320,
+  heroTopSpeed: 130,
+  heroAcceleration: 0.7,
 }
 
 const commonConfig = {
   appBackground: 0x545457,
-  topSpeed: 150,
   soundMutedByDefault: false,
 }
 

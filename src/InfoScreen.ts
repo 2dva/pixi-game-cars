@@ -97,6 +97,12 @@ export class InfoScreen extends Container {
       )
     }
 
+    if (gameConfig.isMobileDevice) {
+      this.eventMode = 'static'
+      this.on('pointerdown', this.doUserAction.bind(this, 'Space'))
+    }
+
+
     this.addChild(this.content)
     stage.addChild(this)
   }
