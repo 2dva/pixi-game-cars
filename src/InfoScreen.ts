@@ -4,7 +4,7 @@ import fontStyles from './fontStyles.json'
 import { tr } from './i18n'
 import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
-import { getTopResults } from './topScore'
+import { getTopScore, isRecordScore, saveMyScore } from './topScore'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
 import { Sound } from './sound'
 
@@ -31,6 +31,8 @@ export type ScreenEvent = {
   type: EventType
   mode?: GameMode
 }
+
+const DEFAULT_NAME = 'User'
 
 type FontStyleKey = keyof typeof fontStyles
 
@@ -73,13 +75,7 @@ export class InfoScreen extends Container {
       alpha: 0.25,
     })
     background
-      .roundRect(
-        gameConfig.screenContentPadding,
-        this.content.y,
-        this.contentWidth,
-        this.contentHeight,
-        10
-      )
+      .roundRect(gameConfig.screenContentPadding, this.content.y, this.contentWidth, this.contentHeight, 10)
       .fill({
         color: 0x000000,
         alpha: 0.5,
@@ -103,17 +99,22 @@ export class InfoScreen extends Container {
       this.on('pointerdown', this.doUserAction.bind(this, 'Space'))
     }
 
-
     this.addChild(this.content)
     stage.addChild(this)
   }
 
-  private buildTopScoreTable() {
-    const data = getTopResults()
-    let results = ''
+  private buildTopScoreTable(name: string, score: number = 0) {
+    const data = getTopScore()
+    let results = '',
+      highlightOnce = false
     for (let i = 0; i < Math.min(6, data.length); i++) {
-      const [name, score] = data[i]
-      results += String(name).padEnd(6) + '   ' + String(score).padStart(6, '0') + '\n'
+      const [n, s] = data[i]
+      let row = String(n).padEnd(6) + '   ' + String(s).padStart(6, '0') + '\n'
+      if (n === name && s === score && !highlightOnce) {
+        highlightOnce = true
+        row = `<b>${row}</b>`
+      }
+      results += row
     }
 
     return results
@@ -207,8 +208,16 @@ export class InfoScreen extends Container {
     this.screenMode = mode
     if (!this.ticker.started) this.ticker.start()
     let data: TemplateData = {}
-    if (mode === SCREEN_MODE.FINISH) data = { score: state.score, distance: formatDistance(state.distance) }
-    if (mode === SCREEN_MODE.TOP_SCORE) data = { topScore: this.buildTopScoreTable() }
+    if (mode === SCREEN_MODE.FINISH) {
+      const record = isRecordScore(state.score)
+      if (record) {
+        saveMyScore(DEFAULT_NAME, state.score)
+      }
+      data = { score: state.score, distance: formatDistance(state.distance), record }
+    }
+    if (mode === SCREEN_MODE.TOP_SCORE) {
+      data = { topScore: this.buildTopScoreTable(DEFAULT_NAME, state.score) }
+    }
     this.setupScreen(mode, data)
 
     if (mode === SCREEN_MODE.FINISH && state.score > 0) {
