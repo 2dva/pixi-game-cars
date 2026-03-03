@@ -188,8 +188,12 @@ export class Game {
     const carBounds = this.cars.getCarsBounds()
     const collision = calculateNextMove(this.state, this.controller.state, heroBounds, carBounds)
 
-    if (collision && !Sound.carHit.playing()) {
-      Sound.carHit.play()
+    if (collision && !Sound.carHit.playing() && !Sound.hitHard.playing()) {
+      if (collision.force > 3) {
+        Sound.hitHard.play()
+      } else {
+        Sound.carHit.play()
+      }
     }
 
     // apply collision effect on cars
@@ -214,8 +218,10 @@ export class Game {
       })
 
       if (timeLeft <= 0.0) {
+        Sound.finish.play()
         this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_TIME_IS_UP)
       } else if (health === 0) {
+        Sound.failed.play()
         this.switchMode(GAME_MODE.GAME_OVER, GAME_MODE_REASON.END_CRASHED)
       }
     }

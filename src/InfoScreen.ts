@@ -6,6 +6,7 @@ import screenConfig from './screenConfig.json'
 import { GAME_MODE, type GameMode, type State } from './state'
 import { getTopResults } from './topScore'
 import { applyTemplate, formatDistance, type TemplateData } from './utils'
+import { Sound } from './sound'
 
 type ScreenMode = keyof typeof screenConfig
 
@@ -223,6 +224,7 @@ export class InfoScreen extends Container {
   }
 
   private emitAndHide(type: EventType, mode?: GameMode) {
+    Sound.tap.play()
     this.hide()
     this.emit(screenEventName, {
       type,

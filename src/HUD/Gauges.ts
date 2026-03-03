@@ -80,6 +80,7 @@ export class Gauges extends Container {
   draw(speed: number, distance: number) {
     this.speed.text = `${Math.round(speed)} kmh`
     this.gear.text = calculateGear(speed)
-    this.odo.text = `${formatDistance(distance, 7)} km`
+    // eslint-disable-next-line no-irregular-whitespace
+    this.odo.text = `${formatDistance(distance, 7)} km`
   }
 }

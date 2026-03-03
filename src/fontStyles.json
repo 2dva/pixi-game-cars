@@ -35,7 +35,7 @@
   },
   "fontGaugesOdometer": {
     "fontFamily": "alarm clock, Arial",
-    "fontSize": 16,
+    "fontSize": 20,
     "fill": "#ffffff",
     "stroke": "#000000"
   },
