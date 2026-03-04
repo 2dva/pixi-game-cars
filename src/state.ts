@@ -42,7 +42,7 @@ export const defaultState: State = {
   deltaSpeed: 0,
   distance: 0,
   deltaDistance: 0,
-  timeLeft: 60,
+  timeLeft: 6,
   deltaX: 0,
   health: 100,
   crash: false,

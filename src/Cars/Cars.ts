@@ -1,10 +1,10 @@
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
-import { type CollisionObject } from './lib/collision'
-import { gameConfig } from './configuration'
-import type { State } from './state'
-import type { IMajorGameContainer } from './types'
-import { type BoundsLike } from './types'
-import { rollDice, rollDiceBool } from './utils'
+import { type CollisionObject } from '../lib/collision'
+import { gameConfig } from '../configuration'
+import type { State } from '../state'
+import type { IMajorGameContainer } from '../types'
+import { type BoundsLike } from '../types'
+import { rollDice, rollDiceBool } from '../utils'
 
 // Cars configuration
 const TRAFFIC_DENSITY = 5 // 1 to n (per 1 sec for free lane)

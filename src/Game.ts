@@ -1,5 +1,5 @@
 import { Assets, Container, Rectangle, Text, Ticker, type Application } from 'pixi.js'
-import { Cars } from './Cars'
+import { Cars } from './Cars/Cars'
 import { gameConfig } from './configuration'
 import { Controller } from './Controller/Controller'
 import fontStyles from './fontStyles.json'
@@ -8,12 +8,12 @@ import { HUD } from './HUD/HUD'
 import { loadTranslations, setMobileVersion } from './lib/i18n'
 import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
-import { ScreenFactory, screenFactoryEvent } from './Screen/ScreenFactory'
+import { SCREEN_MODE } from './Screen/Screen'
+import { ScreenFactory, screenGameModeEvent, screenUnpauseEvent } from './Screen/ScreenFactory'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
-import { EVENT_TYPE, SCREEN_MODE, type ScreenEvent } from './Screen/Screen'
 
 export class Game {
   private app: Application
@@ -82,17 +82,12 @@ export class Game {
     await this.preloadAssets()
 
     this.controller.setup(stage)
-    this.screenFactory.setup(stage)
     this.terrain.setup(stage)
     this.cars.setup(stage)
     this.hero.setup(stage)
     this.hud.setup(stage)
-
-    this.screenFactory.on(screenFactoryEvent, (event: ScreenEvent) => {
-      this.controller.reset()
-      if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode!)
-      else if (event.type === EVENT_TYPE.UNPAUSE_GAME) this.state.paused = false
-    })
+    this.screenFactory.setup(stage)
+    this.screenFactory.on(screenGameModeEvent, this.switchMode, this)
 
     this.onResize()
   }
@@ -115,6 +110,8 @@ export class Game {
   }
 
   switchMode(mode: GameMode, modeReason: GameModeReason = GAME_MODE_REASON.NO_REASON) {
+    this.controller.reset()
+
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
       this.state.modeReason = modeReason
@@ -157,6 +154,9 @@ export class Game {
     if (keyOther === 'KeyP') {
       this.state.paused = true
       this.screenFactory.show(SCREEN_MODE.PAUSE, this.state)
+      this.screenFactory.once(screenUnpauseEvent, () => {
+        this.state.paused = false
+      })
       stopCurrentUpdate = true
     }
     return stopCurrentUpdate

@@ -29,7 +29,8 @@ export type EventType = (typeof EVENT_TYPE)[keyof typeof EVENT_TYPE]
 
 export type ScreenEvent = {
   type: EventType
-  mode?: GameMode
+  gameMode?: GameMode
+  screenMode?: ScreenMode
 }
 
 type FontStyleKey = keyof typeof fontStyles
@@ -135,8 +136,8 @@ export abstract class Screen extends EventEmitter {
     this.doUserAction(keyCode)
   }
 
-  fire(type: EventType, mode?: GameMode | ScreenMode) {
-    this.emit(screenSingleEvent, type, mode)
+  fire(type: EventType, gameMode?: GameMode, screenMode?: ScreenMode) {
+    this.emit(screenSingleEvent, { type, gameMode, screenMode } as ScreenEvent)
   }
 
   destroy(): void {

@@ -25,7 +25,7 @@ export class ScreenFinish extends Screen {
   onAfterSetup(state: State) {
     if (state.score > 0) {
       this.timer = setTimeout(() => {
-        this.fire(EVENT_TYPE.GO_TO_SCREEN, SCREEN_MODE.TOP_SCORE)
+        this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.TOP_SCORE)
       }, 2000)
     }
   }

@@ -1,16 +1,19 @@
-import { Container, Graphics, Text, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
+import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
-import { type GameMode, type State } from '../state'
-import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type EventType, type Screen, type ScreenMode } from './Screen'
+import { type State } from '../state'
+import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
 import { ScreenFailure } from './ScreenFailure'
 import { ScreenFinish } from './ScreenFinish'
 import { ScreenPause } from './ScreenPause'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
 
-const createScreenInstance = (mode: ScreenMode): Screen => {
+export const screenGameModeEvent = 'screenGameModeEvent'
+export const screenUnpauseEvent = 'screenUnpauseEvent'
+
+export const createScreenInstance = (mode: ScreenMode): Screen => {
   switch (mode) {
     case SCREEN_MODE.START:
       return new ScreenStart()
@@ -28,32 +31,23 @@ const createScreenInstance = (mode: ScreenMode): Screen => {
   }
 }
 
-export const screenFactoryEvent = 'screenFactoryEvent'
-
 export class ScreenFactory extends Container {
-  content: Container
-  screenMode: ScreenMode | null
-  contentWidth!: number
-  contentHeight!: number
-  currentScreen: Screen | null = null
-  event: CustomEvent
+  private contentArea = new Container()
+  private currentScreen: Screen | null = null
 
   constructor() {
-    super()
-    this.content = new Container()
-    this.zIndex = zIndexFixed.splashScreens
-    this.event = new CustomEvent(screenFactoryEvent)
-    this.screenMode = null
+    super({
+      zIndex: zIndexFixed.splashScreens,
+    })
   }
 
   async preloadAssets() {}
 
   setup(stage: Container) {
-    this.contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
-    this.contentHeight = gameConfig.screenContentHeight
-    this.content.x = gameConfig.screenContentPadding
-    this.content.y = (gameConfig.appHeight - this.contentHeight) / 2
-
+    const contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
+    const contentHeight = gameConfig.screenContentHeight
+    this.contentArea.x = gameConfig.screenContentPadding
+    this.contentArea.y = (gameConfig.appHeight - contentHeight) / 2
     this.visible = false
 
     const background = new Graphics()
@@ -61,12 +55,10 @@ export class ScreenFactory extends Container {
       color: 0x000000,
       alpha: 0.25,
     })
-    background
-      .roundRect(gameConfig.screenContentPadding, this.content.y, this.contentWidth, this.contentHeight, 10)
-      .fill({
-        color: 0x000000,
-        alpha: 0.5,
-      })
+    background.roundRect(gameConfig.screenContentPadding, this.contentArea.y, contentWidth, contentHeight, 10).fill({
+      color: 0x000000,
+      alpha: 0.5,
+    })
     this.addChild(background)
 
     if (gameConfig.appVersion) {
@@ -74,8 +66,8 @@ export class ScreenFactory extends Container {
         new Text({
           text: `v ${gameConfig.appVersion}`,
           style: fontStyles.fontScreenVersion as TextStyleOptions,
-          x: gameConfig.screenContentPadding + this.contentWidth - 5,
-          y: this.content.y + this.contentHeight - 3,
+          x: gameConfig.screenContentPadding + contentWidth - 5,
+          y: this.contentArea.y + contentHeight - 3,
           anchor: 1,
         })
       )
@@ -83,56 +75,39 @@ export class ScreenFactory extends Container {
 
     if (gameConfig.isMobileDevice) {
       this.eventMode = 'static'
-      this.on('pointerdown', this.onPoinerDown.bind(this)) // fixme: пернести обработчик
+      this.on('pointerdown', () => {
+        // fixme: пернести обработчик
+        this.currentScreen?.doUserAction('Space')
+      })
     }
 
-    this.addChild(this.content)
+    this.addChild(this.contentArea)
     stage.addChild(this)
   }
 
-  private onPoinerDown() {
-    this.currentScreen?.doUserAction('Space')
-  }
-
   show(mode: ScreenMode, state: State) {
-    if (this.visible && mode === this.screenMode) return
+    if (this.visible && mode === this.currentScreen?.screenId) return
 
-    // create Screen instance
-    this.currentScreen = createScreenInstance(mode)
-    this.currentScreen.setup(this.content, state)
-    this.currentScreen.on(screenSingleEvent, (type: EventType, mode?: GameMode | ScreenMode) => {
+    this.currentScreen = createScreenInstance(mode) // create Screen instance
+    this.currentScreen.setup(this.contentArea, state)
+    this.currentScreen.on(screenSingleEvent, (event: ScreenEvent) => {
+      this.visible = false
       this.currentScreen?.destroy()
-      this.screenMode = null
-      switch (type) {
+      switch (event.type) {
         case EVENT_TYPE.SELECT_GAME_MODE:
+          Sound.tap.play()
+          this.emit(screenGameModeEvent, event.gameMode)
+          break
         case EVENT_TYPE.UNPAUSE_GAME:
           Sound.tap.play()
-          this.emitAndHide(type, mode as GameMode)
+          this.emit(screenUnpauseEvent)
           break
         case EVENT_TYPE.GO_TO_SCREEN:
-          this.show(mode as ScreenMode, state)
+          this.show(event.screenMode!, state)
           break
       }
     })
 
-    this.screenMode = mode
     this.visible = true
-  }
-
-  private emitAndHide(type: EventType, mode?: GameMode) {
-    this.hide()
-    this.emit(screenFactoryEvent, {
-      type,
-      mode,
-    })
-  }
-
-  private hide() {
-    this.visible = false
-  }
-
-  destroy(options?: DestroyOptions): void {
-    this.removeChildren()
-    super.destroy(options)
   }
 }
