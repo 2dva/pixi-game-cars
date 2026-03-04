@@ -4,7 +4,7 @@ import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
 export class ScreenStart extends Screen {
   screenId: ScreenMode = 'startScreen'
 
-  doUserAction(keyCode: string) {
+  onUserAction(keyCode: string) {
     if (keyCode === 'Digit1') {
       this.fire(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.FREE_RIDE)
     } else if (keyCode === 'Digit2') {

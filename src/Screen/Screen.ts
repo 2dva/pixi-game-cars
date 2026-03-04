@@ -71,8 +71,10 @@ export abstract class Screen extends EventEmitter {
     }, 400)
   }
 
-  doUserAction(_keyCode: string) {}
+  onUserAction(_keyCode: string) {}
+
   protected onAfterSetup(_state: State) {}
+
   protected setupData(_state: State): TemplateData {
     return {}
   }
@@ -94,7 +96,7 @@ export abstract class Screen extends EventEmitter {
       if ('clickAction' in textObj) {
         txt.eventMode = 'static'
         txt.cursor = 'pointer'
-        txt.on('pointerdown', this.doUserAction.bind(this, textObj.clickAction!))
+        txt.on('pointerdown', this.onUserAction.bind(this, textObj.clickAction!))
       }
 
       txtFields.push(txt)
@@ -133,7 +135,7 @@ export abstract class Screen extends EventEmitter {
 
   private keydownHandler(event: KeyboardEvent) {
     const keyCode = event.code
-    this.doUserAction(keyCode)
+    this.onUserAction(keyCode)
   }
 
   fire(type: EventType, gameMode?: GameMode, screenMode?: ScreenMode) {

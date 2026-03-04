@@ -11,7 +11,8 @@ import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
-export const screenUnpauseEvent = 'screenUnpauseEvent'
+export const screenShowEvent = 'screenShowEvent'
+export const screenCloseEvent = 'screenCloseEvent'
 
 export const createScreenInstance = (mode: ScreenMode): Screen => {
   switch (mode) {
@@ -77,7 +78,7 @@ export class ScreenFactory extends Container {
       this.eventMode = 'static'
       this.on('pointerdown', () => {
         // fixme: пернести обработчик
-        this.currentScreen?.doUserAction('Space')
+        this.currentScreen?.onUserAction('Space')
       })
     }
 
@@ -87,12 +88,16 @@ export class ScreenFactory extends Container {
 
   show(mode: ScreenMode, state: State) {
     if (this.visible && mode === this.currentScreen?.screenId) return
+    this.currentScreen?.destroy() // in case it's not destroyed yet
 
+    this.emit(screenShowEvent)
     this.currentScreen = createScreenInstance(mode) // create Screen instance
     this.currentScreen.setup(this.contentArea, state)
     this.currentScreen.on(screenSingleEvent, (event: ScreenEvent) => {
       this.visible = false
       this.currentScreen?.destroy()
+      this.currentScreen = null
+      this.emit(screenCloseEvent)
       switch (event.type) {
         case EVENT_TYPE.SELECT_GAME_MODE:
           Sound.tap.play()
@@ -100,7 +105,6 @@ export class ScreenFactory extends Container {
           break
         case EVENT_TYPE.UNPAUSE_GAME:
           Sound.tap.play()
-          this.emit(screenUnpauseEvent)
           break
         case EVENT_TYPE.GO_TO_SCREEN:
           this.show(event.screenMode!, state)

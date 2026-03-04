@@ -15,12 +15,20 @@
       "gameOver": "Game Over",
       "carIsBroken": "Car Broken",
       "timeIsUp": "Time is up",
-      "youGainScores": "You traveled ${distance}km and scored <b>${score}</b> points",
-      "topScore": "Top score"
+      "youGainScores": "You traveled ${distance}km and scored <b>${score}</b> points"
+    },
+    "scoreScreen": {
+      "topScore": "Top score",
+      "newRecord": "A new record!",
+      "enterYourName": "Enter your name",
+      "inputConstraint": "Up to 6 chars, latin letters, digits, _",
+      "ok": "OK"
     },
     "blinkText": {
       "pressKeyToSelect": "Press the key to select game mode",
       "pressKeyToSelect_mobile": "Select game mode",
+      "pressPToContinue": "Press P to continue",
+      "pressPToContinue_mobile": "Tap to continue",
       "pressSpaceToContinue": "Press space to continue",
       "pressSpaceToContinue_mobile": "Tap to continue"
     }

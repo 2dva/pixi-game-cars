@@ -8,8 +8,8 @@ import { HUD } from './HUD/HUD'
 import { loadTranslations, setMobileVersion } from './lib/i18n'
 import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
-import { SCREEN_MODE } from './Screen/Screen'
-import { ScreenFactory, screenGameModeEvent, screenUnpauseEvent } from './Screen/ScreenFactory'
+import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
+import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
@@ -88,6 +88,14 @@ export class Game {
     this.hud.setup(stage)
     this.screenFactory.setup(stage)
     this.screenFactory.on(screenGameModeEvent, this.switchMode, this)
+    this.screenFactory.on(screenShowEvent, () => {
+      this.controller.disabled = true
+    })
+    this.screenFactory.on(screenCloseEvent, () => {
+      this.controller.reset()
+      this.controller.disabled = false
+      this.state.paused = false
+    })
 
     this.onResize()
   }
@@ -109,31 +117,30 @@ export class Game {
     this.ticker.add(this.updateOnTick, this)
   }
 
+  showScreen(mode: ScreenMode) {
+    this.screenFactory.show(mode, this.state)
+  }
+
   switchMode(mode: GameMode, modeReason: GameModeReason = GAME_MODE_REASON.NO_REASON) {
     this.controller.reset()
 
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
       this.state.modeReason = modeReason
-      this.screenFactory.show(
-        modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE,
-        this.state
-      )
+      this.showScreen(modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE)
       this.state.speed = 0
-      this.controller.disabled = true
       return
     }
 
     const isDemo = mode === GAME_MODE.DEMO
 
     if (isDemo) {
-      this.screenFactory.show(SCREEN_MODE.START, this.state)
+      this.showScreen(SCREEN_MODE.START)
     }
 
     this.initState()
     this.state.mode = mode
     this.state.speed = isDemo ? 15 : 0
-    this.controller.disabled = isDemo
 
     this.terrain.reset()
     this.cars.reset()
@@ -153,10 +160,7 @@ export class Game {
 
     if (keyOther === 'KeyP') {
       this.state.paused = true
-      this.screenFactory.show(SCREEN_MODE.PAUSE, this.state)
-      this.screenFactory.once(screenUnpauseEvent, () => {
-        this.state.paused = false
-      })
+      this.showScreen(SCREEN_MODE.PAUSE)
       stopCurrentUpdate = true
     }
     return stopCurrentUpdate

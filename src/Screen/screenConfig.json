@@ -33,7 +33,7 @@
   },
   "pauseScreen": {
     "titleText": "pauseScreen.pause",
-    "blinkText": "blinkText.pressSpaceToContinue",
+    "blinkText": "blinkText.pressPToContinue",
     "content": [
       {
         "text": "pauseScreen.pauseText",

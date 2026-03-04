@@ -19,7 +19,7 @@
     },
     "scoreScreen": {
       "topScore": "Лучшие результаты",
-      "newRecord": "Новый рекорд",
+      "newRecord": "Новый рекорд!",
       "enterYourName": "Введи свое имя",
       "inputConstraint": "До 6 символов, латиница, цифры, _",
       "ok": "OK"
@@ -27,6 +27,8 @@
     "blinkText": {
       "pressKeyToSelect": "Нажми клавишу для выбора режима",
       "pressKeyToSelect_mobile": "Выбери режим игры",
+      "pressPToContinue": "Нажми P чтобы продолжить",
+      "pressPToContinue_mobile": "Нажми чтобы продолжить",
       "pressSpaceToContinue": "Нажми пробел чтобы продолжить",
       "pressSpaceToContinue_mobile": "Нажми чтобы продолжить"
     }

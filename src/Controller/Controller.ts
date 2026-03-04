@@ -100,6 +100,8 @@ export class Controller {
   }
 
   private keydownHandler(event: KeyboardEvent) {
+    if (this.disabled) return
+
     const key = keyMap[event.code] || 'other'
 
     // Toggle on the key pressed state.

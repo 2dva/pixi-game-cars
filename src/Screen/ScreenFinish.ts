@@ -8,7 +8,7 @@ const DEFAULT_NAME = 'User'
 export class ScreenFinish extends Screen {
   screenId: ScreenMode = 'endScreenTimeIsUp'
 
-  doUserAction(keyCode: string) {
+  onUserAction(keyCode: string) {
     if (keyCode === 'Space') {
       this.fire(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.DEMO)
     }
