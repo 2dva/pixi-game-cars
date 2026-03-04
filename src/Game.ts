@@ -5,14 +5,15 @@ import { Controller } from './Controller/Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
-import { loadTranslations, setMobileVersion } from './i18n'
-import { EVENT_TYPE, InfoScreen, SCREEN_MODE, screenEventName, type ScreenEvent } from './InfoScreen'
-import { calculateNextMove } from './physics'
-import { Sound } from './sound'
+import { loadTranslations, setMobileVersion } from './lib/i18n'
+import { calculateNextMove } from './lib/physics'
+import { Sound } from './lib/sound'
+import { ScreenFactory, screenFactoryEvent } from './Screen/ScreenFactory'
 import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
 import { Terrain } from './Terrain/Terrain'
 import type { BoundsLike } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
+import { EVENT_TYPE, SCREEN_MODE, type ScreenEvent } from './Screen/Screen'
 
 export class Game {
   private app: Application
@@ -25,7 +26,7 @@ export class Game {
   private cars: Cars
   private hud: HUD
   private terrain: Terrain
-  private infoScreen: InfoScreen
+  private screenFactory: ScreenFactory
   private runEverySegment: RunEverySegment
   private onResizeThrottled = throttle(this.onResize.bind(this), 300)
 
@@ -35,7 +36,7 @@ export class Game {
     this.rootContainer = app.canvas.parentElement!
     this.stage = app.stage
     this.ticker = app.ticker
-    this.infoScreen = new InfoScreen()
+    this.screenFactory = new ScreenFactory()
     this.controller = new Controller()
     this.terrain = new Terrain(app.renderer)
     this.hud = new HUD()
@@ -81,13 +82,13 @@ export class Game {
     await this.preloadAssets()
 
     this.controller.setup(stage)
-    this.infoScreen.setup(stage)
+    this.screenFactory.setup(stage)
     this.terrain.setup(stage)
     this.cars.setup(stage)
     this.hero.setup(stage)
     this.hud.setup(stage)
 
-    this.infoScreen.on(screenEventName, (event: ScreenEvent) => {
+    this.screenFactory.on(screenFactoryEvent, (event: ScreenEvent) => {
       this.controller.reset()
       if (event.type === EVENT_TYPE.SELECT_GAME_MODE) this.switchMode(event.mode!)
       else if (event.type === EVENT_TYPE.UNPAUSE_GAME) this.state.paused = false
@@ -117,7 +118,7 @@ export class Game {
     if (mode === GAME_MODE.GAME_OVER) {
       this.state.mode = mode
       this.state.modeReason = modeReason
-      this.infoScreen.show(
+      this.screenFactory.show(
         modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE,
         this.state
       )
@@ -129,7 +130,7 @@ export class Game {
     const isDemo = mode === GAME_MODE.DEMO
 
     if (isDemo) {
-      this.infoScreen.show(SCREEN_MODE.START, this.state)
+      this.screenFactory.show(SCREEN_MODE.START, this.state)
     }
 
     this.initState()
@@ -155,7 +156,7 @@ export class Game {
 
     if (keyOther === 'KeyP') {
       this.state.paused = true
-      this.infoScreen.show(SCREEN_MODE.PAUSE, this.state)
+      this.screenFactory.show(SCREEN_MODE.PAUSE, this.state)
       stopCurrentUpdate = true
     }
     return stopCurrentUpdate
@@ -166,9 +167,11 @@ export class Game {
 
     if (claimed) Sound.pickCoin.play()
 
-    this.runEverySegment(this.state.deltaDistance, () => {
-      claimed += 10 // 10 очков за каждые 100 метров дороги
-    })
+    if (this.state.mode !== GAME_MODE.DEMO) {
+      this.runEverySegment(this.state.deltaDistance, () => {
+        claimed += 10 // 10 очков за каждые 100 метров дороги
+      })
+    }
 
     Object.assign(this.state, {
       score: this.state.score + claimed,

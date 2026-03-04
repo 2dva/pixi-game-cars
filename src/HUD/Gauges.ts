@@ -1,7 +1,7 @@
 import { BitmapText, Container, Graphics } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
-import { calculateGear } from '../physics'
+import { calculateGear } from '../lib/physics'
 import { formatDistance } from '../utils'
 
 export class Gauges extends Container {

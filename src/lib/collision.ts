@@ -1,5 +1,5 @@
-import { gameConfig } from './configuration'
-import type { BoundsLike } from './types'
+import { gameConfig } from '../configuration'
+import type { BoundsLike } from '../types'
 
 export type CollisionDirection = 'head' | 'back' | 'left' | 'right'
 export type CollisionObject = {

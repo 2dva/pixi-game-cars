@@ -9,7 +9,7 @@ export function setMobileVersion(isMobile: boolean) {
 }
 
 export async function loadTranslations(locale: string = i18n.locale) {
-  const translations = await import(`./translations/${locale}.json`)
+  const translations = await import(`../translations/${locale}.json`)
   i18n.store(translations)
 }
 

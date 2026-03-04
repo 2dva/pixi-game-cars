@@ -1,8 +1,8 @@
-import type { ControllerState } from './Controller/Controller'
+import type { ControllerState } from '../Controller/Controller'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'
-import { gameConfig } from './configuration'
-import type { State } from './state'
-import { type BoundsLike } from './types'
+import { gameConfig } from '../configuration'
+import type { State } from '../state'
+import { type BoundsLike } from '../types'
 
 function calculateHeroOffset(delta: number, speed: number) {
   return delta * ((speed * 12) / (speed * 10 + 200))

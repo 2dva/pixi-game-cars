@@ -1,5 +1,5 @@
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
-import { type CollisionObject } from './collision'
+import { type CollisionObject } from './lib/collision'
 import { gameConfig } from './configuration'
 import type { State } from './state'
 import type { IMajorGameContainer } from './types'

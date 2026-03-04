@@ -13,7 +13,9 @@ const desktopConfig = {
   appWidth: 740,
   appHeight: 600,
   stagePadding: 120,
+
   screenContentPadding: 125,
+  screenContentHeight: 350,
 
   roadLaneCount: 5,
   roadLaneWidth: 100,
@@ -29,7 +31,9 @@ const mobileConfig = {
   appWidth: 720,
   appHeight: 1280,
   stagePadding: 120,
+
   screenContentPadding: 63,
+  screenContentHeight: 350,
 
   roadLaneCount: 4,
   roadLaneWidth: 130,
@@ -60,6 +64,6 @@ export const zIndexFixed = {
   cars: 3,
   flyingObjects: 4,
   hud: 5,
-  infoScreens: 6,
+  splashScreens: 6,
   interactives: 7,
 }

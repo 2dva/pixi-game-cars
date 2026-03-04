@@ -15,8 +15,14 @@
       "gameOver": "Игра закончена",
       "carIsBroken": "Машина разбилась",
       "timeIsUp": "Время вышло",
-      "youGainScores": "Ты проехал ${distance}км и набрал <b>${score}</b> очков",
-      "topScore": "Лучшие результаты"
+      "youGainScores": "Ты проехал ${distance}км и набрал <b>${score}</b> очков"
+    },
+    "scoreScreen": {
+      "topScore": "Лучшие результаты",
+      "newRecord": "Новый рекорд",
+      "enterYourName": "Введи свое имя",
+      "inputConstraint": "До 6 символов, латиница, цифры, _",
+      "ok": "OK"
     },
     "blinkText": {
       "pressKeyToSelect": "Нажми клавишу для выбора режима",

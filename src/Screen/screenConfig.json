@@ -70,8 +70,21 @@
       }
     ]
   },
+  "inputNameScreen": {
+    "titleText": "scoreScreen.newRecord",
+    "blinkText": "scoreScreen.enterYourName",
+    "content": [
+      {
+        "text": "scoreScreen.enterYourName",
+        "style": "fontScreenPrimary",
+        "x": 0,
+        "y": 140,
+        "center": true
+      }
+    ]
+  },
   "endScreenTopScore": {
-    "titleText": "endScreen.topScore",
+    "titleText": "scoreScreen.topScore",
     "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {

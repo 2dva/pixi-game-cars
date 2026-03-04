@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite } from 'pixi.js'
 import { GifSource, GifSprite } from 'pixi.js/gif'
-import { checkCollisionWithObject } from '../collision'
+import { checkCollisionWithObject } from '../lib/collision'
 import { gameConfig } from '../configuration'
 import type { BoundsLike } from '../types'
 import { rollDiceBool } from '../utils'

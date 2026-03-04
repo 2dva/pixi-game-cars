@@ -1,7 +1,7 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
-import { Settings } from '../settings'
-import { Sound } from '../sound'
+import { Settings } from '../lib/settings'
+import { Sound } from '../lib/sound'
 
 export class SoundSwitch extends Container {
   soundOn = false

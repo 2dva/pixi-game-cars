@@ -1,12 +1,12 @@
 import { Container, Graphics, Text, Ticker, type DestroyOptions, type TextStyleOptions } from 'pixi.js'
-import { gameConfig, zIndexFixed } from './configuration'
-import fontStyles from './fontStyles.json'
-import { tr } from './i18n'
+import { gameConfig, zIndexFixed } from '../configuration'
+import fontStyles from '../fontStyles.json'
+import { tr } from '../lib/i18n'
 import screenConfig from './screenConfig.json'
-import { GAME_MODE, type GameMode, type State } from './state'
-import { getTopScore, isRecordScore, saveMyScore } from './topScore'
-import { applyTemplate, formatDistance, type TemplateData } from './utils'
-import { Sound } from './sound'
+import { GAME_MODE, type GameMode, type State } from '../state'
+import { getTopScore, isRecordScore, saveMyScore } from '../lib/topScore'
+import { applyTemplate, formatDistance, type TemplateData } from '../utils'
+import { Sound } from '../lib/sound'
 
 type ScreenMode = keyof typeof screenConfig
 
@@ -15,6 +15,7 @@ export const SCREEN_MODE: Record<string, ScreenMode> = {
   PAUSE: 'pauseScreen',
   FAILURE: 'endScreenCrashed',
   FINISH: 'endScreenTimeIsUp',
+  INPUT_NAME: 'inputNameScreen',
   TOP_SCORE: 'endScreenTopScore',
 } as const
 
@@ -50,7 +51,7 @@ export class InfoScreen extends Container {
   constructor() {
     super()
     this.content = new Container()
-    this.zIndex = zIndexFixed.infoScreens
+    this.zIndex = zIndexFixed.splashScreens
     this.ticker = new Ticker()
     this.elapsedSeconds = 0
     this.blinkText = new Text()
