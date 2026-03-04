@@ -7,6 +7,15 @@
       "mode2_collectIn60Seconds": "2 - Собрать за 60 секунд",
       "youHaveAMinute": "У тебя есть минута чтобы набрать очки"
     },
+    "keyboardScreen": {
+      "keys": "Клавиши",
+      "control1": "управление 1",
+      "control2": "управление 2",
+      "space": "Пробел",
+      "break": "ручной тормоз",
+      "pause": "пауза",
+      "exitToMenu": "выход в меню"
+    },
     "pauseScreen": {
       "pause": "Пауза",
       "pauseText": "Подождем, и дальше поедем..."

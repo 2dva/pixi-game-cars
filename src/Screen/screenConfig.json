@@ -94,5 +94,17 @@
         "y": 80
       }
     ]
+  },
+  "keyboardScreen": {
+    "titleText": "keyboardScreen.keys",
+    "blinkText": "blinkText.pressSpaceToContinue",
+    "content": [
+      {
+        "text": "${controls}",
+        "style": "fontScreenMonoSmall",
+        "x": 60,
+        "y": 100
+      }
+    ]
   }
 }

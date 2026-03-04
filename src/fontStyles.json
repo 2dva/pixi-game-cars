@@ -85,6 +85,13 @@
       }
     }
   },
+  "fontScreenMonoSmall": {
+    "fontFamily": "Courier New, monospace",
+    "fontSize": 21,
+    "fill": "#eeeeee",
+    "letterSpacing": 2,
+    "lineHeight": 28
+  },
   "fontScreenBlink": {
     "fontFamily": "Arial",
     "fontSize": 18,

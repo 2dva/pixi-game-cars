@@ -15,6 +15,7 @@ export const SCREEN_MODE: Record<string, ScreenMode> = {
   FINISH: 'endScreenTimeIsUp',
   INPUT_NAME: 'inputNameScreen',
   TOP_SCORE: 'endScreenTopScore',
+  KEYBOARD: 'keyboardScreen',
 } as const
 
 export const screenSingleEvent = 'screenSingleEvent'

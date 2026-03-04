@@ -9,6 +9,7 @@ import { ScreenFinish } from './ScreenFinish'
 import { ScreenPause } from './ScreenPause'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
+import { ScreenKeyboard } from './ScreenKeyboard'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
@@ -18,17 +19,19 @@ export const createScreenInstance = (mode: ScreenMode): Screen => {
   switch (mode) {
     case SCREEN_MODE.START:
       return new ScreenStart()
+    case SCREEN_MODE.KEYBOARD:
+      return new ScreenKeyboard()
     case SCREEN_MODE.FAILURE:
       return new ScreenFailure()
     case SCREEN_MODE.FINISH:
       return new ScreenFinish()
-    case SCREEN_MODE.TOP_SCORE:
-      return new ScreenTopScore()
     case SCREEN_MODE.INPUT_NAME:
       return new ScreenPause()
     case SCREEN_MODE.PAUSE:
-    default:
       return new ScreenPause()
+    case SCREEN_MODE.TOP_SCORE:
+    default:
+      return new ScreenTopScore()
   }
 }
 
