@@ -1,14 +1,15 @@
-import type { ControllerState } from '../Controller/Controller'
-import { checkCollisionWithCar, checkObstacleAhead } from './collision'
 import { gameConfig } from '../configuration'
-import type { State } from '../state'
+import type { ControllerState } from '../Controller/Controller'
+import { setNextMove } from '../state/actions'
+import { store } from '../state/store'
 import { type BoundsLike } from '../types'
+import { checkCollisionWithCar, checkObstacleAhead } from './collision'
 
 function calculateHeroOffset(delta: number, speed: number) {
   return delta * ((speed * 12) / (speed * 10 + 200))
 }
 
-function calculateDistanceBySpeed(speed: number) {
+export function calculateDistanceBySpeed(speed: number) {
   return speed * 0.01
 }
 
@@ -20,12 +21,11 @@ export function calculateGear(speed: number) {
 }
 
 export function calculateNextMove(
-  state: State,
   controllerState: ControllerState,
   heroBounds: BoundsLike,
   carBounds: Map<number, BoundsLike>
 ) {
-  let { speed, distance } = state
+  let { speed } = store.getState()
   const { keyUp, keyDown, keyLeft, keyRight, keySpace } = controllerState
 
   // Проверяем препятствие впереди перед изменением скорости
@@ -77,17 +77,8 @@ export function calculateNextMove(
   }
 
   if (crash) deltaX = deltaX * 0.6
-  const deltaDistance = calculateDistanceBySpeed(speed)
-  distance += deltaDistance
 
-  Object.assign(state, {
-    speed,
-    deltaSpeed,
-    distance,
-    deltaDistance,
-    deltaX,
-    crash,
-  })
+  store.dispatch(setNextMove(speed, deltaSpeed, deltaX, crash))
 
   return collision
 }

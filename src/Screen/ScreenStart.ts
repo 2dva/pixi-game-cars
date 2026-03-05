@@ -1,5 +1,6 @@
 import { gameConfig } from '../configuration'
-import { GAME_MODE, type State } from '../state'
+import { type State } from '../state/state'
+import { GAME_MODE } from '../types'
 import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
 
 export class ScreenStart extends Screen {

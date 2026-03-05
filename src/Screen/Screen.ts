@@ -1,10 +1,11 @@
 import { Container, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
+import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
-import { type GameMode, type State } from '../state'
+import { type State } from '../state/state'
+import { type GameMode } from '../types'
 import { applyTemplate, type TemplateData } from '../utils'
 import screenConfig from './screenConfig.json'
-import { gameConfig } from '../configuration'
 
 export type ScreenMode = keyof typeof screenConfig
 

@@ -2,11 +2,12 @@ import { Assets, Container, Sprite, Text, Texture, type Renderer } from 'pixi.js
 import { GifSprite } from 'pixi.js/gif'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
-import type { State } from '../state'
+import type { State } from '../state/state'
 import type { BoundsLike, IMajorGameContainer } from '../types'
 import { rollDiceBool, useRunEverySegment, type RunEverySegment } from '../utils'
 import { ClaimableObjects } from './ClaimableObjects'
 import { Road } from './Road'
+import { store } from '../state/store'
 
 const terrainAssets = [
   { alias: 'tree01', src: 'terrain/tree01.png' },
@@ -62,7 +63,8 @@ export class Terrain extends Container implements IMajorGameContainer {
     this.claimable.reset()
   }
 
-  draw({ speed, deltaDistance }: State) {
+  draw() {
+    const { speed, deltaDistance }: State = store.getState()
     this.road.draw(speed)
     this.claimable.draw(speed)
 

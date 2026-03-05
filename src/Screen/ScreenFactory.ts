@@ -2,14 +2,14 @@ import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
-import { type State } from '../state'
+import { store } from '../state/store'
 import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
 import { ScreenFailure } from './ScreenFailure'
 import { ScreenFinish } from './ScreenFinish'
+import { ScreenKeyboard } from './ScreenKeyboard'
 import { ScreenPause } from './ScreenPause'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
-import { ScreenKeyboard } from './ScreenKeyboard'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
@@ -89,10 +89,11 @@ export class ScreenFactory extends Container {
     stage.addChild(this)
   }
 
-  show(mode: ScreenMode, state: State) {
+  show(mode: ScreenMode) {
     if (this.visible && mode === this.currentScreen?.screenId) return
     this.currentScreen?.destroy() // in case it's not destroyed yet
 
+    const state = store.getState()
     this.emit(screenShowEvent)
     this.currentScreen = createScreenInstance(mode) // create Screen instance
     this.currentScreen.setup(this.contentArea, state)
@@ -110,7 +111,7 @@ export class ScreenFactory extends Container {
           Sound.tap.play()
           break
         case EVENT_TYPE.GO_TO_SCREEN:
-          this.show(event.screenMode!, state)
+          this.show(event.screenMode!)
           break
       }
     })

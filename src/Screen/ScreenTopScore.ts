@@ -1,5 +1,6 @@
 import { getTopScore } from '../lib/topScore'
-import { GAME_MODE, type State } from '../state'
+import { type State } from '../state/state'
+import { GAME_MODE } from '../types'
 import type { TemplateData } from '../utils'
 import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
 
