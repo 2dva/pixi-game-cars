@@ -2,7 +2,7 @@ import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
-import { store } from '../state/store'
+import { getStateHero } from '../state/store'
 import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
 import { ScreenFailure } from './ScreenFailure'
 import { ScreenFinish } from './ScreenFinish'
@@ -93,7 +93,7 @@ export class ScreenFactory extends Container {
     if (this.visible && mode === this.currentScreen?.screenId) return
     this.currentScreen?.destroy() // in case it's not destroyed yet
 
-    const state = store.getState()
+    const state = getStateHero()
     this.emit(screenShowEvent)
     this.currentScreen = createScreenInstance(mode) // create Screen instance
     this.currentScreen.setup(this.contentArea, state)

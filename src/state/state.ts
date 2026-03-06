@@ -1,9 +1,21 @@
 import { GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason } from "../types"
 
-export type State = {
+export type StateMode = {
   mode: GameMode
   modeReason: GameModeReason
   paused: boolean
+}
+
+export const defaultStateMode: StateMode = {
+  mode: GAME_MODE.DEMO,
+  modeReason: GAME_MODE_REASON.NO_REASON,
+  paused: false,
+}
+
+export type StateHero = {
+  // mode: GameMode
+  // modeReason: GameModeReason
+  // paused: boolean
   score: number
   speed: number
   deltaSpeed: number
@@ -16,10 +28,10 @@ export type State = {
   claim: boolean
 }
 
-export const defaultState: State = {
-  mode: GAME_MODE.DEMO,
-  modeReason: GAME_MODE_REASON.NO_REASON,
-  paused: false,
+export const defaultState: StateHero = {
+  // mode: GAME_MODE.DEMO,
+  // modeReason: GAME_MODE_REASON.NO_REASON,
+  // paused: false,
   score: 0,
   speed: 0,
   deltaSpeed: 0,

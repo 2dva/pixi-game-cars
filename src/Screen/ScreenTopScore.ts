@@ -1,5 +1,5 @@
 import { getTopScore } from '../lib/topScore'
-import { type State } from '../state/state'
+import { type StateHero } from '../state/state'
 import { GAME_MODE } from '../types'
 import type { TemplateData } from '../utils'
 import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
@@ -32,7 +32,7 @@ export class ScreenTopScore extends Screen {
     return results
   }
 
-  setupData(state: State): TemplateData {
+  setupData(state: StateHero): TemplateData {
     return { topScore: this.buildTopScoreTable(DEFAULT_NAME, state.score) }
   }
 }

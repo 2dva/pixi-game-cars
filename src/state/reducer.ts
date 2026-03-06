@@ -1,10 +1,9 @@
-import type { Reducer } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { calculateDistanceBySpeed } from '../lib/physics'
-import { GAME_MODE } from '../types'
 import { ACTION, type Action } from './actions'
-import { defaultState } from './state'
+import { defaultState, defaultStateMode, type StateHero, type StateMode } from './state'
 
-export const stateReducer: Reducer = (state = defaultState, action: Action) => {
+const modeReducer: Reducer = (state = defaultStateMode, action: Action): StateMode => {
   switch (action.type) {
     case ACTION.SET_PAUSE:
       return {
@@ -17,6 +16,26 @@ export const stateReducer: Reducer = (state = defaultState, action: Action) => {
         mode: action.mode,
         modeReason: action.modeReason,
       }
+    case ACTION.RESET:
+      return { ...defaultStateMode }
+    default:
+      return { ...state }
+  }
+}
+
+export const heroReducer: Reducer = (state = defaultState, action: Action): StateHero => {
+  switch (action.type) {
+    // case ACTION.SET_PAUSE:
+    //   return {
+    //     ...state,
+    //     paused: action.paused,
+    //   }
+    // case ACTION.SET_MODE:
+    //   return {
+    //     ...state,
+    //     mode: action.mode,
+    //     modeReason: action.modeReason,
+    //   }
     case ACTION.SET_NEXT_MOVE: {
       const deltaDistance = calculateDistanceBySpeed(action.speed!)
       return {
@@ -32,7 +51,7 @@ export const stateReducer: Reducer = (state = defaultState, action: Action) => {
     case ACTION.RESET_SPEED:
       return {
         ...state,
-        speed: state.mode === GAME_MODE.DEMO ? 15 : 0,
+        speed: action.speed,
       }
     case ACTION.SET_GAME_OVER:
       return {
@@ -59,3 +78,9 @@ export const stateReducer: Reducer = (state = defaultState, action: Action) => {
       return { ...state }
   }
 }
+
+export const rootReducer = combineReducers({
+  mode: modeReducer,
+  hero: heroReducer,
+})
+

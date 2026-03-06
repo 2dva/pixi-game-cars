@@ -1,5 +1,5 @@
 import type { GameMode, GameModeReason } from '../types'
-import type { State } from './state'
+import type { StateHero, StateMode } from './state'
 
 export const ACTION = {
   RESET: 'RESET',
@@ -17,7 +17,8 @@ type ActionType = (typeof ACTION)[keyof typeof ACTION]
 export type Action = {
   type: ActionType
   claimed?: number
-} & Partial<State>
+} & Partial<StateHero> &
+  Partial<StateMode>
 
 export const resetState = (): Action => {
   return {
@@ -50,9 +51,10 @@ export const setNextMove = (speed: number, deltaSpeed: number, deltaX: number, c
   }
 }
 
-export const resetSpeed = (): Action => {
+export const resetSpeed = (speed :number): Action => {
   return {
     type: ACTION.RESET_SPEED,
+    speed,
   }
 }
 

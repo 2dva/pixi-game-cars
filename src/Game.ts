@@ -11,7 +11,7 @@ import { Sound } from './lib/sound'
 import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
 import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
 import { resetSpeed, resetState, setGameOver, setHealthAndTime, setMode, setPause, setScore } from './state/actions'
-import { store } from './state/store'
+import { getStateHero, getStateMode, store } from './state/store'
 import { Terrain } from './Terrain/Terrain'
 import { GAME_MODE, GAME_MODE_REASON, type BoundsLike, type GameMode, type GameModeReason } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
@@ -123,7 +123,7 @@ export class Game {
     if (mode === GAME_MODE.GAME_OVER) {
       store.dispatch(setMode(mode, modeReason))
       this.showScreen(modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE)
-      store.dispatch(resetSpeed())
+      store.dispatch(resetSpeed(0))
       return
     }
 
@@ -135,7 +135,7 @@ export class Game {
 
     store.dispatch(resetState())
     store.dispatch(setMode(mode, modeReason))
-    store.dispatch(resetSpeed())
+    store.dispatch(resetSpeed(isDemo ? 15 : 0))
 
     this.terrain.reset()
     this.cars.reset()
@@ -166,8 +166,8 @@ export class Game {
 
     if (claimed) Sound.pickCoin.play()
 
-    if (store.getState().mode !== GAME_MODE.DEMO) {
-      this.runEverySegment(store.getState().deltaDistance, () => {
+    if (getStateMode().mode !== GAME_MODE.DEMO) {
+      this.runEverySegment(getStateHero().deltaDistance, () => {
         claimed += 10 // 10 очков за каждые 100 метров дороги
       })
     }
@@ -176,7 +176,7 @@ export class Game {
   }
 
   private updateOnTick(time: Ticker) {
-    if (store.getState().paused) return
+    if (getStateMode().paused) return
     if (this.handleHotkeys()) return
 
     const heroBounds = this.hero.getBounds()
@@ -194,12 +194,12 @@ export class Game {
     // apply collision effect on cars
     this.cars.applyCollisionOnCar(collision)
 
-    let { health, timeLeft } = store.getState() // this.state
-    if (store.getState().mode === GAME_MODE.GAME_OVER) {
+    let { health, timeLeft } = getStateHero() // this.state
+    if (getStateMode().mode === GAME_MODE.GAME_OVER) {
       store.dispatch(setGameOver())
     }
 
-    if (store.getState().mode === GAME_MODE.COLLECT_IN_TIME) {
+    if (getStateMode().mode === GAME_MODE.COLLECT_IN_TIME) {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
       timeLeft -= time.elapsedMS / 1000
