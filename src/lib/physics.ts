@@ -1,6 +1,6 @@
 import { gameConfig } from '../configuration'
 import type { ControllerState } from '../Controller/Controller'
-import { setNextMove } from '../state/actions'
+import { setNextMove } from '../state/reducer'
 import { getStateHero, store } from '../state/store'
 import { type BoundsLike } from '../types'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'

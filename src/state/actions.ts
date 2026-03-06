@@ -1,7 +1,9 @@
 import type { GameMode, GameModeReason } from '../types'
 import type { StateHero, StateMode } from './state'
 
-export const ACTION = {
+// ЭТОТ ФАЙЛ БОЛЬШЕ НЕ ИСПОЛЬЗУЕТСЯ
+
+const ACTION = {
   RESET: 'RESET',
   RESET_SPEED: 'RESET_SPEED',
   SET_PAUSE: 'SET_PAUSE',
@@ -14,26 +16,26 @@ export const ACTION = {
 
 type ActionType = (typeof ACTION)[keyof typeof ACTION]
 
-export type Action = {
+type Action = {
   type: ActionType
   claimed?: number
 } & Partial<StateHero> &
   Partial<StateMode>
 
-export const resetState = (): Action => {
+export const resetState1 = (): Action => {
   return {
     type: ACTION.RESET,
   }
 }
 
-export const setPause = (paused: boolean): Action => {
+export const setPause1 = (paused: boolean): Action => {
   return {
     type: ACTION.SET_PAUSE,
     paused,
   }
 }
 
-export const setMode = (mode: GameMode, modeReason: GameModeReason): Action => {
+export const setMode1 = (mode: GameMode, modeReason: GameModeReason): Action => {
   return {
     type: ACTION.SET_MODE,
     mode,
@@ -41,7 +43,7 @@ export const setMode = (mode: GameMode, modeReason: GameModeReason): Action => {
   }
 }
 
-export const setNextMove = (speed: number, deltaSpeed: number, deltaX: number, crash: boolean): Action => {
+export const setNextMove1 = (speed: number, deltaSpeed: number, deltaX: number, crash: boolean): Action => {
   return {
     type: ACTION.SET_NEXT_MOVE,
     speed,
@@ -51,21 +53,21 @@ export const setNextMove = (speed: number, deltaSpeed: number, deltaX: number, c
   }
 }
 
-export const resetSpeed = (speed :number): Action => {
+export const resetSpeed1 = (speed :number): Action => {
   return {
     type: ACTION.RESET_SPEED,
     speed,
   }
 }
 
-export const setScore = (claimed: number): Action => {
+export const setScore1 = (claimed: number): Action => {
   return {
     type: ACTION.SET_SCORE,
     claimed,
   }
 }
 
-export const setHealthAndTime = (health: number, timeLeft: number): Action => {
+export const setHealthAndTime1 = (health: number, timeLeft: number): Action => {
   return {
     type: ACTION.SET_HEALTH_AND_TIME,
     health,
@@ -73,7 +75,7 @@ export const setHealthAndTime = (health: number, timeLeft: number): Action => {
   }
 }
 
-export const setGameOver = (): Action => {
+export const setGameOver1 = (): Action => {
   return {
     type: ACTION.SET_GAME_OVER,
   }

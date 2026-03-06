@@ -13,9 +13,6 @@ export const defaultStateMode: StateMode = {
 }
 
 export type StateHero = {
-  // mode: GameMode
-  // modeReason: GameModeReason
-  // paused: boolean
   score: number
   speed: number
   deltaSpeed: number
@@ -29,9 +26,6 @@ export type StateHero = {
 }
 
 export const defaultState: StateHero = {
-  // mode: GAME_MODE.DEMO,
-  // modeReason: GAME_MODE_REASON.NO_REASON,
-  // paused: false,
   score: 0,
   speed: 0,
   deltaSpeed: 0,

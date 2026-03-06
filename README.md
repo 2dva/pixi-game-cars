@@ -1,10 +1,13 @@
 # Small Cars
-Простая игра в гонки на Pixi.js
+#### Простая игра в гонки на Pixi.js
 
-Управление: w,a,s,d,space
-## Демо
-https://pixi-game-cars.vercel.app/
-Работает на десктопе и смартфоне
+### Демо: https://pixi-game-cars.vercel.app/
+
+Работает на десктопе и смартфоне. Управление: w,a,s,d,space или touch.
+
+## Stack
+Typescript + Pixi.js + Redux Toolkit + Vite + i18n-js + Howler
+
 
 ## Запуск
 
@@ -19,6 +22,3 @@ npm run dev
 ### Открыть игру в браузере
 http://localhost:5173/
 
-# Stack
-
-Typescript, Pixi.js, Redux, Vite, i18n-js, Howler
