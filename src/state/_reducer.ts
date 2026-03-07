@@ -3,6 +3,12 @@ import { calculateDistanceBySpeed } from '../lib/physics'
 import type { GameMode, GameModeReason } from '../types'
 import { defaultState, defaultStateMode } from './state'
 
+/**
+ * Экшены и редьюсеры на RTK, без слайсов
+ * ЭТОТ ФАЙЛ БОЛЬШЕ НЕ ИСПОЛЬЗУЕТСЯ
+ * ОСТАВЛЯЮ ДЛЯ ИНФОРМАЦИИ
+ */
+
 export const setPause = createAction<boolean>('SET_PAUSE')
 export const resetState = createAction('RESET')
 export const setMode = createAction('SET_MODE', (mode: GameMode, modeReason: GameModeReason) => {
@@ -42,6 +48,7 @@ const modeReducer = createReducer(defaultStateMode, (builder) => {
   builder
     .addCase(setMode, (state, action) => {
       state.mode = action.payload.mode
+      state.modeReason = action.payload.modeReason
     })
     .addCase(setPause, (state, action) => {
       state.paused = action.payload

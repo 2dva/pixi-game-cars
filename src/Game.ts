@@ -10,11 +10,11 @@ import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
 import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
 import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
-import { resetSpeed, resetState, setGameOver, setHealthAndTime, setMode, setPause, setScore } from './state/reducer'
 import { getStateHero, getStateMode, store } from './state/store'
 import { Terrain } from './Terrain/Terrain'
 import { GAME_MODE, GAME_MODE_REASON, type BoundsLike, type GameMode, type GameModeReason } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
+import { resetAll, setSpeed, setGameOver, setHealthAndTime, setMode, setPause, setScore } from './state/slices'
 
 export class Game {
   private app: Application
@@ -121,9 +121,9 @@ export class Game {
 
 
     if (mode === GAME_MODE.GAME_OVER) {
-      store.dispatch(setMode(mode, modeReason))
+      store.dispatch(setMode({ mode, modeReason }))
       this.showScreen(modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE)
-      store.dispatch(resetSpeed(0))
+      store.dispatch(setSpeed(0))
       return
     }
 
@@ -133,9 +133,9 @@ export class Game {
       this.showScreen(SCREEN_MODE.START)
     }
 
-    store.dispatch(resetState())
-    store.dispatch(setMode(mode, modeReason))
-    store.dispatch(resetSpeed(isDemo ? 15 : 0))
+    store.dispatch(resetAll())
+    store.dispatch(setMode({ mode, modeReason }))
+    store.dispatch(setSpeed(isDemo ? 15 : 0))
 
     this.terrain.reset()
     this.cars.reset()
@@ -203,7 +203,7 @@ export class Game {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
       timeLeft -= time.elapsedMS / 1000
-      store.dispatch(setHealthAndTime(health, timeLeft))
+      store.dispatch(setHealthAndTime({ health, timeLeft }))
 
       if (timeLeft <= 0.0) {
         Sound.finish.play()

@@ -1,7 +1,11 @@
 import type { GameMode, GameModeReason } from '../types'
 import type { StateHero, StateMode } from './state'
 
-// ЭТОТ ФАЙЛ БОЛЬШЕ НЕ ИСПОЛЬЗУЕТСЯ
+/**
+ * Экшены для Redux без Redux Toolkit
+ * ЭТОТ ФАЙЛ БОЛЬШЕ НЕ ИСПОЛЬЗУЕТСЯ
+ * ОСТАВЛЯЮ ДЛЯ ИНФОРМАЦИИ
+ */
 
 const ACTION = {
   RESET: 'RESET',

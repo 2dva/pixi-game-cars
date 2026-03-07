@@ -1,6 +1,6 @@
 import { gameConfig } from '../configuration'
 import type { ControllerState } from '../Controller/Controller'
-import { setNextMove } from '../state/reducer'
+import { setNextMove } from '../state/slices'
 import { getStateHero, store } from '../state/store'
 import { type BoundsLike } from '../types'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'
@@ -78,7 +78,7 @@ export function calculateNextMove(
 
   if (crash) deltaX = deltaX * 0.6
 
-  store.dispatch(setNextMove(speed, deltaSpeed, deltaX, crash))
+  store.dispatch(setNextMove({ speed, deltaSpeed, deltaX, crash }))
 
   return collision
 }
