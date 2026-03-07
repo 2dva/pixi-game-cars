@@ -1,10 +1,11 @@
 import { Container, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
+import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
-import { type GameMode, type State } from '../state'
+import { type StateHero } from '../state/state'
+import { type GameMode } from '../types'
 import { applyTemplate, type TemplateData } from '../utils'
 import screenConfig from './screenConfig.json'
-import { gameConfig } from '../configuration'
 
 export type ScreenMode = keyof typeof screenConfig
 
@@ -55,7 +56,7 @@ export abstract class Screen extends EventEmitter {
     this.screenMode = null
   }
 
-  setup(cont: Container, state: State) {
+  setup(cont: Container, state: StateHero) {
     this.contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
     this.contentHeight = gameConfig.screenContentHeight
 
@@ -74,9 +75,9 @@ export abstract class Screen extends EventEmitter {
 
   onUserAction(_keyCode: string) {}
 
-  protected onAfterSetup(_state: State) {}
+  protected onAfterSetup(_state: StateHero) {}
 
-  protected setupData(_state: State): TemplateData {
+  protected setupData(_state: StateHero): TemplateData {
     return {}
   }
 

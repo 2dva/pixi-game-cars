@@ -10,17 +10,17 @@ import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
 import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
 import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
-import { defaultState, GAME_MODE, GAME_MODE_REASON, type GameMode, type GameModeReason, type State } from './state'
+import { getStateHero, getStateMode, store } from './state/store'
 import { Terrain } from './Terrain/Terrain'
-import type { BoundsLike } from './types'
+import { GAME_MODE, GAME_MODE_REASON, type BoundsLike, type GameMode, type GameModeReason } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
+import { resetAll, setSpeed, setGameOver, setHealthAndTime, setMode, setPause, setScore } from './state/slices'
 
 export class Game {
   private app: Application
   private stage: Container
   private ticker: Ticker
   private rootContainer: HTMLElement
-  private state!: State
   private controller: Controller
   private hero: Hero
   private cars: Cars
@@ -31,7 +31,6 @@ export class Game {
   private onResizeThrottled = throttle(this.onResize.bind(this), 300)
 
   constructor(app: Application) {
-    this.initState()
     this.app = app
     this.rootContainer = app.canvas.parentElement!
     this.stage = app.stage
@@ -46,10 +45,6 @@ export class Game {
 
     setMobileVersion(gameConfig.isMobileDevice)
     app.renderer.addListener('resize', this.onResizeThrottled)
-  }
-
-  private initState() {
-    this.state = Object.assign({}, defaultState)
   }
 
   async preloadAssets() {
@@ -94,7 +89,7 @@ export class Game {
     this.screenFactory.on(screenCloseEvent, () => {
       this.controller.reset()
       this.controller.disabled = false
-      this.state.paused = false
+      store.dispatch(setPause(false))
     })
 
     this.onResize()
@@ -118,17 +113,17 @@ export class Game {
   }
 
   showScreen(mode: ScreenMode) {
-    this.screenFactory.show(mode, this.state)
+    this.screenFactory.show(mode)
   }
 
   switchMode(mode: GameMode, modeReason: GameModeReason = GAME_MODE_REASON.NO_REASON) {
     this.controller.reset()
 
+
     if (mode === GAME_MODE.GAME_OVER) {
-      this.state.mode = mode
-      this.state.modeReason = modeReason
+      store.dispatch(setMode({ mode, modeReason }))
       this.showScreen(modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE)
-      this.state.speed = 0
+      store.dispatch(setSpeed(0))
       return
     }
 
@@ -138,9 +133,9 @@ export class Game {
       this.showScreen(SCREEN_MODE.START)
     }
 
-    this.initState()
-    this.state.mode = mode
-    this.state.speed = isDemo ? 15 : 0
+    store.dispatch(resetAll())
+    store.dispatch(setMode({ mode, modeReason }))
+    store.dispatch(setSpeed(isDemo ? 15 : 0))
 
     this.terrain.reset()
     this.cars.reset()
@@ -159,7 +154,7 @@ export class Game {
     }
 
     if (keyOther === 'KeyP') {
-      this.state.paused = true
+      store.dispatch(setPause(true))
       this.showScreen(SCREEN_MODE.PAUSE)
       stopCurrentUpdate = true
     }
@@ -171,25 +166,22 @@ export class Game {
 
     if (claimed) Sound.pickCoin.play()
 
-    if (this.state.mode !== GAME_MODE.DEMO) {
-      this.runEverySegment(this.state.deltaDistance, () => {
+    if (getStateMode().mode !== GAME_MODE.DEMO) {
+      this.runEverySegment(getStateHero().deltaDistance, () => {
         claimed += 10 // 10 очков за каждые 100 метров дороги
       })
     }
 
-    Object.assign(this.state, {
-      score: this.state.score + claimed,
-      claim: claimed >= 100,
-    })
+    store.dispatch(setScore(claimed))
   }
 
   private updateOnTick(time: Ticker) {
-    if (this.state.paused) return
+    if (getStateMode().paused) return
     if (this.handleHotkeys()) return
 
     const heroBounds = this.hero.getBounds()
     const carBounds = this.cars.getCarsBounds()
-    const collision = calculateNextMove(this.state, this.controller.state, heroBounds, carBounds)
+    const collision = calculateNextMove(this.controller.state, heroBounds, carBounds)
 
     if (collision && !Sound.carHit.playing() && !Sound.hitHard.playing()) {
       if (collision.force > 3) {
@@ -202,23 +194,16 @@ export class Game {
     // apply collision effect on cars
     this.cars.applyCollisionOnCar(collision)
 
-    let { health, timeLeft } = this.state
-    if (this.state.mode === GAME_MODE.GAME_OVER) {
-      Object.assign(this.state, {
-        speed: 0,
-        deltaSpeed: 0,
-        crash: health === 0,
-      })
+    let { health, timeLeft } = getStateHero() // this.state
+    if (getStateMode().mode === GAME_MODE.GAME_OVER) {
+      store.dispatch(setGameOver())
     }
 
-    if (this.state.mode === GAME_MODE.COLLECT_IN_TIME) {
+    if (getStateMode().mode === GAME_MODE.COLLECT_IN_TIME) {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
       timeLeft -= time.elapsedMS / 1000
-      Object.assign(this.state, {
-        health,
-        timeLeft,
-      })
+      store.dispatch(setHealthAndTime({ health, timeLeft }))
 
       if (timeLeft <= 0.0) {
         Sound.finish.play()
@@ -231,9 +216,9 @@ export class Game {
 
     this.handleClaimable(heroBounds)
 
-    this.hud.draw(this.state)
-    this.hero.draw(this.state, time)
-    this.cars.draw(this.state, time)
-    this.terrain.draw(this.state)
+    this.hud.draw()
+    this.hero.draw(time)
+    this.cars.draw(time)
+    this.terrain.draw()
   }
 }

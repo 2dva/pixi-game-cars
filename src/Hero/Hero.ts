@@ -1,7 +1,7 @@
 import { ColorOverlayFilter } from 'pixi-filters'
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { gameConfig } from '../configuration'
-import type { State } from '../state'
+import { getStateHero } from '../state/store'
 import type { IMajorGameContainer } from '../types'
 import { Exhaust } from './Exhaust'
 
@@ -58,7 +58,8 @@ export class Hero extends Container implements IMajorGameContainer {
     this.y = show ? this.startPositionY : -999
   }
 
-  draw({ speed, deltaSpeed, deltaX, crash, claim }: State, time: Ticker) {
+  draw(time: Ticker) {
+    const { speed, deltaSpeed, deltaX, crash, claim } = getStateHero()
     const oldX = this.x
     if (!crash) {
       // Если не происходит коллизия - перемещаем машинку

@@ -13,6 +13,13 @@
     "types": "tsc --noEmit --project ./tsconfig.json",
     "prettify": "prettier --loglevel warn --cache --write '{src/**/*,*}.{js,ts,json,yml,css}' '!**/{node_modules,dist}/**/*'"
   },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
+    "howler": "^2.2.4",
+    "i18n-js": "^4.5.2",
+    "pixi-filters": "^6.1.5",
+    "pixi.js": "^8.16.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/howler": "^2.2.12",
@@ -24,11 +31,5 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.55.0",
     "vite": "^7.3.1"
-  },
-  "dependencies": {
-    "howler": "^2.2.4",
-    "i18n-js": "^4.5.2",
-    "pixi-filters": "^6.1.5",
-    "pixi.js": "^8.16.0"
   }
 }
