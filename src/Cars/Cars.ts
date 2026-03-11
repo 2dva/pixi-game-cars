@@ -1,7 +1,7 @@
 import { Assets, Container, Sprite, Ticker } from 'pixi.js'
 import { gameConfig } from '../configuration'
 import { type CollisionObject } from '../lib/collision'
-import { getStateHero } from '../state/store'
+import { getSpeed } from '../state/selectors'
 import type { IMajorGameContainer } from '../types'
 import { type BoundsLike } from '../types'
 import { rollDice, rollDiceBool } from '../utils'
@@ -62,7 +62,7 @@ export class Cars extends Container implements IMajorGameContainer {
   }
 
   draw(time: Ticker) {
-    const { speed } = getStateHero()
+    const speed = getSpeed()
     for (const car of this.cars.values()) {
       if (!car.active) continue
       const deltaSpeed = speed - car.speed
@@ -112,7 +112,7 @@ export class Cars extends Container implements IMajorGameContainer {
   }
 
   checkReleaseCar() {
-    const { speed } = getStateHero()
+    const speed = getSpeed()
     // в цикле проверяем свободные полосы
     for (let i = -1; i < gameConfig.roadLaneCount; i++) {
       // если есть свободная полоса

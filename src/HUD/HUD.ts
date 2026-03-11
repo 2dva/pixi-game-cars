@@ -1,5 +1,5 @@
 import { Assets, Container } from 'pixi.js'
-import { getStateHero, getStateMode } from '../state/store'
+import { getHero, getMode } from '../state/selectors'
 import type { IMajorGameContainer } from '../types'
 import { GAME_MODE } from '../types'
 import { throttle } from '../utils'
@@ -53,11 +53,11 @@ export class HUD extends Container implements IMajorGameContainer {
   reset() {}
 
   private instantDraw() {
-    const { speed, distance, score, health, timeLeft } = getStateHero()
+    const { speed, distance, score, health, timeLeft } = getHero()
     this.gauges.draw(speed, distance)
     this.health.draw(health)
     this.score.draw(score)
-    this.timer.visible = getStateMode().mode === GAME_MODE.COLLECT_IN_TIME
+    this.timer.visible = getMode() === GAME_MODE.COLLECT_IN_TIME
     this.timer.draw(timeLeft)
   }
 }

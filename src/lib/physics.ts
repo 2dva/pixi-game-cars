@@ -1,7 +1,8 @@
 import { gameConfig } from '../configuration'
 import type { ControllerState } from '../Controller/Controller'
+import { getSpeed } from '../state/selectors'
 import { setNextMove } from '../state/slices'
-import { getStateHero, store } from '../state/store'
+import { dispatchAction } from '../state/store'
 import { type BoundsLike } from '../types'
 import { checkCollisionWithCar, checkObstacleAhead } from './collision'
 
@@ -25,7 +26,7 @@ export function calculateNextMove(
   heroBounds: BoundsLike,
   carBounds: Map<number, BoundsLike>
 ) {
-  let { speed } = getStateHero()
+  let speed = getSpeed()
   const { keyUp, keyDown, keyLeft, keyRight, keySpace } = controllerState
 
   // Проверяем препятствие впереди перед изменением скорости
@@ -78,7 +79,7 @@ export function calculateNextMove(
 
   if (crash) deltaX = deltaX * 0.6
 
-  store.dispatch(setNextMove({ speed, deltaSpeed, deltaX, crash }))
+  dispatchAction(setNextMove({ speed, deltaSpeed, deltaX, crash }))
 
   return collision
 }

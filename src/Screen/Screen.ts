@@ -2,7 +2,6 @@ import { Container, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pi
 import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
-import { type StateHero } from '../state/state'
 import { type GameMode } from '../types'
 import { applyTemplate, type TemplateData } from '../utils'
 import screenConfig from './screenConfig.json'
@@ -56,7 +55,7 @@ export abstract class Screen extends EventEmitter {
     this.screenMode = null
   }
 
-  setup(cont: Container, state: StateHero) {
+  setup(cont: Container) {
     this.contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
     this.contentHeight = gameConfig.screenContentHeight
 
@@ -64,9 +63,9 @@ export abstract class Screen extends EventEmitter {
 
     if (!this.ticker.started) this.ticker.start()
 
-    const data: TemplateData = this.setupData(state)
+    const data: TemplateData = this.setupData()
     this.setupScreen(cont, data)
-    this.onAfterSetup(state)
+    this.onAfterSetup()
 
     setTimeout(() => {
       window.addEventListener('keydown', this.keydownHandlerBound)
@@ -75,9 +74,9 @@ export abstract class Screen extends EventEmitter {
 
   onUserAction(_keyCode: string) {}
 
-  protected onAfterSetup(_state: StateHero) {}
+  protected onAfterSetup() {}
 
-  protected setupData(_state: StateHero): TemplateData {
+  protected setupData(): TemplateData {
     return {}
   }
 

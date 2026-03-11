@@ -10,11 +10,12 @@ import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
 import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
 import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
-import { getStateHero, getStateMode, store } from './state/store'
+import { getDeltaDistance, getHero, getMode, isPaused } from './state/selectors'
+import { resetAll, setGameOver, setHealthAndTime, setMode, setPause, setScore, setSpeed } from './state/slices'
+import { dispatchAction } from './state/store'
 import { Terrain } from './Terrain/Terrain'
 import { GAME_MODE, GAME_MODE_REASON, type BoundsLike, type GameMode, type GameModeReason } from './types'
 import { throttle, useRunEverySegment, type RunEverySegment } from './utils'
-import { resetAll, setSpeed, setGameOver, setHealthAndTime, setMode, setPause, setScore } from './state/slices'
 
 export class Game {
   private app: Application
@@ -89,7 +90,7 @@ export class Game {
     this.screenFactory.on(screenCloseEvent, () => {
       this.controller.reset()
       this.controller.disabled = false
-      store.dispatch(setPause(false))
+      dispatchAction(setPause(false))
     })
 
     this.onResize()
@@ -121,9 +122,9 @@ export class Game {
 
 
     if (mode === GAME_MODE.GAME_OVER) {
-      store.dispatch(setMode({ mode, modeReason }))
+      dispatchAction(setMode({ mode, modeReason }))
       this.showScreen(modeReason === GAME_MODE_REASON.END_TIME_IS_UP ? SCREEN_MODE.FINISH : SCREEN_MODE.FAILURE)
-      store.dispatch(setSpeed(0))
+      dispatchAction(setSpeed(0))
       return
     }
 
@@ -133,9 +134,9 @@ export class Game {
       this.showScreen(SCREEN_MODE.START)
     }
 
-    store.dispatch(resetAll())
-    store.dispatch(setMode({ mode, modeReason }))
-    store.dispatch(setSpeed(isDemo ? 15 : 0))
+    dispatchAction(resetAll())
+    dispatchAction(setMode({ mode, modeReason }))
+    dispatchAction(setSpeed(isDemo ? 15 : 0))
 
     this.terrain.reset()
     this.cars.reset()
@@ -154,7 +155,7 @@ export class Game {
     }
 
     if (keyOther === 'KeyP') {
-      store.dispatch(setPause(true))
+      dispatchAction(setPause(true))
       this.showScreen(SCREEN_MODE.PAUSE)
       stopCurrentUpdate = true
     }
@@ -166,17 +167,17 @@ export class Game {
 
     if (claimed) Sound.pickCoin.play()
 
-    if (getStateMode().mode !== GAME_MODE.DEMO) {
-      this.runEverySegment(getStateHero().deltaDistance, () => {
+    if (getMode() !== GAME_MODE.DEMO) {
+      this.runEverySegment(getDeltaDistance(), () => {
         claimed += 10 // 10 очков за каждые 100 метров дороги
       })
     }
 
-    store.dispatch(setScore(claimed))
+    dispatchAction(setScore(claimed))
   }
 
   private updateOnTick(time: Ticker) {
-    if (getStateMode().paused) return
+    if (isPaused()) return
     if (this.handleHotkeys()) return
 
     const heroBounds = this.hero.getBounds()
@@ -194,16 +195,16 @@ export class Game {
     // apply collision effect on cars
     this.cars.applyCollisionOnCar(collision)
 
-    let { health, timeLeft } = getStateHero() // this.state
-    if (getStateMode().mode === GAME_MODE.GAME_OVER) {
-      store.dispatch(setGameOver())
+    let { health, timeLeft } = getHero()
+    if (getMode() === GAME_MODE.GAME_OVER) {
+      dispatchAction(setGameOver())
     }
 
-    if (getStateMode().mode === GAME_MODE.COLLECT_IN_TIME) {
+    if (getMode() === GAME_MODE.COLLECT_IN_TIME) {
       if (collision) health -= collision.damage
       health = Math.max(0, health)
       timeLeft -= time.elapsedMS / 1000
-      store.dispatch(setHealthAndTime({ health, timeLeft }))
+      dispatchAction(setHealthAndTime({ health, timeLeft }))
 
       if (timeLeft <= 0.0) {
         Sound.finish.play()

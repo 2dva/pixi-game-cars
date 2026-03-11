@@ -5,6 +5,4 @@ export const store = configureStore({
   reducer: rootReducer,
 })
 
-export const getStateMode = () => store.getState().mode
-
-export const getStateHero = () => store.getState().hero
+export const dispatchAction = store.dispatch

@@ -1,5 +1,5 @@
 import { isRecordScore, saveMyScore } from '../lib/topScore'
-import { type StateHero } from '../state/state'
+import { getDistance, getScore } from '../state/selectors'
 import { GAME_MODE } from '../types'
 import { formatDistance, type TemplateData } from '../utils'
 import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
@@ -15,16 +15,18 @@ export class ScreenFinish extends Screen {
     }
   }
 
-  setupData(state: StateHero): TemplateData {
-    const record = isRecordScore(state.score)
+  setupData(): TemplateData {
+    const score = getScore()
+    const record = isRecordScore(score)
+    const distance = formatDistance(getDistance())
     if (record) {
-      saveMyScore(DEFAULT_NAME, state.score)
+      saveMyScore(DEFAULT_NAME, score)
     }
-    return { score: state.score, distance: formatDistance(state.distance), record }
+    return { score, distance, record }
   }
 
-  onAfterSetup(state: StateHero) {
-    if (state.score > 0) {
+  onAfterSetup() {
+    if (getScore() > 0) {
       this.timer = setTimeout(() => {
         this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.TOP_SCORE)
       }, 2000)

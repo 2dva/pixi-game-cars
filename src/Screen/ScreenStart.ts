@@ -1,12 +1,11 @@
 import { gameConfig } from '../configuration'
-import { type StateHero } from '../state/state'
 import { GAME_MODE } from '../types'
 import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
 
 export class ScreenStart extends Screen {
   screenId: ScreenMode = 'startScreen'
 
-  onAfterSetup(_state: StateHero): void {
+  onAfterSetup(): void {
     if (!gameConfig.isTouchDevice) {
       this.timer = setTimeout(() => {
         this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.KEYBOARD)
