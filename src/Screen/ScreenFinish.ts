@@ -20,6 +20,7 @@ export class ScreenFinish extends Screen {
     const record = isRecordScore(score)
     const distance = formatDistance(getDistance())
     if (record) {
+      // TODO: редирект на inputNameScreen через 2сек
       saveMyScore(DEFAULT_NAME, score)
     }
     return { score, distance, record }

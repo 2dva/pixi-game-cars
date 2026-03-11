@@ -131,7 +131,8 @@ export class Game {
     const isDemo = mode === GAME_MODE.DEMO
 
     if (isDemo) {
-      this.showScreen(SCREEN_MODE.START)
+      // this.showScreen(SCREEN_MODE.START)
+      this.showScreen(SCREEN_MODE.INPUT_NAME)
     }
 
     dispatchAction(resetAll())

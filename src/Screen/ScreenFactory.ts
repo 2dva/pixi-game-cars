@@ -9,6 +9,7 @@ import { ScreenKeyboard } from './ScreenKeyboard'
 import { ScreenPause } from './ScreenPause'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
+import { ScreenNameInput } from './ScreenNameInput'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
@@ -25,7 +26,7 @@ export const createScreenInstance = (mode: ScreenMode): Screen => {
     case SCREEN_MODE.FINISH:
       return new ScreenFinish()
     case SCREEN_MODE.INPUT_NAME:
-      return new ScreenPause()
+      return new ScreenNameInput()
     case SCREEN_MODE.PAUSE:
       return new ScreenPause()
     case SCREEN_MODE.TOP_SCORE:

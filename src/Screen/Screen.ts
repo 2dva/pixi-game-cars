@@ -1,4 +1,4 @@
-import { Container, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
+import { Container, DOMContainer, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
 import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
@@ -63,8 +63,8 @@ export abstract class Screen extends EventEmitter {
 
     if (!this.ticker.started) this.ticker.start()
 
-    const data: TemplateData = this.setupData()
-    this.setupScreen(cont, data)
+    const data = this.setupData()
+    this.setupScreen(cont, data || {})
     this.onAfterSetup()
 
     setTimeout(() => {
@@ -76,9 +76,9 @@ export abstract class Screen extends EventEmitter {
 
   protected onAfterSetup() {}
 
-  protected setupData(): TemplateData {
-    return {}
-  }
+  protected setupData(): TemplateData | void {}
+
+  protected customContent(): Container | DOMContainer | void {}
 
   protected setupScreen(cont: Container, data: TemplateData = {}) {
     const cfgScreen = screenConfig[this.screenId]
@@ -123,6 +123,9 @@ export abstract class Screen extends EventEmitter {
 
     cont.removeChildren()
     cont.addChild(...txtFields)
+
+    const customContentContainer = this.customContent()
+    if (customContentContainer) cont.addChild(customContentContainer)
   }
 
   protected tickHandler(time: Ticker) {

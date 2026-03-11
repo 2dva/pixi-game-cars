@@ -39,7 +39,9 @@
       "pressPToContinue": "Нажми P чтобы продолжить",
       "pressPToContinue_mobile": "Нажми чтобы продолжить",
       "pressSpaceToContinue": "Нажми пробел чтобы продолжить",
-      "pressSpaceToContinue_mobile": "Нажми чтобы продолжить"
+      "pressSpaceToContinue_mobile": "Нажми чтобы продолжить",
+      "enterYourName": "Введи имя и нажми Enter",
+      "enterYourName_mobile": "Введи имя"
     }
   }
 }
