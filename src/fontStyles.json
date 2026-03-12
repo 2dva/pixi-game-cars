@@ -114,10 +114,11 @@
     "fontSize": "44px",
     "fontWeight": "bold",
     "fill": "#cccccc",
-    "width": "200px",
+    "width": "230px",
     "height": "60px",
     "padding": "8px",
     "boxSizing": "border-box",
-    "textAlign": "center"
+    "textAlign": "center",
+    "caretShape": "block"
   }
 }

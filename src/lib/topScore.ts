@@ -1,6 +1,6 @@
 type ScorePair = [string, number]
 
-export const TOP_RESULTS_LIMIT = 10
+export const TOP_RESULTS_LIMIT = 6
 
 const storageKey = 'clines_local_top'
 

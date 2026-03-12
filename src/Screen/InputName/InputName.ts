@@ -1,9 +1,8 @@
 import { DOMContainer } from 'pixi.js'
+import { gameConfig } from '../../configuration'
 import { DomInput } from './DomInput'
 
 export const inputNameEvent = 'inputNameEvent'
-
-const FILTER_INVALID_SYMBOLS_REGEXP = /[^-_a-zA-Zа-яА-Я0-9.]/g
 
 export class InputName extends DOMContainer {
   input: DomInput
@@ -11,7 +10,7 @@ export class InputName extends DOMContainer {
 
   constructor() {
     super()
-    this.input = new DomInput(FILTER_INVALID_SYMBOLS_REGEXP)
+    this.input = new DomInput(gameConfig.playerNameInvalidSymbolsRegExp)
     this.element = this.input
   }
 
@@ -26,7 +25,7 @@ export class InputName extends DOMContainer {
 
   private keydownHandler(event: KeyboardEvent) {
     if (event.code === 'Enter' || event.code === 'NumpadEnter') {
-      const value = this.input.value.trim().replace(FILTER_INVALID_SYMBOLS_REGEXP, '')
+      const value = this.input.value.trim().replace(gameConfig.playerNameInvalidSymbolsRegExp, '')
       this.emit('inputNameEvent', value)
     }
   }

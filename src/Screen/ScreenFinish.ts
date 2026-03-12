@@ -1,10 +1,8 @@
-import { isRecordScore, saveMyScore } from '../lib/topScore'
+import { isRecordScore } from '../lib/topScore'
 import { getDistance, getScore } from '../state/selectors'
 import { GAME_MODE } from '../types'
 import { formatDistance, type TemplateData } from '../utils'
 import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
-
-const DEFAULT_NAME = 'User'
 
 export class ScreenFinish extends Screen {
   screenId: ScreenMode = 'endScreenTimeIsUp'
@@ -19,17 +17,15 @@ export class ScreenFinish extends Screen {
     const score = getScore()
     const record = isRecordScore(score)
     const distance = formatDistance(getDistance())
-    if (record) {
-      // TODO: редирект на inputNameScreen через 2сек
-      saveMyScore(DEFAULT_NAME, score)
-    }
     return { score, distance, record }
   }
 
   onAfterSetup() {
-    if (getScore() > 0) {
+    const score = getScore()
+    if (score > 0) {
+      const screen = isRecordScore(score) ? SCREEN_MODE.INPUT_NAME : SCREEN_MODE.TOP_SCORE
       this.timer = setTimeout(() => {
-        this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.TOP_SCORE)
+        this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, screen)
       }, 2000)
     }
   }

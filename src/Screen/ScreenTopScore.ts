@@ -1,10 +1,10 @@
+import { gameConfig } from '../configuration'
+import { SETTING_NAME, Settings } from '../lib/settings'
 import { getTopScore } from '../lib/topScore'
 import { getScore } from '../state/selectors'
 import { GAME_MODE } from '../types'
 import type { TemplateData } from '../utils'
 import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
-
-const DEFAULT_NAME = 'User'
 
 export class ScreenTopScore extends Screen {
   screenId: ScreenMode = 'endScreenTopScore'
@@ -33,6 +33,11 @@ export class ScreenTopScore extends Screen {
   }
 
   setupData(): TemplateData {
-    return { topScore: this.buildTopScoreTable(DEFAULT_NAME, getScore()) }
+    return {
+      topScore: this.buildTopScoreTable(
+        (Settings.load(SETTING_NAME.PLAYER_NAME) as string) || gameConfig.playerNameDefault,
+        getScore()
+      ),
+    }
   }
 }
