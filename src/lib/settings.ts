@@ -3,7 +3,12 @@
  */
 const storageKey = 'clines_settings'
 
-type SettingName = 'soundOn'
+export const SETTING_NAME = {
+  SOUND_ON: 'soundOn',
+  PLAYER_NAME: 'playerName',
+}
+
+type SettingName = (typeof SETTING_NAME)[keyof typeof SETTING_NAME]
 type SettingValue = string | boolean | number
 
 export const Settings = {

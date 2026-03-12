@@ -111,13 +111,13 @@
     "border": "2px inset #787878",
     "borderRadius": "4px",
     "fontFamily": "Courier New, monospace",
-    "fontSize": "38px",
-    "fontStyle": "italic",
+    "fontSize": "44px",
+    "fontWeight": "bold",
     "fill": "#cccccc",
     "width": "200px",
-    "height": "40px",
-    "padding": "4px",
+    "height": "60px",
+    "padding": "8px",
     "boxSizing": "border-box",
-    "textAlign": "left"
+    "textAlign": "center"
   }
 }

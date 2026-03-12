@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
-import { Settings } from '../lib/settings'
+import { SETTING_NAME, Settings } from '../lib/settings'
 import { Sound } from '../lib/sound'
 
 export class SoundSwitch extends Container {
@@ -21,7 +21,7 @@ export class SoundSwitch extends Container {
 
   setup(parent: Container) {
     // сначала пробуем взять настройку из стораджа
-    let value = Settings.load('soundOn')
+    let value = Settings.load(SETTING_NAME.SOUND_ON)
     if (value === undefined) {
       // затем значение по-умолчанию
       value = !gameConfig.soundMutedByDefault
@@ -45,7 +45,7 @@ export class SoundSwitch extends Container {
       this.soundOn = !this.soundOn
       this.draw()
       Sound.mute(!this.soundOn)
-      Settings.save('soundOn', this.soundOn)
+      Settings.save(SETTING_NAME.SOUND_ON, this.soundOn)
     })
     this.sprite = sprite
 
