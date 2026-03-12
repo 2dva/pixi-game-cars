@@ -118,7 +118,7 @@
     "height": "60px",
     "padding": "8px",
     "boxSizing": "border-box",
-    "textAlign": "center",
+    "textAlign": "left",
     "caretShape": "block"
   }
 }

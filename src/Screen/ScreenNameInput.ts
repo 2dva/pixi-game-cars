@@ -15,18 +15,17 @@ export class ScreenNameInput extends Screen {
   }
 
   customContent() {
-    const domContainer = new InputName()
-    this.inputNameContainer = domContainer
-    domContainer.anchor = 0.5
-    domContainer.x = this.contentWidth / 2
-    domContainer.y = 180
-    domContainer.on(inputNameEvent, (name: string) => {
+    const input = new InputName()
+    this.inputNameContainer = input
+    input.x = this.contentWidth / 2 - 30
+    input.y = 180
+    input.on(inputNameEvent, (name: string) => {
       Settings.save(SETTING_NAME.PLAYER_NAME, name)
       const score = getScore()
       saveMyScore(name || gameConfig.playerNameDefault, score)
       this.inputNameContainer?.destroy()
       this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.TOP_SCORE)
     })
-    return domContainer
+    return input
   }
 }
