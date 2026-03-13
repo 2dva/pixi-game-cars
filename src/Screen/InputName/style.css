@@ -1,0 +1,19 @@
+.cl-screenname-input {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #cdcdcd;
+  outline: none;
+  border: 2px inset #787878;
+  border-radius: 4px;
+  font-family:
+    Courier New,
+    monospace;
+  font-size: 44px;
+  font-weight: bold;
+  fill: #cccccc;
+  width: 230px;
+  height: 60px;
+  padding: 8px;
+  box-sizing: border-box;
+  text-align: left;
+  caret-shape: block;
+}
