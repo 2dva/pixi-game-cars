@@ -7,27 +7,34 @@
         "text": "startScreen.mode1_training",
         "style": "fontScreenPrimary",
         "x": 75,
-        "y": 95,
+        "y": 85,
         "clickAction": "Digit1"
       },
       {
         "text": "startScreen.unlimitedHealth",
         "style": "fontScreenSecondary",
         "x": 75,
-        "y": 135
+        "y": 125
       },
       {
         "text": "startScreen.mode2_collectIn60Seconds",
         "style": "fontScreenPrimary",
         "x": 75,
-        "y": 195,
+        "y": 175,
         "clickAction": "Digit2"
       },
       {
         "text": "startScreen.youHaveAMinute",
         "style": "fontScreenSecondary",
         "x": 75,
-        "y": 235
+        "y": 215
+      },
+      {
+        "text": "0 - Настройки",
+        "style": "fontScreenPrimary",
+        "x": 75,
+        "y": 265,
+        "clickAction": "Digit0"
       }
     ]
   },
@@ -112,7 +119,7 @@
     "blinkText": "blinkText.pressSpaceToContinue",
     "content": [
       {
-        "text": "${controls}",
+        "text": "",
         "style": "fontScreenMonoSmall",
         "x": 60,
         "y": 100

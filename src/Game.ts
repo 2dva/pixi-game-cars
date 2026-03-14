@@ -5,7 +5,7 @@ import { Controller } from './Controller/Controller'
 import fontStyles from './fontStyles.json'
 import { Hero } from './Hero/Hero'
 import { HUD } from './HUD/HUD'
-import { loadTranslations, setMobileVersion } from './lib/i18n'
+import { loadTranslations, setupLanguageOptions } from './lib/i18n'
 import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
 import { type ScreenMode } from './Screen/Screen'
@@ -45,7 +45,7 @@ export class Game {
     this.hero = new Hero()
     this.runEverySegment = useRunEverySegment(100)
 
-    setMobileVersion(gameConfig.isMobileDevice)
+    setupLanguageOptions()
     app.renderer.addListener('resize', this.onResizeThrottled)
   }
 
@@ -63,6 +63,7 @@ export class Game {
     await loadTranslations()
 
     Assets.init({ basePath: 'assets/' })
+    await this.screenFactory.preloadAssets()
     await this.hud.preloadAssets()
     await this.cars.preloadAssets()
     await this.terrain.preloadAssets()
@@ -132,8 +133,7 @@ export class Game {
     const isDemo = mode === GAME_MODE.DEMO
 
     if (isDemo) {
-      this.showScreen(SCREEN_MODE.SETTINGS)
-      // this.showScreen(SCREEN_MODE.START)
+      this.showScreen(SCREEN_MODE.START)
     }
 
     dispatchAction(resetAll())

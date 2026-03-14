@@ -15,10 +15,13 @@ export class ScreenStart extends Screen {
   }
 
   onUserAction(keyCode: string) {
+    
     if (keyCode === 'Digit1') {
       this.fire(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.FREE_RIDE)
     } else if (keyCode === 'Digit2') {
       this.fire(EVENT_TYPE.SELECT_GAME_MODE, GAME_MODE.COLLECT_IN_TIME)
+    } else if (keyCode === 'Digit0') {
+      this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.SETTINGS)
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
+import { Assets, Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
@@ -16,7 +16,7 @@ export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
 export const screenCloseEvent = 'screenCloseEvent'
 
-export const SCREEN_MODE: Record<string, ScreenMode> = {
+export const SCREEN_MODE = {
   START: 'startScreen',
   PAUSE: 'pauseScreen',
   FAILURE: 'endScreenCrashed',
@@ -59,7 +59,10 @@ export class ScreenFactory extends Container {
     })
   }
 
-  async preloadAssets() {}
+  async preloadAssets() {
+    await Assets.load({ alias: 'switch_off', src: 'switch_off.png' })
+    await Assets.load({ alias: 'switch_on', src: 'switch_on.png' })
+  }
 
   setup(stage: Container) {
     const contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
@@ -72,10 +75,6 @@ export class ScreenFactory extends Container {
     background.rect(0, 0, gameConfig.appWidth, gameConfig.appHeight).fill({
       color: 0x000000,
       alpha: 0.25,
-    })
-    background.roundRect(gameConfig.screenContentPadding, this.contentArea.y, contentWidth, contentHeight, 10).fill({
-      color: 0x000000,
-      alpha: 0.5,
     })
     this.addChild(background)
 
@@ -92,6 +91,10 @@ export class ScreenFactory extends Container {
     }
 
     if (gameConfig.isMobileDevice) {
+      this.contentArea.eventMode = 'static'
+      this.contentArea.on('pointerdown', (e) => {
+        e.stopPropagation()
+      })
       this.eventMode = 'static'
       this.on('pointerdown', () => {
         // fixme: пернести обработчик

@@ -1,4 +1,4 @@
-import { Container, DOMContainer, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
+import { Container, DOMContainer, EventEmitter, Graphics, Text, Ticker, type TextStyleOptions } from 'pixi.js'
 import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
@@ -87,7 +87,9 @@ export abstract class Screen extends EventEmitter {
       if ('clickAction' in textObj) {
         txt.eventMode = 'static'
         txt.cursor = 'pointer'
-        txt.on('pointerdown', this.onUserAction.bind(this, textObj.clickAction!))
+        txt.on('pointerdown', () => {
+          this.onUserAction(textObj.clickAction!)
+        })
       }
 
       txtFields.push(txt)
@@ -112,6 +114,12 @@ export abstract class Screen extends EventEmitter {
     this.blinkText = txtBlink
 
     cont.removeChildren()
+    const backgroundCont = new Graphics()
+    backgroundCont.roundRect(0, 0, this.contentWidth, this.contentHeight, 10).fill({
+      color: 0x000000,
+      alpha: 0.5,
+    })
+    cont.addChild(backgroundCont)
     cont.addChild(...txtFields)
 
     const customContentContainer = this.customContent()
