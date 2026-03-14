@@ -9,12 +9,11 @@ const LANGS = ['ru', 'en']
 
 export class ScreenSettings extends Screen {
   screenId: ScreenMode = 'settingsScreen'
-  cont: Container | null = null
 
   customContent() {
-    this.cont = new Container()
-    this.cont.x = 80
-    this.cont.y = 120
+    const cont = new Container()
+    cont.x = 80
+    cont.y = 120
 
     const select = new RadioGroup({
       items: [
@@ -47,8 +46,8 @@ export class ScreenSettings extends Screen {
       Settings.save(SETTING_NAME.LOCALE, LANGS[selectedId])
       setupLanguageOptions()
     })
-    this.cont.addChild(select)
-    return this.cont
+    cont.addChild(select)
+    return cont
   }
 
   onUserAction(keyCode: string) {
