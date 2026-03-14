@@ -1,4 +1,4 @@
-import { Container, EventEmitter, Text, Ticker, type TextStyleOptions } from 'pixi.js'
+import { Container, DOMContainer, EventEmitter, Graphics, Text, Ticker, type TextStyleOptions } from 'pixi.js'
 import { gameConfig } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { tr } from '../lib/i18n'
@@ -7,16 +7,6 @@ import { applyTemplate, type TemplateData } from '../utils'
 import screenConfig from './screenConfig.json'
 
 export type ScreenMode = keyof typeof screenConfig
-
-export const SCREEN_MODE: Record<string, ScreenMode> = {
-  START: 'startScreen',
-  PAUSE: 'pauseScreen',
-  FAILURE: 'endScreenCrashed',
-  FINISH: 'endScreenTimeIsUp',
-  INPUT_NAME: 'inputNameScreen',
-  TOP_SCORE: 'endScreenTopScore',
-  KEYBOARD: 'keyboardScreen',
-} as const
 
 export const screenSingleEvent = 'screenSingleEvent'
 
@@ -63,8 +53,8 @@ export abstract class Screen extends EventEmitter {
 
     if (!this.ticker.started) this.ticker.start()
 
-    const data: TemplateData = this.setupData()
-    this.setupScreen(cont, data)
+    const data = this.setupData()
+    this.setupScreen(cont, data || {})
     this.onAfterSetup()
 
     setTimeout(() => {
@@ -76,9 +66,9 @@ export abstract class Screen extends EventEmitter {
 
   protected onAfterSetup() {}
 
-  protected setupData(): TemplateData {
-    return {}
-  }
+  protected setupData(): TemplateData | void {}
+
+  protected customContent(): Container | DOMContainer | void {}
 
   protected setupScreen(cont: Container, data: TemplateData = {}) {
     const cfgScreen = screenConfig[this.screenId]
@@ -97,7 +87,9 @@ export abstract class Screen extends EventEmitter {
       if ('clickAction' in textObj) {
         txt.eventMode = 'static'
         txt.cursor = 'pointer'
-        txt.on('pointerdown', this.onUserAction.bind(this, textObj.clickAction!))
+        txt.on('pointerdown', () => {
+          this.onUserAction(textObj.clickAction!)
+        })
       }
 
       txtFields.push(txt)
@@ -122,7 +114,16 @@ export abstract class Screen extends EventEmitter {
     this.blinkText = txtBlink
 
     cont.removeChildren()
+    const backgroundCont = new Graphics()
+    backgroundCont.roundRect(0, 0, this.contentWidth, this.contentHeight, 10).fill({
+      color: 0x000000,
+      alpha: 0.5,
+    })
+    cont.addChild(backgroundCont)
     cont.addChild(...txtFields)
+
+    const customContentContainer = this.customContent()
+    if (customContentContainer) cont.addChild(customContentContainer)
   }
 
   protected tickHandler(time: Ticker) {

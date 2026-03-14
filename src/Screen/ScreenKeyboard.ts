@@ -1,6 +1,7 @@
 import { tr } from '../lib/i18n'
 import { GAME_MODE } from '../types'
-import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
+import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
+import { SCREEN_MODE } from './ScreenFactory'
 
 export class ScreenKeyboard extends Screen {
   screenId: ScreenMode = 'keyboardScreen'

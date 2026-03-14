@@ -48,6 +48,9 @@ const mobileConfig = {
 const commonConfig = {
   appBackground: 0x545457,
   soundMutedByDefault: false,
+
+  playerNameDefault: 'User',
+  playerNameInvalidSymbolsRegExp: /[^-_a-zA-Zа-яА-Я0-9.]/g,
 }
 
 export const gameConfig = Object.assign({}, isMobileDevice ? mobileConfig : desktopConfig, commonConfig, {

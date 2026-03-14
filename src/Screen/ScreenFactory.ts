@@ -1,18 +1,31 @@
-import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
+import { Assets, Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
-import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
+import { EVENT_TYPE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
 import { ScreenFailure } from './ScreenFailure'
 import { ScreenFinish } from './ScreenFinish'
 import { ScreenKeyboard } from './ScreenKeyboard'
+import { ScreenNameInput } from './ScreenNameInput'
 import { ScreenPause } from './ScreenPause'
+import { ScreenSettings } from './ScreenSettings'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
 export const screenCloseEvent = 'screenCloseEvent'
+
+export const SCREEN_MODE = {
+  START: 'startScreen',
+  PAUSE: 'pauseScreen',
+  FAILURE: 'endScreenCrashed',
+  FINISH: 'endScreenTimeIsUp',
+  INPUT_NAME: 'inputNameScreen',
+  TOP_SCORE: 'endScreenTopScore',
+  KEYBOARD: 'keyboardScreen',
+  SETTINGS: 'settingsScreen',
+} as const
 
 export const createScreenInstance = (mode: ScreenMode): Screen => {
   switch (mode) {
@@ -25,9 +38,11 @@ export const createScreenInstance = (mode: ScreenMode): Screen => {
     case SCREEN_MODE.FINISH:
       return new ScreenFinish()
     case SCREEN_MODE.INPUT_NAME:
-      return new ScreenPause()
+      return new ScreenNameInput()
     case SCREEN_MODE.PAUSE:
       return new ScreenPause()
+    case SCREEN_MODE.SETTINGS:
+      return new ScreenSettings()
     case SCREEN_MODE.TOP_SCORE:
     default:
       return new ScreenTopScore()
@@ -44,7 +59,10 @@ export class ScreenFactory extends Container {
     })
   }
 
-  async preloadAssets() {}
+  async preloadAssets() {
+    await Assets.load({ alias: 'switch_off', src: 'switch_off.png' })
+    await Assets.load({ alias: 'switch_on', src: 'switch_on.png' })
+  }
 
   setup(stage: Container) {
     const contentWidth = gameConfig.appWidth - 2 * gameConfig.screenContentPadding
@@ -57,10 +75,6 @@ export class ScreenFactory extends Container {
     background.rect(0, 0, gameConfig.appWidth, gameConfig.appHeight).fill({
       color: 0x000000,
       alpha: 0.25,
-    })
-    background.roundRect(gameConfig.screenContentPadding, this.contentArea.y, contentWidth, contentHeight, 10).fill({
-      color: 0x000000,
-      alpha: 0.5,
     })
     this.addChild(background)
 
@@ -77,6 +91,10 @@ export class ScreenFactory extends Container {
     }
 
     if (gameConfig.isMobileDevice) {
+      this.contentArea.eventMode = 'static'
+      this.contentArea.on('pointerdown', (e) => {
+        e.stopPropagation()
+      })
       this.eventMode = 'static'
       this.on('pointerdown', () => {
         // fixme: пернести обработчик

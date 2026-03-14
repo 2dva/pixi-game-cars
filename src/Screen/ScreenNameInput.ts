@@ -1,0 +1,32 @@
+import { gameConfig } from '../configuration'
+import { SETTING_NAME, Settings } from '../lib/settings'
+import { saveMyScore } from '../lib/topScore'
+import { getScore } from '../state/selectors'
+import { InputName, inputNameEvent } from './InputName/InputName'
+import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
+import { SCREEN_MODE } from './ScreenFactory'
+
+export class ScreenNameInput extends Screen {
+  screenId: ScreenMode = 'inputNameScreen'
+  inputNameContainer: InputName | undefined
+
+  onAfterSetup(): void {
+    const name = Settings.load(SETTING_NAME.PLAYER_NAME) || ''
+    this.inputNameContainer?.activate(name as string)
+  }
+
+  customContent() {
+    const input = new InputName()
+    this.inputNameContainer = input
+    input.x = this.contentWidth / 2 - 30
+    input.y = 180
+    input.on(inputNameEvent, (name: string) => {
+      Settings.save(SETTING_NAME.PLAYER_NAME, name)
+      const score = getScore()
+      saveMyScore(name || gameConfig.playerNameDefault, score)
+      this.inputNameContainer?.destroy()
+      this.fire(EVENT_TYPE.GO_TO_SCREEN, undefined, SCREEN_MODE.TOP_SCORE)
+    })
+    return input
+  }
+}

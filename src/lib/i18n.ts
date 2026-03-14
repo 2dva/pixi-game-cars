@@ -1,11 +1,27 @@
 import { I18n } from 'i18n-js'
+import { SETTING_NAME, Settings } from './settings'
+import { gameConfig } from '../configuration'
 
-const locale = navigator.language.startsWith('en') ? 'en' : 'ru'
-const i18n = new I18n(undefined, { locale })
+const i18n = new I18n(undefined, { locale: 'ru' })
 let keySuffix = ''
 
-export function setMobileVersion(isMobile: boolean) {
-  keySuffix = isMobile ? '_mobile' : ''
+export const setupLanguageOptions = () => {
+  keySuffix = gameConfig.isMobileDevice ? '_mobile' : ''
+
+  // сначала пробуем взять настройку из стораджа
+  let locale = Settings.load(SETTING_NAME.LOCALE) as string
+  if (locale === undefined) {
+    // затем значение по-умолчанию
+    locale = navigator.language.startsWith('en') ? 'en' : 'ru'
+  }
+  if (i18n.locale !== locale) {
+    i18n.locale = locale
+    loadTranslations(locale)
+  }
+}
+
+export const getCurrentLocale = () => {
+  return i18n.locale
 }
 
 export async function loadTranslations(locale: string = i18n.locale) {
