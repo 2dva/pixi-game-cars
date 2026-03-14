@@ -106,5 +106,17 @@
         "y": 100
       }
     ]
+  },
+  "settingsScreen": {
+    "titleText": "Настройки",
+    "blinkText": "blinkText.pressSpaceToContinue",
+    "content": [
+      {
+        "text": "${controls}",
+        "style": "fontScreenMonoSmall",
+        "x": 60,
+        "y": 100
+      }
+    ]
   }
 }

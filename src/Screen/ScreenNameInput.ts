@@ -3,7 +3,8 @@ import { SETTING_NAME, Settings } from '../lib/settings'
 import { saveMyScore } from '../lib/topScore'
 import { getScore } from '../state/selectors'
 import { InputName, inputNameEvent } from './InputName/InputName'
-import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
+import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
+import { SCREEN_MODE } from './ScreenFactory'
 
 export class ScreenNameInput extends Screen {
   screenId: ScreenMode = 'inputNameScreen'

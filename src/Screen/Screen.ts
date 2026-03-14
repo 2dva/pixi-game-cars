@@ -8,16 +8,6 @@ import screenConfig from './screenConfig.json'
 
 export type ScreenMode = keyof typeof screenConfig
 
-export const SCREEN_MODE: Record<string, ScreenMode> = {
-  START: 'startScreen',
-  PAUSE: 'pauseScreen',
-  FAILURE: 'endScreenCrashed',
-  FINISH: 'endScreenTimeIsUp',
-  INPUT_NAME: 'inputNameScreen',
-  TOP_SCORE: 'endScreenTopScore',
-  KEYBOARD: 'keyboardScreen',
-} as const
-
 export const screenSingleEvent = 'screenSingleEvent'
 
 export const EVENT_TYPE = {

@@ -2,7 +2,8 @@ import { isRecordScore } from '../lib/topScore'
 import { getDistance, getScore } from '../state/selectors'
 import { GAME_MODE } from '../types'
 import { formatDistance, type TemplateData } from '../utils'
-import { EVENT_TYPE, Screen, SCREEN_MODE, type ScreenMode } from './Screen'
+import { EVENT_TYPE, Screen, type ScreenMode } from './Screen'
+import { SCREEN_MODE } from './ScreenFactory'
 
 export class ScreenFinish extends Screen {
   screenId: ScreenMode = 'endScreenTimeIsUp'

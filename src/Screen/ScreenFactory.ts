@@ -2,18 +2,30 @@ import { Container, Graphics, Text, type TextStyleOptions } from 'pixi.js'
 import { gameConfig, zIndexFixed } from '../configuration'
 import fontStyles from '../fontStyles.json'
 import { Sound } from '../lib/sound'
-import { EVENT_TYPE, SCREEN_MODE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
+import { EVENT_TYPE, screenSingleEvent, type Screen, type ScreenEvent, type ScreenMode } from './Screen'
 import { ScreenFailure } from './ScreenFailure'
 import { ScreenFinish } from './ScreenFinish'
 import { ScreenKeyboard } from './ScreenKeyboard'
+import { ScreenNameInput } from './ScreenNameInput'
 import { ScreenPause } from './ScreenPause'
+import { ScreenSettings } from './ScreenSettings'
 import { ScreenStart } from './ScreenStart'
 import { ScreenTopScore } from './ScreenTopScore'
-import { ScreenNameInput } from './ScreenNameInput'
 
 export const screenGameModeEvent = 'screenGameModeEvent'
 export const screenShowEvent = 'screenShowEvent'
 export const screenCloseEvent = 'screenCloseEvent'
+
+export const SCREEN_MODE: Record<string, ScreenMode> = {
+  START: 'startScreen',
+  PAUSE: 'pauseScreen',
+  FAILURE: 'endScreenCrashed',
+  FINISH: 'endScreenTimeIsUp',
+  INPUT_NAME: 'inputNameScreen',
+  TOP_SCORE: 'endScreenTopScore',
+  KEYBOARD: 'keyboardScreen',
+  SETTINGS: 'settingsScreen',
+} as const
 
 export const createScreenInstance = (mode: ScreenMode): Screen => {
   switch (mode) {
@@ -29,6 +41,8 @@ export const createScreenInstance = (mode: ScreenMode): Screen => {
       return new ScreenNameInput()
     case SCREEN_MODE.PAUSE:
       return new ScreenPause()
+    case SCREEN_MODE.SETTINGS:
+      return new ScreenSettings()
     case SCREEN_MODE.TOP_SCORE:
     default:
       return new ScreenTopScore()

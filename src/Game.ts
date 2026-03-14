@@ -8,7 +8,8 @@ import { HUD } from './HUD/HUD'
 import { loadTranslations, setMobileVersion } from './lib/i18n'
 import { calculateNextMove } from './lib/physics'
 import { Sound } from './lib/sound'
-import { SCREEN_MODE, type ScreenMode } from './Screen/Screen'
+import { type ScreenMode } from './Screen/Screen'
+import { SCREEN_MODE } from './Screen/ScreenFactory'
 import { screenCloseEvent, ScreenFactory, screenGameModeEvent, screenShowEvent } from './Screen/ScreenFactory'
 import { getDeltaDistance, getHero, getMode, isPaused } from './state/selectors'
 import { resetAll, setGameOver, setHealthAndTime, setMode, setPause, setScore, setSpeed } from './state/slices'
@@ -131,7 +132,8 @@ export class Game {
     const isDemo = mode === GAME_MODE.DEMO
 
     if (isDemo) {
-      this.showScreen(SCREEN_MODE.START)
+      this.showScreen(SCREEN_MODE.SETTINGS)
+      // this.showScreen(SCREEN_MODE.START)
     }
 
     dispatchAction(resetAll())
